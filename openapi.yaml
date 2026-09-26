@@ -398,7 +398,11 @@ components:
       additionalProperties: false
       properties:
         items: { type: array, items: { $ref: '#/components/schemas/Attempt' } }
-        nextCursor: { type: [string, 'null'], description: null en la última página. }
+        nextCursor:
+          type: [string, 'null']
+          description: null en la última página.
+          # Obligatorio aunque sea null: el DTO generado lo serializa siempre (la API omite los demás null).
+          x-field-extra-annotation: '@com.fasterxml.jackson.annotation.JsonInclude(com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS)'
     HandStat:
       type: object
       required: [situation, stack, hand, attempts, correct, lastAnsweredAt]

@@ -37,7 +37,8 @@ class DatabaseRolesIT extends ApiIntegrationTest {
             entry("default_range", READ),
             entry("default_range_hand", READ),
             entry("user_range", READ_WRITE),
-            entry("user_range_hand", READ_WRITE));
+            entry("user_range_hand", READ_WRITE),
+            entry("quiz_attempt", Set.of("SELECT", "INSERT")));
 
     @Autowired
     JdbcClient jdbc;
@@ -81,6 +82,17 @@ class DatabaseRolesIT extends ApiIntegrationTest {
                         () -> jdbc.sql("UPDATE app.situation SET label = 'x'").update())
                 .rootCause()
                 .hasMessageContaining("permission denied for table situation");
+    }
+
+    @Test
+    void quizAttemptsAreImmutableForTheApi() {
+        assertThatThrownBy(() ->
+                        jdbc.sql("UPDATE app.quiz_attempt SET correct = true").update())
+                .rootCause()
+                .hasMessageContaining("permission denied for table quiz_attempt");
+        assertThatThrownBy(() -> jdbc.sql("DELETE FROM app.quiz_attempt").update())
+                .rootCause()
+                .hasMessageContaining("permission denied for table quiz_attempt");
     }
 
     @Test

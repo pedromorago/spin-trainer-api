@@ -1,6 +1,8 @@
 package com.pedromorago.spintrainer.shared.web;
 
 import java.util.List;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
+import org.springframework.boot.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,15 @@ class WebConfig implements WebMvcConfigurer {
                 ApiPaths.BASE,
                 HandlerTypePredicate.forAnnotation(RestController.class)
                         .and(HandlerTypePredicate.forBasePackage("com.pedromorago.spintrainer")));
+    }
+
+    /**
+     * Tomcat rejected an encoded slash ({@code %2F}) itself, with its own HTML error page. Passed through untouched, it
+     * reaches Spring Security's firewall, which rejects it as well, but as a Problem like every other error.
+     */
+    @Bean
+    TomcatConnectorCustomizer encodedSlashesReachTheFirewall() {
+        return connector -> connector.setEncodedSolidusHandling(EncodedSolidusHandling.PASS_THROUGH.getValue());
     }
 
     /** {@code Accept: application/json} is enough to receive the errors too (see {@link JsonAcceptsProblemDetails}). */

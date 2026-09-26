@@ -85,6 +85,12 @@ Every error response is a Problem Details object (RFC 9457, `application/problem
 `urn:spin-trainer:<type>` (`validation`, `unauthorized`, `not-found`, `conflict`, `no-range`, `unsupported`,
 `unavailable`, `internal`),
 `correlationId` (the one from the `X-Correlation-Id` header, which is accepted or generated) and, on 400s, per-field `errors`.
+That includes URLs rejected before any controller (Spring Security's firewall: `;`, encoded slashes). Messages are in
+Spanish, those of the spec's constraints too (`ConstraintMessages`: not Hibernate Validator's, which follow the JVM's
+locale).
+
+Public without a token: `/actuator/health` (and its probes) and `/actuator/info`, which only says the commit the image
+was built from (the deploy waits for it).
 
 ## Contract
 
@@ -99,7 +105,7 @@ An API change starts in the spec; the web app pulls the copy with `npm run spec:
 | GET | `/situations` | Catalog of the 16 situations (ETag) |
 | GET | `/ranges/default`, `/ranges/default/{situation}/{stack}` | Reference ranges (ETag) |
 | GET | `/ranges/user`, `/ranges/user/{situation}/{stack}` | The user's custom ranges |
-| PUT | `/ranges/user/{situation}/{stack}` | Creates (`version: 0` → 201) or replaces version N (200); 409 if it changed |
+| PUT | `/ranges/user/{situation}/{stack}` | Creates (`version: 0` → 201) or replaces version N (200); 409 if it changed. Versions keep counting after a delete |
 | DELETE | `/ranges/user/{situation}/{stack}` | Reverts to the reference range (204, idempotent) |
 | POST | `/quiz/attempts` | Records an answer; the server grades it (201; 422 without a range) |
 | GET | `/quiz/attempts` | Attempts, newest first, with cursor pagination |

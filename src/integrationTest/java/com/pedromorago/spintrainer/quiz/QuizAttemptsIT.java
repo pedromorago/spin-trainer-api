@@ -166,7 +166,11 @@ class QuizAttemptsIT extends ApiIntegrationTest {
                 "{\"situation\":\"btn_open\",\"stack\":\"25\",\"hand\":\"AA\",\"given\":\"FOLD\"}",
                 "{\"situation\":\"btn_open\",\"stack\":25,\"hand\":\"AA\",\"given\":17}",
                 "{\"situation\":\"btn_open\",\"stack\":25,\"hand\":\"AA\",\"given\":null}",
-                "{\"situation\":\"btn_open\",\"stack\":true,\"hand\":\"AA\",\"given\":\"FOLD\"}")) {
+                "{\"situation\":\"btn_open\",\"stack\":true,\"hand\":\"AA\",\"given\":\"FOLD\"}",
+                // A number or a boolean is not a situation, even if its text would fit the pattern (it was a 404).
+                "{\"situation\":5,\"stack\":25,\"hand\":\"AA\",\"given\":\"FOLD\"}",
+                "{\"situation\":true,\"stack\":25,\"hand\":\"AA\",\"given\":\"FOLD\"}",
+                "{\"situation\":\"btn_open\",\"stack\":25,\"hand\":1.5,\"given\":\"FOLD\"}")) {
             MvcTestResult result = record(body);
             assertThat(result).as(body).hasStatus(400);
             CONTRACT.assertResponse("POST", PATH, result);
@@ -234,8 +238,17 @@ class QuizAttemptsIT extends ApiIntegrationTest {
 
     @Test
     void rejectsInvalidPagingParameters() {
-        for (String query :
-                List.of("?limit=0", "?limit=201", "?limit=x", "?cursor=bm9wZQ", "?stack=12.3", "?situation=BTN")) {
+        // The last cursor carries a well-formed position in the year 300000, beyond what Postgres stores (it was a
+        // 500).
+        String yearTooFar = "KzMwMDAwMC0wMS0wMVQwMDowMDowMFp8MDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAw";
+        for (String query : List.of(
+                "?limit=0",
+                "?limit=201",
+                "?limit=x",
+                "?cursor=bm9wZQ",
+                "?stack=12.3",
+                "?situation=BTN",
+                "?cursor=" + yearTooFar)) {
             MvcTestResult result = list(query);
             assertThat(result).as(query).hasStatus(400);
             CONTRACT.assertResponse("GET", PATH, result);

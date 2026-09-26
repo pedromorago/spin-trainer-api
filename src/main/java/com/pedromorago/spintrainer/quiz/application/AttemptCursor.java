@@ -14,6 +14,11 @@ import java.util.UUID;
  */
 final class AttemptCursor {
 
+    // Instant.parse accepts years the database cannot store (up to ±1,000,000,000): a hand-made cursor with one of
+    // them reached the query and ended in a 500. No attempt is answered outside these years.
+    private static final Instant MIN = Instant.parse("0001-01-01T00:00:00Z");
+    private static final Instant MAX = Instant.parse("9999-12-31T23:59:59.999999999Z");
+
     private AttemptCursor() {}
 
     static String encode(QuizAttempt last) {
@@ -27,7 +32,11 @@ final class AttemptCursor {
             if (parts.length != 2) {
                 throw new IllegalArgumentException("format");
             }
-            return new Position(Instant.parse(parts[0]), UUID.fromString(parts[1]));
+            Instant answeredAt = Instant.parse(parts[0]);
+            if (answeredAt.isBefore(MIN) || answeredAt.isAfter(MAX)) {
+                throw new IllegalArgumentException("year out of range");
+            }
+            return new Position(answeredAt, UUID.fromString(parts[1]));
         } catch (RuntimeException e) {
             throw DomainException.validation("cursor", "cursor no válido");
         }

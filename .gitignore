@@ -1,14 +1,14 @@
 # Gradle
 .gradle/
-build/
+/build/
 !gradle/wrapper/gradle-wrapper.jar
 
 # IDE
 .idea/
 *.iml
 .vscode/
-out/
-bin/
+/out/
+/bin/
 
 # SO
 .DS_Store

@@ -1,7 +1,7 @@
 # spin-trainer-api
 
 Spin Trainer API. Rules shared by the three repos, summarized here so this repo is self-contained.
-Project source of truth: `spin-trainer-web/docs/` (context, `ARCHITECTURE.md`, ADRs 0001..0016).
+Project source of truth: `spin-trainer-web/docs/` (context, `ARCHITECTURE.md`, ADRs 0001..0017).
 
 ## Global rules (summary)
 - Portfolio quality > speed. ADRs are closed; they are reopened only for a concrete, justified flaw (new ADR).

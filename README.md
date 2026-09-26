@@ -121,4 +121,4 @@ src/integrationTest/java               full API: Testcontainers, real JWTs, resp
 src/testFixtures/java                  test Postgres and JWT issuer (suites and bootTestRun)
 ```
 
-Architecture, decisions (ADR-0001..0016) and context: `spin-trainer-web/docs/`.
+Architecture, decisions (ADR-0001..0017) and context: `spin-trainer-web/docs/`.

@@ -56,13 +56,37 @@ Todas las respuestas de error son Problem Details (RFC 9457, `application/proble
 (`build/generated/openapi`); los controllers las implementan, así que el código no puede desviarse de la spec.
 Un cambio de API empieza en la spec; la web trae la copia con `npm run spec:sync`.
 
+## Endpoints (`/api/v1`, todos con `Authorization: Bearer <JWT>`)
+
+| Método | Ruta | Qué hace |
+|---|---|---|
+| GET | `/situations` | Catálogo de las 16 situaciones (ETag) |
+| GET | `/ranges/default`, `/ranges/default/{situation}/{stack}` | Rangos de referencia (ETag) |
+| GET | `/ranges/user`, `/ranges/user/{situation}/{stack}` | Rangos personalizados del usuario |
+| PUT | `/ranges/user/{situation}/{stack}` | Crea (`version: 0` → 201) o reemplaza la versión N (200); 409 si cambió |
+| DELETE | `/ranges/user/{situation}/{stack}` | Vuelve al de referencia (204, idempotente) |
+| POST | `/quiz/attempts` | Registra una respuesta; el servidor la corrige (201; 422 sin rango) |
+| GET | `/quiz/attempts` | Intentos, del más reciente al más antiguo, por cursor |
+| GET | `/stats/hands`, `/stats/progress` | Agregados por mano y por día (zona IANA) |
+
+Contrato completo en `openapi.yaml`. Con `bootTestRun`:
+
+```
+curl -H "Authorization: Bearer <token impreso al arrancar>" http://localhost:8080/api/v1/situations
+```
+
 ## Estructura
 
 ```
-openapi.yaml                       contrato (fuente de verdad)
-gradle/libs.versions.toml          versiones
-src/main/java/.../spintrainer/     aplicación
-src/test/java                      tests sin Spring ni Docker
-src/integrationTest/java           tests con Spring (y Testcontainers)
-src/testFixtures/java              Postgres de pruebas y emisor de JWT, compartidos por las suites y bootTestRun
+openapi.yaml                           contrato (fuente de verdad)
+gradle/libs.versions.toml              versiones
+src/main/java/com/pedromorago/spintrainer/
+  situation/ range/ quiz/ stats/       módulos: domain · application (port.in, port.out) · adapter (in.rest, out.persistence)
+  shared/                              kernel · security · web · config
+src/main/resources/db/                 migration/ (Flyway) · bootstrap/ (roles, una vez por entorno)
+src/test/java                          dominio, casos de uso y ArchUnit (sin Spring ni Docker)
+src/integrationTest/java               API completa: Testcontainers, JWT reales, respuestas validadas contra la spec
+src/testFixtures/java                  Postgres de pruebas y emisor de JWT (suites y bootTestRun)
 ```
+
+Arquitectura, decisiones (ADR-0001..0015) y contexto: `spin-trainer-web/docs/`.

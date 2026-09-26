@@ -52,8 +52,8 @@ class JdbcAttemptRepository implements AttemptRepository {
     @Override
     public List<QuizAttempt> findPage(
             UserId user, Optional<SituationKey> situation, Optional<Stack> stack, Optional<Position> after, int limit) {
-        // Condiciones opcionales como fragmentos fijos (nunca texto del usuario; los valores van como parámetros): así
-        // la comparación de fila del cursor usa el índice (user_id, answered_at DESC, id DESC) en todas las páginas.
+        // Optional conditions as fixed fragments (never user text; the values go as parameters): this way the cursor
+        // row comparison uses the index (user_id, answered_at DESC, id DESC) on every page.
         StringBuilder sql = new StringBuilder("""
                 SELECT id, user_id, situation, stack, hand, given, expected, correct, range_source, range_version,
                        answered_at

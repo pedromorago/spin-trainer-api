@@ -3,7 +3,7 @@ package com.pedromorago.spintrainer.shared.kernel;
 import java.util.Objects;
 import java.util.UUID;
 
-/** Usuario autenticado: el {@code sub} del JWT de Supabase. */
+/** Authenticated user: the {@code sub} of the Supabase JWT. */
 public record UserId(UUID value) {
 
     public UserId {

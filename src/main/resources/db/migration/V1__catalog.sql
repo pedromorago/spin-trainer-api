@@ -1,11 +1,11 @@
--- Catálogo: manos del grid 13×13 y las situaciones de Spin & Go (ADR-0011) con sus stacks, acciones y acciones previas.
--- Flyway se ejecuta como spin_migrator, dueño del esquema `app`; la API se conecta como ${app_role} (ADR-0015).
+-- Catalog: the 13×13 grid hands and the Spin & Go situations (ADR-0011) with their stacks, actions and prior actions.
+-- Flyway runs as spin_migrator, owner of the `app` schema; the API connects as ${app_role} (ADR-0015).
 
 REVOKE ALL ON SCHEMA app FROM PUBLIC;
 GRANT USAGE ON SCHEMA app TO ${app_role};
 
--- Las 169 manos canónicas: pareja (AA), alta + baja + s/o (AKs, T9o). Las tablas de manos la referencian,
--- así la base de datos rechaza "AAs", "AK" o "KAs" igual que el dominio.
+-- The 169 canonical hands: pair (AA), high + low + s/o (AKs, T9o). The hand tables reference it,
+-- so the database rejects "AAs", "AK" or "KAs" just like the domain.
 CREATE TABLE app.hand (
     code text PRIMARY KEY
 );
@@ -29,7 +29,7 @@ CREATE TABLE app.situation (
     notes    text
 );
 
--- Lo que hicieron los jugadores anteriores, en orden; vacío si abre el héroe.
+-- What the previous players did, in order; empty if the hero opens.
 CREATE TABLE app.situation_prior_action (
     situation text     NOT NULL REFERENCES app.situation,
     seq       smallint NOT NULL CHECK (seq >= 1),
@@ -38,15 +38,15 @@ CREATE TABLE app.situation_prior_action (
     PRIMARY KEY (situation, seq)
 );
 
--- Stacks efectivos en BB, múltiplos de 0,5 (12.5 existe).
+-- Effective stacks in BB, multiples of 0.5 (12.5 exists).
 CREATE TABLE app.situation_stack (
     situation text         NOT NULL REFERENCES app.situation,
     stack     numeric(4, 1) NOT NULL CHECK (stack BETWEEN 1 AND 100 AND stack * 2 = trunc(stack * 2)),
     PRIMARY KEY (situation, stack)
 );
 
--- Acciones posibles de cada situación, en el orden de la paleta. Las manos de los rangos y los intentos las
--- referencian: una mano no puede tener una acción que no existe en su situación.
+-- Possible actions of each situation, in palette order. The hands of the ranges and the attempts reference them:
+-- a hand cannot have an action that does not exist in its situation.
 CREATE TABLE app.situation_action (
     situation text     NOT NULL REFERENCES app.situation,
     seq       smallint NOT NULL CHECK (seq >= 1),

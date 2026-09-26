@@ -1,6 +1,6 @@
 package com.pedromorago.spintrainer.situation.domain;
 
-/** Posición en la mesa. En heads-up el botón es la SB. */
+/** Position at the table. In heads-up the button is the SB. */
 public enum Position {
     BTN,
     SB,

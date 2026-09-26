@@ -17,8 +17,8 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
- * Resource server sin estado: cada petición trae su JWT de Supabase (ADR-0003). Sin sesiones ni cookies, así que no
- * hay CSRF. Solo la salud de Actuator es pública.
+ * Stateless resource server: each request carries its Supabase JWT (ADR-0003). No sessions or cookies, so there is no
+ * CSRF. Only the Actuator health endpoint is public.
  */
 @Configuration(proxyBeanMethods = false)
 class SecurityConfig {
@@ -27,9 +27,9 @@ class SecurityConfig {
     SecurityFilterChain securityFilterChain(
             HttpSecurity http, @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver)
             throws Exception {
-        // Los errores de autenticación pasan por el mismo @RestControllerAdvice que el resto: un único formato Problem.
-        // También los fallos del propio emisor (JWKS inalcanzable), que Spring relanzaría y acabarían en /error como un
-        // 401 engañoso ("falta el token") cuando el problema es de Supabase o de SUPABASE_URL.
+        // Authentication errors go through the same @RestControllerAdvice as the rest: a single Problem format.
+        // So do failures of the issuer itself (unreachable JWKS), which Spring would rethrow and which would end up in
+        // /error as a misleading 401 ("missing token") when the problem lies with Supabase or SUPABASE_URL.
         AuthenticationEntryPoint problemEntryPoint =
                 (request, response, ex) -> resolver.resolveException(request, response, null, ex);
         AuthenticationFailureHandler problemFailureHandler =

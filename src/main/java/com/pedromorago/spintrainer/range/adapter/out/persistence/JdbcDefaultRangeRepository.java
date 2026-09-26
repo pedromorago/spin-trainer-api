@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-/** Rangos de referencia: solo lectura (los escribe el seed de Flyway; spin_app no tiene permiso de escritura). */
+/** Reference ranges: read-only (written by the Flyway seed; spin_app has no write permission). */
 @Repository
 class JdbcDefaultRangeRepository implements DefaultRangeRepository {
 

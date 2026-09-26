@@ -15,8 +15,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Respuesta a una mano del Quiz: un evento inmutable (ADR-0007). Guarda la acción esperada en ese momento y de qué rango
- * salió, así que las estadísticas siguen siendo válidas aunque el rango cambie después (ADR-0006, ADR-0012).
+ * Answer to a Quiz hand: an immutable event (ADR-0007). It stores the expected action at that moment and which range it
+ * came from, so the statistics remain valid even if the range changes later (ADR-0006, ADR-0012).
  */
 public record QuizAttempt(
         UUID id,
@@ -47,10 +47,10 @@ public record QuizAttempt(
     }
 
     /**
-     * Corrige la respuesta en el servidor: el cliente solo dice qué hizo; la acción esperada sale del rango efectivo
-     * con la misma regla que el feedback local de la web.
+     * Grades the answer on the server: the client only says what it did; the expected action comes from the effective
+     * range with the same rule as the local feedback of the web.
      *
-     * @throws DomainException VALIDATION si la acción no existe en la situación
+     * @throws DomainException VALIDATION if the action does not exist in the situation
      */
     public static QuizAttempt grade(
             UUID id, UserId user, Situation situation, Stack stack, Hand hand, Action given, Range range, Instant at) {

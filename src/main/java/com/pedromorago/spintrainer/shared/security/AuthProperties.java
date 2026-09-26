@@ -9,8 +9,8 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Emisor de los JWT (Supabase Auth). En Supabase: {@code issuer = <SUPABASE_URL>/auth/v1}; el JWKS se deriva del emisor
- * si no se indica.
+ * Issuer of the JWTs (Supabase Auth). In Supabase: {@code issuer = <SUPABASE_URL>/auth/v1}; the JWKS is derived from
+ * the issuer if not specified.
  */
 @Validated
 @ConfigurationProperties("spin-trainer.auth")

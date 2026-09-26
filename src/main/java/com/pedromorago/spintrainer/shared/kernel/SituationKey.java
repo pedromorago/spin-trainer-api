@@ -2,7 +2,7 @@ package com.pedromorago.spintrainer.shared.kernel;
 
 import java.util.regex.Pattern;
 
-/** Clave de una situación del catálogo ({@code btn_open}, {@code hu_bb_vs_os}...). */
+/** Key of a catalog situation ({@code btn_open}, {@code hu_bb_vs_os}...). */
 public record SituationKey(String value) {
 
     private static final Pattern FORMAT = Pattern.compile("[a-z0-9_]{1,64}");

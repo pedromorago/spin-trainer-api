@@ -2,7 +2,7 @@ package com.pedromorago.spintrainer.stats.domain;
 
 import java.time.LocalDate;
 
-/** Intentos y aciertos de un día (en la zona horaria pedida). Solo existen días con actividad. */
+/** Attempts and correct answers of a day (in the requested time zone). Only days with activity exist. */
 public record ProgressDay(LocalDate date, int attempts, int correct) {
 
     public ProgressDay {

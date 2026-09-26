@@ -11,16 +11,16 @@ import java.util.UUID;
 
 public interface AttemptRepository {
 
-    /** Solo inserta: los intentos no se modifican ni se borran (el rol de la API no tiene permiso para ello). */
+    /** Insert only: attempts are never modified or deleted (the API role has no permission to do so). */
     void insert(QuizAttempt attempt);
 
     /**
-     * Hasta {@code limit} intentos del usuario anteriores a {@code after} (si hay), ordenados por
-     * ({@code answeredAt}, {@code id}) descendente: paginación por clave, estable aunque lleguen intentos nuevos.
+     * Up to {@code limit} attempts of the user before {@code after} (if any), ordered by ({@code answeredAt},
+     * {@code id}) descending: keyset pagination, stable even if new attempts arrive.
      */
     List<QuizAttempt> findPage(
             UserId user, Optional<SituationKey> situation, Optional<Stack> stack, Optional<Position> after, int limit);
 
-    /** Posición de un intento en el orden de la paginación. */
+    /** Position of an attempt in the pagination order. */
     record Position(Instant answeredAt, UUID id) {}
 }

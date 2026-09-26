@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration(proxyBeanMethods = false)
 class WebConfig implements WebMvcConfigurer {
 
-    /** Los controllers de la API (no Actuator) cuelgan de /api/v1, como dice {@code servers} en la spec. */
+    /** The API controllers (not Actuator) are mounted under /api/v1, as {@code servers} in the spec says. */
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.addPathPrefix(
@@ -23,15 +23,15 @@ class WebConfig implements WebMvcConfigurer {
                         .and(HandlerTypePredicate.forBasePackage("com.pedromorago.spintrainer")));
     }
 
-    /** {@code Accept: application/json} basta para recibir también los errores (ver {@link JsonAcceptsProblemDetails}). */
+    /** {@code Accept: application/json} is enough to receive the errors too (see {@link JsonAcceptsProblemDetails}). */
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer.strategies(List.of(new JsonAcceptsProblemDetails()));
     }
 
     /**
-     * {@code ETag} (hash del cuerpo) y {@code 304} con {@code If-None-Match} en lo que solo cambia con una migración:
-     * catálogo y rangos de referencia. Va detrás de Spring Security: solo se calcula para peticiones autenticadas.
+     * {@code ETag} (hash of the body) and {@code 304} with {@code If-None-Match} on what only changes with a migration:
+     * catalog and reference ranges. It runs after Spring Security: it is only computed for authenticated requests.
      */
     @Bean
     FilterRegistrationBean<ShallowEtagHeaderFilter> etagFilter() {

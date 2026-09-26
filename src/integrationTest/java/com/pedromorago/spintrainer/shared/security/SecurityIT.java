@@ -15,7 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-/** Toda ruta de la API exige un JWT de sesión válido; los rechazos son Problem Details con correlationId. */
+/** Every API route requires a valid session JWT; the rejections are Problem Details with correlationId. */
 class SecurityIT extends ApiIntegrationTest {
 
     static final UUID USER = UUID.randomUUID();
@@ -71,7 +71,7 @@ class SecurityIT extends ApiIntegrationTest {
 
     @Test
     void validTokenReachesTheApi() {
-        // Ruta inexistente: si responde 404 (y no 401) es que la autenticación pasó.
+        // Nonexistent route: if it responds 404 (and not 401), authentication passed.
         MvcTestResult result = mvc.get()
                 .uri("/api/v1/does-not-exist")
                 .header(HttpHeaders.AUTHORIZATION, bearer(USER))

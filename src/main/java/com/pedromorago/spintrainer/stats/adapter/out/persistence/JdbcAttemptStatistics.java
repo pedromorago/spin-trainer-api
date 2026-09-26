@@ -16,8 +16,8 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 /**
- * Lee {@code app.quiz_attempt} (tabla del módulo quiz) solo con SQL de agregación: stats es el lado de lectura de quiz
- * y no depende de sus clases (ArchUnit).
+ * Reads {@code app.quiz_attempt} (table of the quiz module) only with aggregation SQL: stats is the read side of quiz
+ * and does not depend on its classes (ArchUnit).
  */
 @Repository
 class JdbcAttemptStatistics implements AttemptStatistics {
@@ -30,7 +30,7 @@ class JdbcAttemptStatistics implements AttemptStatistics {
 
     @Override
     public List<HandStat> byHand(UserId user, Optional<SituationKey> situation, Optional<Stack> stack) {
-        // Filtros opcionales como fragmentos fijos; los valores van como parámetros.
+        // Optional filters as fixed fragments; the values go as parameters.
         StringBuilder sql = new StringBuilder("""
                 SELECT a.situation, a.stack, a.hand,
                        count(*) AS attempts,
@@ -62,8 +62,8 @@ class JdbcAttemptStatistics implements AttemptStatistics {
 
     @Override
     public List<ProgressDay> byDay(UserId user, DayWindow window) {
-        // Los límites de cada día los calcula java.time (cambios de hora incluidos) y viajan como instantes: Postgres
-        // agrupa sin interpretar nombres de zona (con AT TIME ZONE, "CET" sería un desfase fijo y no la zona europea).
+        // Each day's boundaries come from java.time (DST changes included) and travel as instants: Postgres groups
+        // without interpreting zone names (with AT TIME ZONE, "CET" would be a fixed offset, not the European zone).
         List<DayWindow.Day> days = window.days();
         return jdbc.sql("""
                         SELECT d.day, count(*) AS attempts, count(*) FILTER (WHERE a.correct) AS correct

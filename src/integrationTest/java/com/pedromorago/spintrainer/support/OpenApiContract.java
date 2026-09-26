@@ -23,9 +23,9 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.dataformat.yaml.YAMLMapper;
 
 /**
- * Valida respuestas reales contra {@code openapi.yaml}: el estado tiene que estar declarado para esa operación y el
- * cuerpo tiene que cumplir su schema (JSON Schema 2020-12, como OpenAPI 3.1). La API comprueba en su propio CI que
- * cumple el contrato que publica; spin-trainer-qa lo vuelve a hacer contra la API desplegada (ADR-0008).
+ * Validates real responses against {@code openapi.yaml}: the status has to be declared for that operation and the body
+ * has to comply with its schema (JSON Schema 2020-12, like OpenAPI 3.1). The API checks in its own CI that it complies
+ * with the contract it publishes; spin-trainer-qa does it again against the deployed API (ADR-0008).
  */
 public final class OpenApiContract {
 
@@ -36,7 +36,7 @@ public final class OpenApiContract {
 
     private OpenApiContract(String specText) {
         spec = YAMLMapper.builder().build().readTree(specText);
-        // En 2020-12 "format" es solo una anotación: se activa como aserción (uuid, date, date-time, uri-reference).
+        // In 2020-12 "format" is only an annotation: enabled as an assertion (uuid, date, date-time, uri-reference).
         registry = SchemaRegistry.withDefaultDialect(
                 SpecificationVersion.DRAFT_2020_12,
                 builder -> builder.schemas(Map.of(SPEC_IRI, specText))
@@ -55,9 +55,9 @@ public final class OpenApiContract {
     }
 
     /**
-     * La respuesta está declarada en la spec y su cuerpo cumple el schema.
+     * The response is declared in the spec and its body complies with the schema.
      *
-     * @param path plantilla de la spec, p. ej. {@code /ranges/user/{situation}/{stack}}
+     * @param path spec template, e.g. {@code /ranges/user/{situation}/{stack}}
      */
     public void assertResponse(String method, String path, MvcTestResult result) {
         int status = result.getResponse().getStatus();
@@ -67,7 +67,7 @@ public final class OpenApiContract {
                 .isEmpty();
     }
 
-    /** Incumplimientos del contrato de una respuesta (estado, tipo de contenido y cuerpo); vacío si la cumple. */
+    /** Contract violations of a response (status, content type and body); empty if it complies. */
     public List<String> violations(String method, String path, int status, @Nullable String contentType, String body) {
         String responsePointer = "/paths/" + escape(path) + "/" + method.toLowerCase() + "/responses/" + status;
         JsonNode response = spec.at(responsePointer);

@@ -18,7 +18,7 @@ java {
 
 repositories { mavenCentral() }
 
-// OpenAPI-first (ADR-0004): las interfaces *Api y los DTOs se generan desde openapi.yaml en cada build.
+// OpenAPI-first (ADR-0004): the *Api interfaces and the DTOs are generated from openapi.yaml on every build.
 val generatedOpenApi = layout.buildDirectory.dir("generated/openapi")
 
 openApiGenerate {
@@ -35,7 +35,7 @@ openApiGenerate {
     configOptions.putAll(
         mapOf(
             "interfaceOnly" to "true",
-            // Sin implementación por defecto: un controller que no implemente una operación no compila.
+            // No default implementation: a controller that does not implement an operation does not compile.
             "skipDefaultInterface" to "true",
             "useTags" to "true",
             "useSpringBoot4" to "true",
@@ -79,7 +79,7 @@ dependencies {
     testFixturesRuntimeOnly(libs.postgresql)
 }
 
-// Dos suites: `test` (dominio, casos de uso, arquitectura; sin Docker) e `integrationTest` (Spring + Testcontainers).
+// Two suites: `test` (domain, use cases, architecture; no Docker) and `integrationTest` (Spring + Testcontainers).
 testing {
     suites {
         named<JvmTestSuite>("test") { useJUnitJupiter() }
@@ -109,7 +109,7 @@ tasks.withType<Test>().configureEach {
 
 tasks.check { dependsOn(testing.suites.named("integrationTest"), tasks.jacocoTestCoverageVerification) }
 
-// Cobertura de las dos suites; el código generado desde la spec no cuenta.
+// Coverage of both suites; the code generated from the spec does not count.
 val coveredClasses =
     sourceSets.main.map { main ->
         main.output.classesDirs.asFileTree.matching {
@@ -127,7 +127,7 @@ tasks.jacocoTestReport {
     }
 }
 
-// Mismo listón que la web (90 % en el dominio): dominio, kernel y casos de uso; 85 % en el conjunto.
+// Same bar as the web (90 % in the domain): domain, kernel and use cases; 85 % overall.
 tasks.jacocoTestCoverageVerification {
     dependsOn(tasks.jacocoTestReport)
     executionData.setFrom(fileTree(layout.buildDirectory.dir("jacoco")).include("*.exec"))

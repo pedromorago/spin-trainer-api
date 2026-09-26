@@ -1,18 +1,18 @@
--- Rangos de referencia de Tablasmentov3.pdf (ADR-0006): las 73 tablas de las 16 situaciones, versión 1. Mismo
--- contenido que reference-ranges.json (lo comprueba ReferenceSeedIT). Una fila por mano con acción explícita; el resto
--- tiene la implícita de la situación (FOLD, o CHECK si FOLD no es posible).
+-- Reference ranges from Tablasmentov3.pdf (ADR-0006): the 73 tables of the 16 situations, version 1. Same
+-- content as reference-ranges.json (checked by ReferenceSeedIT). One row per hand with an explicit action; the rest
+-- have the implicit action of the situation (FOLD, or CHECK if FOLD is not possible).
 
--- El PDF corrige el catálogo de V2, que se escribió antes de tenerlo:
--- sb_open: la leyenda trae L/F (limp/fold, solo vs fish pasivo) y no L/C/C.
+-- The PDF corrects the V2 catalog, which was written before having it:
+-- sb_open: the legend has L/F (limp/fold, only vs passive fish) and not L/C/C.
 DELETE FROM app.situation_action WHERE situation = 'sb_open' AND action = 'L_C_C';
 UPDATE app.situation_action SET seq = 5 WHERE situation = 'sb_open' AND action = 'L_C_F';
 INSERT INTO app.situation_action (situation, seq, action) VALUES ('sb_open', 6, 'L_F');
 
--- hu_sb_open: la leyenda trae open-shove (OS).
+-- hu_sb_open: the legend has open-shove (OS).
 UPDATE app.situation_action SET seq = 10 WHERE situation = 'hu_sb_open' AND action = 'FOLD';
 INSERT INTO app.situation_action (situation, seq, action) VALUES ('hu_sb_open', 9, 'ALLIN');
 
--- btn_open: la nota de la tabla de 25 BB.
+-- btn_open: the note of the 25 BB table.
 UPDATE app.situation SET notes = 'A 25 BB, contra un 3bet a 3 BB el amarillo (MR/F/F) es call.' WHERE key = 'btn_open';
 
 WITH pdf (situation, stack, hands) AS (VALUES

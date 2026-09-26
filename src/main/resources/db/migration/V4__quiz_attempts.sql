@@ -1,5 +1,5 @@
--- Intentos del Quiz: eventos inmutables (ADR-0007). El servidor los corrige y guarda la acción esperada, el rango
--- y su versión de ese momento (ADR-0013); las estadísticas son consultas sobre esta tabla.
+-- Quiz attempts: immutable events (ADR-0007). The server grades them and stores the expected action, the range
+-- and its version at that moment (ADR-0013); the statistics are queries over this table.
 
 CREATE TABLE app.quiz_attempt (
     id            uuid          PRIMARY KEY,
@@ -19,9 +19,9 @@ CREATE TABLE app.quiz_attempt (
     FOREIGN KEY (situation, expected) REFERENCES app.situation_action (situation, action)
 );
 
--- Paginación por clave del más reciente al más antiguo, y agregados por mano.
+-- Keyset pagination from most recent to oldest, and per-hand aggregates.
 CREATE INDEX quiz_attempt_recent ON app.quiz_attempt (user_id, answered_at DESC, id DESC);
 CREATE INDEX quiz_attempt_by_hand ON app.quiz_attempt (user_id, situation, stack, hand);
 
--- Inmutables por permisos, no solo por código: la API inserta y lee; no puede modificar ni borrar.
+-- Immutable through permissions, not just through code: the API inserts and reads; it cannot update or delete.
 GRANT SELECT, INSERT ON app.quiz_attempt TO ${app_role};

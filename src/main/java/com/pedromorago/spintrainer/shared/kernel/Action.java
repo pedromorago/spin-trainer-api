@@ -6,8 +6,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Acción compuesta de una mano (una por mano y situación/stack). {@link #code()} es el valor del contrato ({@code 3BET});
- * el nombre Java no puede empezar por un dígito ({@code THREE_BET}).
+ * Compound action of a hand (one per hand and situation/stack). {@link #code()} is the contract value ({@code 3BET});
+ * the Java name cannot start with a digit ({@code THREE_BET}).
  */
 public enum Action {
     MR_4B_C("MR_4B_C"),

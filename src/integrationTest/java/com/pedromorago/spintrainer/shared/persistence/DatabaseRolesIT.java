@@ -18,15 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 /**
- * Mínimos privilegios (ADR-0015): la API se conecta como spin_app y solo tiene los permisos que declaran las
- * migraciones. Si una migración añade una tabla sin decidir sus permisos, este test falla.
+ * Least privilege (ADR-0015): the API connects as spin_app and only has the permissions that the migrations declare. If
+ * a migration adds a table without deciding its permissions, this test fails.
  */
 class DatabaseRolesIT extends ApiIntegrationTest {
 
     static final Set<String> READ = Set.of("SELECT");
     static final Set<String> READ_WRITE = Set.of("SELECT", "INSERT", "UPDATE", "DELETE");
 
-    /** Permisos esperados de spin_app en cada tabla del esquema app. */
+    /** Expected permissions of spin_app on each table of the app schema. */
     static final Map<String, Set<String>> EXPECTED = Map.ofEntries(
             entry("flyway_schema_history", Set.of()),
             entry("hand", READ),
@@ -50,7 +50,7 @@ class DatabaseRolesIT extends ApiIntegrationTest {
 
     @Test
     void theRuntimeRoleHasExactlyTheDeclaredPrivileges() throws SQLException {
-        // Como administrador: information_schema solo le enseña a spin_app las tablas en las que ya tiene permisos.
+        // As administrator: information_schema only shows spin_app the tables on which it already has permissions.
         Map<String, Set<String>> actual = new TreeMap<>();
         try (Connection admin = DB.adminConnection();
                 PreparedStatement query = admin.prepareStatement("""

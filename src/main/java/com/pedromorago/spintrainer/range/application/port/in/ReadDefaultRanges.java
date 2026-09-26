@@ -5,12 +5,15 @@ import com.pedromorago.spintrainer.shared.kernel.SituationKey;
 import com.pedromorago.spintrainer.shared.kernel.Stack;
 import java.util.List;
 
-/** Rangos de referencia (seed del PDF, ADR-0006). */
+/** Reference ranges (seed from the PDF, ADR-0006). */
 public interface ReadDefaultRanges {
 
-    /** Todos los cargados, en orden de catálogo y de mayor a menor stack. */
+    /** All the loaded ones, in catalog order and from largest to smallest stack. */
     List<Range> all();
 
-    /** @throws com.pedromorago.spintrainer.shared.kernel.DomainException NOT_FOUND si la combinación no existe o no tiene seed */
+    /**
+     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException NOT_FOUND if the combination does not exist or
+     *     has no seed
+     */
     Range get(SituationKey situation, Stack stack);
 }

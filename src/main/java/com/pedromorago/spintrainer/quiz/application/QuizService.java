@@ -67,7 +67,7 @@ class QuizService implements RecordAttempt, ListAttempts {
         if (limit < 1 || limit > MAX_LIMIT) {
             throw DomainException.validation("limit", "limit debe estar entre 1 y " + MAX_LIMIT);
         }
-        // Se pide uno más para saber si hay página siguiente sin contar todas las filas.
+        // One extra row is requested to know whether there is a next page without counting all the rows.
         List<QuizAttempt> rows =
                 attempts.findPage(user, situation, stack, cursor.map(AttemptCursor::decode), limit + 1);
         if (rows.size() <= limit) {

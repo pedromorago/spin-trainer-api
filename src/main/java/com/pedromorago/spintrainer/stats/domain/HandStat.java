@@ -5,7 +5,7 @@ import com.pedromorago.spintrainer.shared.kernel.SituationKey;
 import com.pedromorago.spintrainer.shared.kernel.Stack;
 import java.time.Instant;
 
-/** Intentos y aciertos de una mano en una situación y stack. La política de estudio la aplica el cliente (ADR-0013). */
+/** Attempts and correct answers of a hand in a situation and stack. The client applies the study policy (ADR-0013). */
 public record HandStat(
         SituationKey situation, Stack stack, Hand hand, int attempts, int correct, Instant lastAnsweredAt) {
 

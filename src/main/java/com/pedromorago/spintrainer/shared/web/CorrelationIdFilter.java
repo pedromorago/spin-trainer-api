@@ -11,7 +11,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/** Primer filtro de la cadena (antes que Spring Security): también los 401 llevan correlation id. */
+/** First filter of the chain (before Spring Security): 401s also carry a correlation id. */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class CorrelationIdFilter extends OncePerRequestFilter {
@@ -26,7 +26,7 @@ class CorrelationIdFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        // En un redespacho a /error se reutiliza el de la petición original.
+        // On a redispatch to /error, the one of the original request is reused.
         String id = request.getAttribute(ATTRIBUTE) instanceof String original
                 ? original
                 : CorrelationId.accept(request.getHeader(CorrelationId.HEADER));

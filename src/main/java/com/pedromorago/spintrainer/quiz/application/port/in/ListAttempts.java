@@ -10,10 +10,10 @@ import java.util.Optional;
 public interface ListAttempts {
 
     /**
-     * Intentos del usuario, del más reciente al más antiguo, en páginas de {@code limit}.
+     * The user's attempts, from most recent to oldest, in pages of {@code limit}.
      *
-     * @param cursor el {@code nextCursor} de la página anterior (opaco); vacío para la primera
-     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException VALIDATION si el cursor o el límite no son válidos
+     * @param cursor the {@code nextCursor} of the previous page (opaque); empty for the first one
+     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException VALIDATION if the cursor or limit is invalid
      */
     Page list(UserId user, Optional<SituationKey> situation, Optional<Stack> stack, int limit, Optional<String> cursor);
 

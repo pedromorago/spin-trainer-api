@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-/** Las filas agregadas no pueden tener recuentos imposibles (una consulta mal escrita fallaría aquí, no en la web). */
+/** Aggregated rows cannot have impossible counts (a badly written query would fail here, not in the web). */
 class StatRowsTest {
 
     static final Instant AT = Instant.parse("2026-09-26T10:00:00Z");

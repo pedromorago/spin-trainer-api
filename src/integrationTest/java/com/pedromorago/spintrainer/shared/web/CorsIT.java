@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-/** El navegador solo puede llamar desde los orígenes configurados; las preflight no llevan token. */
+/** The browser can only call from the configured origins; preflight requests do not carry a token. */
 class CorsIT extends ApiIntegrationTest {
 
     @Test

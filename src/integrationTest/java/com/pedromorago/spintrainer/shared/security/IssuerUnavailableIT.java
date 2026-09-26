@@ -11,8 +11,8 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
 /**
- * Si el JWKS de Supabase no responde (caída o SUPABASE_URL mal configurada), el cliente recibe un 503 que lo dice, no
- * un 401 "falta el token" que la web interpretaría como sesión cerrada.
+ * If the Supabase JWKS does not respond (outage or SUPABASE_URL misconfigured), the client gets a 503 that says so, not
+ * a "missing token" 401 that the web would interpret as a signed-out session.
  */
 @TestPropertySource(properties = "spin-trainer.auth.jwk-set-uri=http://127.0.0.1:1/auth/v1/.well-known/jwks.json")
 class IssuerUnavailableIT extends ApiIntegrationTest {

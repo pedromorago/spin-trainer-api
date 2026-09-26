@@ -8,23 +8,26 @@ import com.pedromorago.spintrainer.shared.kernel.UserId;
 import java.util.List;
 import java.util.Map;
 
-/** Rangos personalizados: solo los escribe el Explorer (ADR-0012), con concurrencia optimista (ADR-0013). */
+/** Custom ranges: only the Explorer writes them (ADR-0012), with optimistic concurrency (ADR-0013). */
 public interface ManageUserRanges {
 
     List<Range> all(UserId user);
 
-    /** @throws com.pedromorago.spintrainer.shared.kernel.DomainException NOT_FOUND si la combinación no existe o no hay rango */
+    /**
+     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException NOT_FOUND if the combination does not exist or
+     *     there is no range
+     */
     Range get(UserId user, SituationKey situation, Stack stack);
 
     /**
-     * Crea ({@code version} 0) o reemplaza la versión {@code version}. Las manos con la acción implícita se descartan.
+     * Creates ({@code version} 0) or replaces version {@code version}. Hands with the implicit action are discarded.
      *
-     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException VALIDATION, NOT_FOUND o CONFLICT (la versión no
-     *     es la actual: otra pestaña o dispositivo lo cambió)
+     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException VALIDATION, NOT_FOUND or CONFLICT (the version
+     *     is not the current one: another tab or device changed it)
      */
     SavedRange save(UserId user, SituationKey situation, Stack stack, Map<String, Action> hands, int version);
 
-    /** Idempotente: vuelve a aplicar el de referencia. */
+    /** Idempotent: the reference range applies again. */
     void delete(UserId user, SituationKey situation, Stack stack);
 
     record SavedRange(Range range, boolean created) {}

@@ -3,8 +3,8 @@ package com.pedromorago.spintrainer.shared.kernel;
 import java.math.BigDecimal;
 
 /**
- * Stack efectivo en BB: de 1 a 100 en múltiplos de 0,5 (12.5 existe). Se guarda en medias ciegas para que
- * {@code 25}, {@code 25.0} y {@code 25.00} sean el mismo stack.
+ * Effective stack in BB: from 1 to 100 in multiples of 0.5 (12.5 exists). Stored in half blinds so that {@code 25},
+ * {@code 25.0} and {@code 25.00} are the same stack.
  */
 public record Stack(int halfBigBlinds) implements Comparable<Stack> {
 
@@ -34,7 +34,7 @@ public record Stack(int halfBigBlinds) implements Comparable<Stack> {
         return of(BigDecimal.valueOf(bigBlinds));
     }
 
-    /** Forma canónica: {@code 25}, {@code 12.5} (sin ceros finales ni notación científica). */
+    /** Canonical form: {@code 25}, {@code 12.5} (no trailing zeros or scientific notation). */
     public BigDecimal bigBlinds() {
         return BigDecimal.valueOf(halfBigBlinds).divide(TWO);
     }

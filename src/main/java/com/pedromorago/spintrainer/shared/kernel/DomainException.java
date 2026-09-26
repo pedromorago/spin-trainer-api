@@ -3,8 +3,8 @@ package com.pedromorago.spintrainer.shared.kernel;
 import java.util.List;
 
 /**
- * Error de negocio. Los módulos lo lanzan con un tipo y la capa web lo traduce a Problem Details (RFC 9457); el
- * dominio no sabe nada de HTTP.
+ * Business error. The modules throw it with a type and the web layer translates it into Problem Details (RFC 9457); the
+ * domain knows nothing about HTTP.
  */
 public final class DomainException extends RuntimeException {
 
@@ -15,7 +15,7 @@ public final class DomainException extends RuntimeException {
         NO_RANGE
     }
 
-    /** Detalle por campo de un error de validación ({@code hands.AAs}, {@code version}...). */
+    /** Per-field detail of a validation error ({@code hands.AAs}, {@code version}...). */
     public record FieldError(String field, String message) {}
 
     private final Kind kind;

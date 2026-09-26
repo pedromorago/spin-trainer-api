@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
- * El catálogo solo cambia con una migración de seed (y una migración implica un despliegue), así que se lee una vez
- * y se sirve desde memoria: cada intento del Quiz lo consulta.
+ * The catalog only changes with a seed migration (and a migration implies a deployment), so it is read once and served
+ * from memory: every Quiz attempt queries it.
  */
 @Service
 class SituationCatalogService implements SituationCatalog {

@@ -16,13 +16,13 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 /**
- * Rangos personalizados. La versión se comprueba en la propia sentencia ({@code UPDATE ... WHERE version = ?}), así
- * que dos escrituras concurrentes sobre la misma versión no pueden ganar las dos.
+ * Custom ranges. The version is checked in the statement itself ({@code UPDATE ... WHERE version = ?}), so two
+ * concurrent writes on the same version cannot both win.
  */
 @Repository
 class JdbcUserRangeRepository implements UserRangeRepository {
 
-    // Versión y manos en una sola sentencia (misma instantánea): ver RangeRows.
+    // Version and hands in a single statement (same snapshot): see RangeRows.
     private static final String SELECT = """
             SELECT r.situation, r.stack, r.version, r.updated_at, h.hand, h.action
             FROM app.user_range r
@@ -110,7 +110,7 @@ class JdbcUserRangeRepository implements UserRangeRepository {
                 .update();
     }
 
-    /** Todas las manos en una sentencia (unnest de dos arrays paralelos). */
+    /** All the hands in one statement (unnest of two parallel arrays). */
     private void insertHands(UserId user, Range range) {
         if (range.hands().isEmpty()) {
             return;

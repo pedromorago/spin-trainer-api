@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class ActionTest {
 
-    /** El enum del dominio y el generado desde la spec tienen los mismos códigos: si la spec cambia, esto falla. */
+    /** The domain enum and the one generated from the spec have the same codes: if the spec changes, this fails. */
     @Test
     void matchesTheContract() {
         assertThat(Arrays.stream(Action.values()).map(Action::code))

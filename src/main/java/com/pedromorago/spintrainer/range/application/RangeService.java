@@ -75,10 +75,10 @@ class RangeService implements ReadDefaultRanges, ManageUserRanges, ResolveEffect
         }
         Map<Hand, Action> normalized = RangeRules.normalize(hands, spot);
         if (version == Integer.MAX_VALUE) {
-            // No puede ser la versión actual de nada que se pueda reemplazar (y version + 1 desbordaría).
+            // It cannot be the current version of anything that can be replaced (and version + 1 would overflow).
             throw conflict(user, situation, stack);
         }
-        // Milisegundos, como el navegador: lo que devuelve el PUT es exactamente lo que devolverá un GET posterior.
+        // Milliseconds, like the browser: what the PUT returns is exactly what a later GET will return.
         Instant now = clock.instant().truncatedTo(ChronoUnit.MILLIS);
         Range next = new Range(situation, stack, normalized, RangeSource.USER, version + 1, Optional.of(now));
         boolean saved = version == 0 ? userRanges.insert(user, next) : userRanges.replace(user, next, version);

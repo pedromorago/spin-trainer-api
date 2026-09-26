@@ -11,8 +11,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 /**
- * Base de los tests de integración: la aplicación completa con MockMvc sobre Postgres real (Testcontainers, migrado
- * por Flyway con los roles de producción) y JWT reales validados contra el JWKS de {@link TestJwtIssuer}.
+ * Base of the integration tests: the full application with MockMvc over a real Postgres (Testcontainers, migrated by
+ * Flyway with the production roles) and real JWTs validated against the JWKS of {@link TestJwtIssuer}.
  */
 @SpringBootTest
 @AutoConfigureMockMvc

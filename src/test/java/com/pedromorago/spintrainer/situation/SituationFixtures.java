@@ -10,7 +10,7 @@ import com.pedromorago.spintrainer.situation.domain.Situation;
 import java.util.List;
 import java.util.Optional;
 
-/** Situaciones del catálogo real para los tests unitarios. */
+/** Situations of the real catalog for the unit tests. */
 public final class SituationFixtures {
 
     private SituationFixtures() {}
@@ -35,7 +35,7 @@ public final class SituationFixtures {
                 Optional.empty());
     }
 
-    /** La BB ante un limp no puede foldear: la acción implícita es CHECK. */
+    /** The BB facing a limp cannot fold: the implicit action is CHECK. */
     public static Situation bbVsSbLimp() {
         return new Situation(
                 SituationKey.of("bb_vs_sb_limp"),

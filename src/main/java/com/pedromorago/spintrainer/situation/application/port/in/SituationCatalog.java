@@ -5,16 +5,17 @@ import com.pedromorago.spintrainer.shared.kernel.Stack;
 import com.pedromorago.spintrainer.situation.domain.Situation;
 import java.util.List;
 
-/** Catálogo de situaciones. Lo usan la API REST y los módulos range y quiz para validar la combinación. */
+/** Situation catalog. Used by the REST API and by the range and quiz modules to validate the combination. */
 public interface SituationCatalog {
 
-    /** Todas, en orden de presentación. */
+    /** All of them, in presentation order. */
     List<Situation> all();
 
     /**
-     * La situación de una combinación (situación, stack) existente.
+     * The situation of an existing (situation, stack) combination.
      *
-     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException NOT_FOUND si la situación o el stack no existen
+     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException NOT_FOUND if the situation or the stack does
+     *     not exist
      */
     Situation spot(SituationKey key, Stack stack);
 }

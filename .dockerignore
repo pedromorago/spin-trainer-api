@@ -1,4 +1,4 @@
-# Solo lo que necesita la imagen: el wrapper, la configuración de Gradle, la spec y src/main.
+# Only what the image needs: the wrapper, the Gradle configuration, the spec and src/main.
 *
 !gradlew
 !gradle/

@@ -1,5 +1,5 @@
--- Seed del catálogo: las 16 situaciones del PDF de referencia (12 de 3-max y 4 de HU), en orden de presentación.
--- hero y las acciones previas se leen de las etiquetas del PDF (ADR-0013): pendientes de validar con Pedro.
+-- Catalog seed: the 16 situations of the reference PDF (12 3-max and 4 HU), in presentation order.
+-- hero and the prior actions are read from the PDF labels (ADR-0013): pending validation with Pedro.
 
 INSERT INTO app.situation (key, position, label, format, hero, notes) VALUES
     ('btn_open', 1, 'BTN Open', '3max', 'BTN', NULL),

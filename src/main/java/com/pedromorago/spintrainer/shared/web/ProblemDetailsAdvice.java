@@ -38,9 +38,9 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.exc.UnrecognizedPropertyException;
 
 /**
- * Traduce todos los errores a Problem Details (RFC 9457) con los tipos de {@link ProblemType}, {@code correlationId}
- * y, en los 400, {@code errors} por campo. También recibe los 401 de Spring Security (ver SecurityConfig), así que
- * hay un único sitio que da forma a los errores.
+ * Translates all errors into Problem Details (RFC 9457) with the types of {@link ProblemType}, {@code correlationId}
+ * and, in 400s, per-field {@code errors}. It also receives the 401s of Spring Security (see SecurityConfig), so there
+ * is a single place that shapes the errors.
  */
 @RestControllerAdvice
 class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
@@ -59,8 +59,8 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         return problem(type, ex.getMessage(), ex.errors(), new HttpHeaders(), request);
     }
 
-    // Parámetros de ruta o query que no cumplen la spec: las interfaces generadas llevan @Validated, así que Spring
-    // los valida con un proxy AOP (ConstraintViolationException) y no con la validación propia de MVC.
+    // Path or query parameters that do not comply with the spec: the generated interfaces carry @Validated, so Spring
+    // validates them with an AOP proxy (ConstraintViolationException) and not with MVC's own validation.
     @ExceptionHandler(ConstraintViolationException.class)
     ResponseEntity<Object> constraintViolation(ConstraintViolationException ex, WebRequest request) {
         List<FieldError> errors = ex.getConstraintViolations().stream()
@@ -70,7 +70,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         return problem(ProblemType.VALIDATION, invalidFields(errors), errors, new HttpHeaders(), request);
     }
 
-    // El emisor de los JWT no responde (Supabase caído o SUPABASE_URL mal configurada): 503, no "falta el token".
+    // The JWT issuer does not respond (Supabase down or SUPABASE_URL misconfigured): 503, not "missing token".
     @ExceptionHandler(AuthenticationServiceException.class)
     ResponseEntity<Object> authenticationUnavailable(AuthenticationServiceException ex, WebRequest request) {
         log.error("No se pudo validar el JWT: el emisor no responde", ex);
@@ -84,8 +84,8 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     ResponseEntity<Object> unauthenticated(AuthenticationException ex, WebRequest request) {
-        // RFC 6750: sin token → "Bearer"; token presente pero inválido → error="invalid_token".
-        // El motivo concreto (caducado, audiencia...) se registra, pero no se devuelve.
+        // RFC 6750: no token → "Bearer"; token present but invalid → error="invalid_token".
+        // The specific reason (expired, audience...) is logged, but not returned.
         boolean invalidToken = ex instanceof OAuth2AuthenticationException;
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.WWW_AUTHENTICATE, invalidToken ? "Bearer error=\"invalid_token\"" : "Bearer");
@@ -109,7 +109,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
                 request);
     }
 
-    // Cuerpo que no cumple las anotaciones de Bean Validation generadas desde la spec.
+    // Body that does not comply with the Bean Validation annotations generated from the spec.
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -123,7 +123,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         return problem(ProblemType.VALIDATION, invalidFields(errors), errors, headers, request);
     }
 
-    // Parámetros de ruta o query que no cumplen la spec (patrón de situación, rango del stack, limit...).
+    // Path or query parameters that do not comply with the spec (situation pattern, stack range, limit...).
     @Override
     protected ResponseEntity<Object> handleHandlerMethodValidationException(
             HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -134,7 +134,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         return problem(ProblemType.VALIDATION, invalidFields(errors), errors, headers, request);
     }
 
-    // JSON mal formado, campos no permitidos (additionalProperties: false) o valores fuera de un enum.
+    // Malformed JSON, disallowed fields (additionalProperties: false) or values outside an enum.
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -165,8 +165,8 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         return problem(ProblemType.NOT_FOUND, "Ruta desconocida", List.of(), headers, request);
     }
 
-    // Resto de errores de Spring MVC (405, 406, 415...): su ProblemDetail, con un type propio (la spec lo exige y
-    // "about:blank" se omite al serializar), correlationId e instance.
+    // Other Spring MVC errors (405, 406, 415...): their ProblemDetail, with a type of its own (the spec requires it and
+    // "about:blank" is omitted when serializing), correlationId and instance.
     @Override
     protected ResponseEntity<Object> createResponseEntity(
             @Nullable Object body, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -215,7 +215,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         return error.getDefaultMessage() != null ? error.getDefaultMessage() : "valor no válido";
     }
 
-    /** {@code getDefaultRange.situation} → {@code situation}: sin el nombre del método. */
+    /** {@code getDefaultRange.situation} → {@code situation}: without the method name. */
     private static String parameterPath(Path path) {
         List<String> names = new ArrayList<>();
         for (Path.Node node : path) {
@@ -226,7 +226,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         return String.join(".", names);
     }
 
-    /** {@code hands[AAs]} → {@code hands.AAs}, como en el resto de la API. */
+    /** {@code hands[AAs]} → {@code hands.AAs}, as in the rest of the API. */
     private static String fieldPath(String springPath) {
         return springPath.replaceAll("\\[([^]]*)]", ".$1");
     }

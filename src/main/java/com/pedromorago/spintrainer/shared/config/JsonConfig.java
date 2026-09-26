@@ -10,14 +10,14 @@ import tools.jackson.databind.MapperFeature;
 import tools.jackson.databind.cfg.EnumFeature;
 
 /**
- * JSON estricto: lo que la spec no admite es un 400, no se "arregla" en silencio. Jackson por defecto trunca
- * {@code "version": 0.9} a 0, acepta {@code "stack": "25"} o un índice numérico como enum, e ignora campos
- * desconocidos ({@code additionalProperties: false}).
+ * Strict JSON: what the spec does not allow is a 400, it is not silently "fixed". By default Jackson truncates
+ * {@code "version": 0.9} to 0, accepts {@code "stack": "25"} or a numeric index as an enum, and ignores unknown fields
+ * ({@code additionalProperties: false}).
  */
 @Configuration(proxyBeanMethods = false)
 class JsonConfig {
 
-    /** Un rango completo (169 manos) ocupa unos 3 KB: 64 KB sobran y acotan la memoria de cada petición. */
+    /** A full range (169 hands) takes about 3 KB: 64 KB is plenty and bounds the memory of each request. */
     static final long MAX_DOCUMENT_BYTES = 64 * 1024;
 
     @Bean

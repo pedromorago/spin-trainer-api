@@ -6,15 +6,15 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.MDC;
 
 /**
- * Identificador de la petición: llega en {@code X-Correlation-Id} o se genera, va a los logs (MDC), a la respuesta y a
- * {@code Problem.correlationId}.
+ * Request identifier: it arrives in {@code X-Correlation-Id} or is generated, and goes to the logs (MDC), to the
+ * response and to {@code Problem.correlationId}.
  */
 public final class CorrelationId {
 
     public static final String HEADER = "X-Correlation-Id";
     public static final String MDC_KEY = "correlationId";
 
-    // Solo se acepta un valor corto y seguro para logs y cabeceras; cualquier otro se sustituye.
+    // Only a short value that is safe for logs and headers is accepted; any other one is replaced.
     private static final Pattern ACCEPTED = Pattern.compile("[A-Za-z0-9._-]{1,64}");
 
     private CorrelationId() {}
@@ -25,7 +25,7 @@ public final class CorrelationId {
                 : UUID.randomUUID().toString();
     }
 
-    /** El de la petición en curso, o null fuera de una petición. */
+    /** The one of the current request, or null outside a request. */
     public static @Nullable String current() {
         return MDC.get(MDC_KEY);
     }

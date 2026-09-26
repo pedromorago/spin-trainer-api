@@ -11,6 +11,7 @@ Fuente de verdad del proyecto: `spin-trainer-web/docs/` (contexto, `ARCHITECTURE
   (`ReferenceSeedIT` exige que coincidan; web y QA guardan copia). Intentos del Quiz = eventos inmutables.
 - OpenAPI-first: se cambia `openapi.yaml` antes que el código (y la copia de la web con `npm run spec:sync`).
 - Gradle (Kotlin DSL), nunca Maven. Descartados: OWASP ZAP, carga, Pact, pgTAP.
+- Comentarios de código en inglés (Java, JS/TS, SQL, YAML, Gradle, scripts). En español: documentación (README, ADRs, CONTRIBUTING.md), textos de la app, mensajes de error de la API, títulos de tests y features de Gherkin.
 - Commits **siempre a nombre de Pedro** (autor y committer: `Pedro Morago López-Vázquez <pedromoragolv@gmail.com>`;
   verificar `git config user.name/user.email` antes de commitear). Conventional Commits, sin trailer de coautoría ni de atribución.
 - Entorno de Pedro: Windows 10/11 (comandos con `gradlew.bat`; nada que dependa de bash).

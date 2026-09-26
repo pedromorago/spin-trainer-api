@@ -9,8 +9,8 @@ import java.util.Base64;
 import java.util.UUID;
 
 /**
- * Cursor de la paginación: la posición del último intento de la página, en Base64 URL-safe. Es opaco para el cliente
- * (solo lo reenvía), así que el formato puede cambiar sin tocar el contrato.
+ * Pagination cursor: the position of the last attempt of the page, in URL-safe Base64. It is opaque to the client
+ * (which only sends it back), so the format can change without touching the contract.
  */
 final class AttemptCursor {
 

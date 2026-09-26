@@ -27,7 +27,7 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      # Formato, tests unitarios, ArchUnit, integración con Testcontainers (Docker viene en el runner) y JaCoCo.
+      # Formatting, unit tests, ArchUnit, integration with Testcontainers (Docker comes with the runner) and JaCoCo.
       - name: Check
         run: ./gradlew check
 

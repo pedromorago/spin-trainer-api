@@ -12,8 +12,8 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 /**
- * Rango de una situación y stack: acción explícita por mano (las ausentes tienen la implícita de la situación).
- * {@code version}: en los de referencia, la del seed; en los del usuario, la de la concurrencia optimista.
+ * Range of a situation and stack: explicit action per hand (absent ones have the implicit action of the situation).
+ * {@code version}: in reference ranges, the seed's; in user ranges, the one for optimistic concurrency.
  */
 public record Range(
         SituationKey situation,

@@ -33,7 +33,7 @@ class DayWindowTest {
 
     @Test
     void daylightSavingDaysAreNaturalDays() {
-        // 25/10/2026: en Madrid se atrasa la hora; ese día dura 25 horas.
+        // 25/10/2026: in Madrid the clocks go back; that day lasts 25 hours.
         DayWindow day = DayWindow.lastDays(1, Instant.parse("2026-10-25T12:00:00Z"), "Europe/Madrid");
 
         assertThat(Duration.between(day.start(), day.end())).isEqualTo(Duration.ofHours(25));

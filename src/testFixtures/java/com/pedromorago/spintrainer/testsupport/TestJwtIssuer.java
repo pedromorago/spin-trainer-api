@@ -28,9 +28,9 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Emisor de JWT para tests y desarrollo local que imita a Supabase Auth: clave ES256 propia, JWKS publicado por HTTP en
- * {@code <issuer>/.well-known/jwks.json} y tokens de sesión con las mismas claims ({@code aud}, {@code role}, {@code
- * sub}...). La API lo valida exactamente igual que a Supabase: solo cambia {@code spin-trainer.auth.issuer}.
+ * JWT issuer for tests and local development that imitates Supabase Auth: its own ES256 key, JWKS published over HTTP
+ * at {@code <issuer>/.well-known/jwks.json} and session tokens with the same claims ({@code aud}, {@code role},
+ * {@code sub}...). The API validates it exactly like Supabase: only {@code spin-trainer.auth.issuer} changes.
  */
 public final class TestJwtIssuer implements AutoCloseable {
 
@@ -59,12 +59,12 @@ public final class TestJwtIssuer implements AutoCloseable {
         issuer = "http://127.0.0.1:" + server.getAddress().getPort() + "/auth/v1";
     }
 
-    /** Emisor nuevo; el llamante lo cierra. */
+    /** New issuer; the caller closes it. */
     public static TestJwtIssuer start() {
         return new TestJwtIssuer();
     }
 
-    /** Emisor compartido por toda la JVM de tests (se para al salir). */
+    /** Issuer shared by the whole test JVM (stopped on exit). */
     public static synchronized TestJwtIssuer shared() {
         if (shared == null) {
             shared = start();
@@ -76,17 +76,17 @@ public final class TestJwtIssuer implements AutoCloseable {
         return issuer;
     }
 
-    /** Token de sesión válido durante una hora, como el que obtiene la web al hacer login. */
+    /** Session token valid for one hour, like the one the web gets on login. */
     public String tokenFor(UUID user) {
         return token(user, claims -> {});
     }
 
-    /** Token válido con las claims modificadas (caducado, otra audiencia, otro rol...). */
+    /** Valid token with modified claims (expired, another audience, another role...). */
     public String token(UUID user, Consumer<JWTClaimsSet.Builder> customizer) {
         return sign(claims(user, customizer), key);
     }
 
-    /** Mismas claims, firmado con una clave que no está en el JWKS. */
+    /** Same claims, signed with a key that is not in the JWKS. */
     public String tokenSignedByUnknownKey(UUID user) {
         try {
             return sign(claims(user, claims -> {}), newKey());
@@ -95,7 +95,7 @@ public final class TestJwtIssuer implements AutoCloseable {
         }
     }
 
-    /** Mismas claims firmadas con HS256 (el secreto compartido heredado de Supabase), que la API no acepta. */
+    /** Same claims signed with HS256 (the legacy shared secret of Supabase), which the API does not accept. */
     public String hs256Token(UUID user) {
         try {
             byte[] secret = new byte[32];
@@ -108,7 +108,7 @@ public final class TestJwtIssuer implements AutoCloseable {
         }
     }
 
-    /** Mismas claims sin firma ({@code alg: none}). */
+    /** Same claims without a signature ({@code alg: none}). */
     public String unsignedToken(UUID user) {
         return new PlainJWT(claims(user, claims -> {})).serialize();
     }

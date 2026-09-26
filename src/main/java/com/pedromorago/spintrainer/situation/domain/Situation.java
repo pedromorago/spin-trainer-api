@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Situación de Spin & Go: quién decide (héroe), qué pasó antes, con qué stacks y entre qué acciones. Las manos que un
- * rango no lista tienen la acción implícita: FOLD, o CHECK si FOLD no es posible (la BB ante un limp).
+ * Spin & Go situation: who decides (hero), what happened before, with which stacks and among which actions. The hands
+ * that a range does not list have the implicit action: FOLD, or CHECK if FOLD is not possible (the BB facing a limp).
  */
 public record Situation(
         SituationKey key,
@@ -46,7 +46,7 @@ public record Situation(
         return actions.contains(action);
     }
 
-    /** Acción de las manos que el rango no lista (misma regla que {@code fallbackAction} en la web). */
+    /** Action of the hands that the range does not list (same rule as {@code fallbackAction} in the web). */
     public Action implicitAction() {
         return allows(Action.FOLD) ? Action.FOLD : Action.CHECK;
     }

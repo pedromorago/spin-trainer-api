@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-/** El validador de contrato no aprueba en vacío: detecta cuerpos, formatos, tipos y estados que la spec no admite. */
+/** The contract validator does not pass vacuously: it detects bodies, formats, types and statuses the spec rejects. */
 class OpenApiContractTest {
 
     static final OpenApiContract CONTRACT = OpenApiContract.load();

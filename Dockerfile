@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
-# Imagen de la API para Docker Desktop, la suite de spin-trainer-qa (docker compose) y el despliegue.
-# Compila con el wrapper de Gradle y ejecuta el jar por capas (dependencias, loader y código por separado): un cambio de
-# código no vuelve a subir las dependencias. Configuración solo por variables de entorno (README, "Configuración").
+# API image for Docker Desktop, the spin-trainer-qa suite (docker compose) and deployment.
+# Builds with the Gradle wrapper and runs the jar in layers (dependencies, loader and code separately): a code change
+# does not re-upload the dependencies. Configuration only through environment variables (README, "Configuración").
 
 FROM eclipse-temurin:21-jdk AS build
 WORKDIR /workspace

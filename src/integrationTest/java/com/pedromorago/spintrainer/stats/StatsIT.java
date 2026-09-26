@@ -20,7 +20,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-/** Agregados sobre los intentos (ADR-0013), con la hora fijada para probar los cortes de día por zona horaria. */
+/** Aggregates over the attempts (ADR-0013), with the time fixed to test the day boundaries by time zone. */
 @Import(StatsIT.FixedClock.class)
 class StatsIT extends ApiIntegrationTest {
 
@@ -39,7 +39,7 @@ class StatsIT extends ApiIntegrationTest {
 
     @BeforeEach
     void attempts() {
-        // 25/09 22:30 UTC es ya 26/09 00:30 en Madrid (UTC+2).
+        // 25/09 22:30 UTC is already 26/09 00:30 in Madrid (UTC+2).
         TestData.attempt(user, "btn_open", 25, "AA", "MR_4B_C", "MR_4B_C", Instant.parse("2026-09-25T22:30:00Z"));
         TestData.attempt(user, "btn_open", 25, "AA", "FOLD", "MR_4B_C", Instant.parse("2026-09-26T09:00:00Z"));
         TestData.attempt(user, "btn_open", 20, "K9s", "FOLD", "MR_F_F", Instant.parse("2026-09-20T12:00:00Z"));

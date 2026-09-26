@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface SituationRepository {
 
-    /** Todas las situaciones del seed, en orden de presentación. */
+    /** All the situations of the seed, in presentation order. */
     List<Situation> findAll();
 }

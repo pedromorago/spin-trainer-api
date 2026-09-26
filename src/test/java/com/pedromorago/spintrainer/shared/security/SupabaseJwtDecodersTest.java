@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidationException;
 
-/** El decoder contra un JWKS real (servido por {@link TestJwtIssuer}): qué acepta y qué rechaza. */
+/** The decoder against a real JWKS (served by {@link TestJwtIssuer}): what it accepts and what it rejects. */
 class SupabaseJwtDecodersTest {
 
     static TestJwtIssuer issuer;

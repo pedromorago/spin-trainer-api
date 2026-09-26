@@ -9,10 +9,10 @@ import com.pedromorago.spintrainer.shared.kernel.UserId;
 public interface RecordAttempt {
 
     /**
-     * Corrige y guarda una respuesta del Quiz contra el rango efectivo del usuario en este momento.
+     * Grades and stores a Quiz answer against the user's effective range at this moment.
      *
-     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException NOT_FOUND (combinación desconocida), VALIDATION
-     *     (mano o acción no válidas) o NO_RANGE (la combinación no tiene rango con el que corregir)
+     * @throws com.pedromorago.spintrainer.shared.kernel.DomainException NOT_FOUND (unknown combination), VALIDATION
+     *     (invalid hand or action) or NO_RANGE (the combination has no range to grade against)
      */
     QuizAttempt record(UserId user, SituationKey situation, Stack stack, String hand, Action given);
 }

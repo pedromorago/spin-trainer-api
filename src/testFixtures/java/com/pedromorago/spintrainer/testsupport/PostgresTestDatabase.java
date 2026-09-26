@@ -11,9 +11,9 @@ import java.util.Map;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
 /**
- * Postgres de pruebas (Testcontainers) preparado como un entorno real: el mismo {@code db/bootstrap/bootstrap.sql}
- * crea los roles {@code spin_migrator} y {@code spin_app}, y la aplicación migra con uno y se conecta con el otro.
- * Misma versión mayor que Supabase.
+ * Test Postgres (Testcontainers) prepared like a real environment: the same {@code db/bootstrap/bootstrap.sql} creates
+ * the {@code spin_migrator} and {@code spin_app} roles, and the application migrates with one and connects with the
+ * other. Same major version as Supabase.
  */
 public final class PostgresTestDatabase {
 
@@ -33,7 +33,7 @@ public final class PostgresTestDatabase {
         bootstrap();
     }
 
-    /** Base de datos compartida por toda la JVM de tests (Testcontainers la elimina al salir). */
+    /** Database shared by the whole test JVM (Testcontainers removes it on exit). */
     public static synchronized PostgresTestDatabase shared() {
         if (shared == null) {
             shared = new PostgresTestDatabase();
@@ -41,7 +41,7 @@ public final class PostgresTestDatabase {
         return shared;
     }
 
-    /** Base de datos nueva y solo para quien la pide (p. ej. aplicar las migraciones desde cero); pararla al acabar. */
+    /** New database only for whoever requests it (e.g. applying the migrations from scratch); stop it when done. */
     public static PostgresTestDatabase fresh() {
         return new PostgresTestDatabase();
     }
@@ -54,7 +54,7 @@ public final class PostgresTestDatabase {
         return container.getJdbcUrl();
     }
 
-    /** Propiedades de Spring para conectar la API: como spin_app, y Flyway como spin_migrator. */
+    /** Spring properties to connect the API: as spin_app, and Flyway as spin_migrator. */
     public Map<String, String> springProperties() {
         return Map.of(
                 "spring.datasource.url", jdbcUrl(),
@@ -65,7 +65,7 @@ public final class PostgresTestDatabase {
                 "spring.flyway.password", MIGRATOR_PASSWORD);
     }
 
-    /** Conexión de administrador, para inspeccionar o preparar datos que la API no puede escribir. */
+    /** Administrator connection, to inspect or prepare data that the API cannot write. */
     public Connection adminConnection() throws SQLException {
         return DriverManager.getConnection(jdbcUrl(), container.getUsername(), container.getPassword());
     }

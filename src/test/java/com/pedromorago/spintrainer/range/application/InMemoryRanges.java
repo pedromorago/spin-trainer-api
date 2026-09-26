@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/** Repositorios en memoria con la misma semántica que los JDBC (los prueban los tests de integración). */
+/** In-memory repositories with the same semantics as the JDBC ones (which the integration tests cover). */
 final class InMemoryRanges implements DefaultRangeRepository, UserRangeRepository {
 
     private record Key(UserId user, SituationKey situation, Stack stack) {}

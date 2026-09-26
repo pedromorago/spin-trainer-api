@@ -12,7 +12,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration(proxyBeanMethods = false)
 class CorsConfig {
 
-    /** Lo usa Spring Security ({@code http.cors()}), así que las preflight no necesitan token. */
+    /** Used by Spring Security ({@code http.cors()}), so preflight requests do not need a token. */
     @Bean
     CorsConfigurationSource corsConfigurationSource(CorsProperties properties) {
         CorsConfiguration cors = new CorsConfiguration();

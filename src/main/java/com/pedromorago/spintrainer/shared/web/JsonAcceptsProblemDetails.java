@@ -10,11 +10,11 @@ import org.springframework.web.accept.HeaderContentNegotiationStrategy;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
- * Negociación por {@code Accept} en la que quien acepta {@code application/json} acepta también Problem Details
- * ({@code application/problem+json} es JSON; RFC 9457). Sin esto, una operación cuya única representación es un
- * Problem (el DELETE de un rango: 204 sin cuerpo y errores en problem+json) respondía 406 a un cliente con
- * {@code Accept: application/json}, sin llegar a ejecutarse. El tipo de problema va detrás: los datos siguen
- * saliendo como {@code application/json}.
+ * {@code Accept} negotiation in which whoever accepts {@code application/json} also accepts Problem Details
+ * ({@code application/problem+json} is JSON; RFC 9457). Without this, an operation whose only representation is a
+ * Problem (the DELETE of a range: 204 with no body and errors in problem+json) responded 406 to a client with
+ * {@code Accept: application/json}, without even being executed. The problem type goes last: data still comes out as
+ * {@code application/json}.
  */
 final class JsonAcceptsProblemDetails implements ContentNegotiationStrategy {
 
@@ -31,7 +31,7 @@ final class JsonAcceptsProblemDetails implements ContentNegotiationStrategy {
             return accepted;
         }
         List<MediaType> withProblems = new ArrayList<>(accepted);
-        // Con la misma preferencia (q) que el JSON que pidió el cliente.
+        // With the same preference (q) as the JSON the client asked for.
         withProblems.add(MediaType.APPLICATION_PROBLEM_JSON.copyQualityValue(json.get()));
         return withProblems;
     }

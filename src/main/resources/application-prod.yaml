@@ -1,4 +1,4 @@
-# Despliegue: logs JSON (ECS) con el correlationId de cada petición.
+# Deployment: JSON logs (ECS) with the correlationId of each request.
 logging:
   structured:
     format:

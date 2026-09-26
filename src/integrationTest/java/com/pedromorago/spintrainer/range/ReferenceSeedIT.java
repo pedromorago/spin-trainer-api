@@ -24,9 +24,9 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Las migraciones aplicadas desde cero dejan exactamente los rangos de {@code reference-ranges.json}, el fichero que
- * copian la web (mock) y spin-trainer-qa (oráculos): si cambia uno sin el otro, falla. Base de datos propia, sin la
- * aplicación: el resto de los IT modifican los rangos de referencia de la compartida.
+ * The migrations applied from scratch leave exactly the ranges of {@code reference-ranges.json}, the file that the web
+ * (mock) and spin-trainer-qa (oracles) copy: if one changes without the other, this fails. Its own database, without
+ * the application: the rest of the ITs modify the reference ranges of the shared one.
  */
 class ReferenceSeedIT {
 
@@ -35,7 +35,7 @@ class ReferenceSeedIT {
     @BeforeAll
     static void migrateFromScratch() {
         database = PostgresTestDatabase.fresh();
-        // La misma configuración que spring.flyway en application.yaml.
+        // The same configuration as spring.flyway in application.yaml.
         Flyway.configure()
                 .dataSource(
                         database.jdbcUrl(), PostgresTestDatabase.MIGRATOR_USER, PostgresTestDatabase.MIGRATOR_PASSWORD)

@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
-/** Usuario de la petición en curso ({@code sub} del JWT, ya validado como UUID). Lo usan los adaptadores REST. */
+/** User of the current request ({@code sub} of the JWT, already validated as a UUID). Used by the REST adapters. */
 @Component
 public class CurrentUser {
 

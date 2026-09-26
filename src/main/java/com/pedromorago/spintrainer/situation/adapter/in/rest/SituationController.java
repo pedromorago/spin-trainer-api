@@ -41,7 +41,7 @@ class SituationController implements SituationApi {
                 situation.priorActions().stream()
                         .map(SituationController::toDto)
                         .toList(),
-                // uniqueItems → Set en el DTO generado; LinkedHashSet conserva el orden del catálogo.
+                // uniqueItems → Set in the generated DTO; LinkedHashSet keeps the catalog order.
                 situation.stacks().stream().map(Stack::bigBlinds).collect(Collectors.toCollection(LinkedHashSet::new)),
                 situation.actions().stream()
                         .map(action -> ActionDto.fromValue(action.code()))

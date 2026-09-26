@@ -11,14 +11,14 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Datos que la API no puede escribir (spin_app solo lee los rangos de referencia): se insertan como administrador,
- * igual que lo haría una migración de seed. Idempotente: los tests comparten base de datos.
+ * Data that the API cannot write (spin_app only reads the reference ranges): inserted as administrator, just as a seed
+ * migration would do it. Idempotent: the tests share the database.
  */
 public final class TestData {
 
     private TestData() {}
 
-    /** Un intento con fecha elegida (la API siempre usa la hora actual), para probar las estadísticas por día. */
+    /** An attempt with a chosen date (the API always uses the current time), to test the per-day statistics. */
     public static void attempt(
             UUID user, String situation, double stack, String hand, String given, String expected, Instant answeredAt) {
         try (Connection admin = PostgresTestDatabase.shared().adminConnection();
@@ -41,7 +41,7 @@ public final class TestData {
         }
     }
 
-    /** Quita el rango de referencia de un spot (el seed los trae todos): para probar lo que pasa sin él. */
+    /** Removes the reference range of a spot (the seed includes all of them): to test what happens without it. */
     public static void withoutDefaultRange(String situation, double stack) {
         try (Connection admin = PostgresTestDatabase.shared().adminConnection();
                 PreparedStatement delete =

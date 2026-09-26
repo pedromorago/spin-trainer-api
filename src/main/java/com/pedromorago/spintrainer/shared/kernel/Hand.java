@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mano canónica del grid 13×13: pareja ({@code AA}) o carta alta + carta baja + {@code s}/{@code o} ({@code AKs},
- * {@code T9o}). No son canónicas {@code AAs}, {@code AK} ni {@code KAs}. Mismas reglas que {@code domain/hand.js} de la
+ * Canonical hand of the 13×13 grid: a pair ({@code AA}) or high card + low card + {@code s}/{@code o} ({@code AKs},
+ * {@code T9o}). {@code AAs}, {@code AK} and {@code KAs} are not canonical. Same rules as {@code domain/hand.js} in the
  * web.
  */
 public record Hand(String code) implements Comparable<Hand> {
@@ -39,7 +39,7 @@ public record Hand(String code) implements Comparable<Hand> {
         return high < low && (kind == 's' || kind == 'o');
     }
 
-    /** Las 169 manos, fila a fila del grid (AA, AKs, AQs... 32o, 22). */
+    /** The 169 hands, row by row of the grid (AA, AKs, AQs... 32o, 22). */
     public static List<Hand> all() {
         return ALL;
     }
@@ -52,7 +52,7 @@ public record Hand(String code) implements Comparable<Hand> {
         return code.length() == 3 && code.charAt(2) == 's';
     }
 
-    /** Orden de lectura: parejas, suited y offsuit; dentro de cada grupo, de mayor a menor. */
+    /** Reading order: pairs, suited and offsuit; within each group, from highest to lowest. */
     @Override
     public int compareTo(Hand other) {
         return Integer.compare(sortKey(), other.sortKey());

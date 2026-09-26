@@ -10,10 +10,10 @@
 /out/
 /bin/
 
-# SO
+# OS
 .DS_Store
 Thumbs.db
 
-# Entorno local (secretos)
+# Local environment (secrets)
 .env
 *.local.yaml

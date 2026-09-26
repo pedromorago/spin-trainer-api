@@ -18,7 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
-/** El servidor corrige cada respuesta (ADR-0013) y guarda eventos inmutables (ADR-0007). */
+/** The server grades each answer (ADR-0013) and stores immutable events (ADR-0007). */
 class QuizAttemptsIT extends ApiIntegrationTest {
 
     static final String PATH = "/quiz/attempts";

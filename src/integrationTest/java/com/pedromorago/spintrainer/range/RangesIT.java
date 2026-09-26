@@ -28,8 +28,8 @@ class RangesIT extends ApiIntegrationTest {
 
     final String auth = bearer(UUID.randomUUID());
 
-    // Después de arrancar el contexto (Flyway ya migró): en un @BeforeAll la tabla aún no existiría. Se reemplazan
-    // rangos del seed por otros pequeños y conocidos, y btn_open@8 se queda sin rango de referencia.
+    // After the context starts (Flyway has already migrated): in a @BeforeAll the table would not exist yet. Seed
+    // ranges are replaced with small, known ones, and btn_open@8 is left without a reference range.
     @BeforeEach
     void referenceRanges() {
         TestData.defaultRange("btn_open", 25, 1, Map.of("AA", "MR_4B_C", "KK", "MR_4B_C", "22", "L_C_C"));
@@ -321,7 +321,7 @@ class RangesIT extends ApiIntegrationTest {
 
         @Test
         void oversizedDocumentsAreRejectedWithoutReadingThemWhole() {
-            // JSON válido (espacios entre tokens) que sin el límite de tamaño daría 201.
+            // Valid JSON (whitespace between tokens) that would give 201 without the size limit.
             String huge = "{\"hands\":{}," + " ".repeat(70_000) + "\"version\":0}";
 
             MvcTestResult result = put(URI, huge);
@@ -348,8 +348,8 @@ class RangesIT extends ApiIntegrationTest {
     }
 
     /**
-     * La web manda {@code Accept: application/json}; los errores son {@code application/problem+json} (RFC 9457). El
-     * DELETE, cuya única representación es un Problem, respondía 406 a esos clientes (hallado por los E2E de QA).
+     * The web sends {@code Accept: application/json}; the errors are {@code application/problem+json} (RFC 9457). The
+     * DELETE, whose only representation is a Problem, responded 406 to those clients (found by the QA E2E tests).
      */
     @Nested
     class JsonOnlyClients {

@@ -1,11 +1,11 @@
-# Versiones en un solo sitio (ADR-0002). Las librerías sin versión las gestiona el BOM de Spring Boot.
+# Versions in a single place (ADR-0002). Libraries without a version are managed by the Spring Boot BOM.
 [versions]
 spring-boot = "4.1.1"
 openapi-generator = "7.25.0"
 spotless = "8.10.3"
 palantir-java-format = "2.99.0"
 archunit = "1.5.1"
-# 3.0.6: la última sobre Jackson 3.1 (la de Spring Boot 4.1); 3.0.7 arrastra Jackson 3.2 a los tests.
+# 3.0.6: the last one on Jackson 3.1 (the one in Spring Boot 4.1); 3.0.7 drags Jackson 3.2 into the tests.
 json-schema-validator = "3.0.6"
 
 [libraries]

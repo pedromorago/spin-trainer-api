@@ -9,10 +9,10 @@ import java.util.UUID;
 import org.springframework.boot.SpringApplication;
 
 /**
- * Arranque local con solo Docker instalado: {@code gradlew bootTestRun}. Levanta un Postgres de Testcontainers
- * preparado como producción (roles + Flyway) y, si no hay {@code SUPABASE_URL}, un emisor de JWT local e imprime un
- * token para probar la API con curl, Postman o Newman. Con {@code SUPABASE_URL} valida los tokens reales de la web.
- * Los rangos de referencia son los del seed (V5), los mismos que en producción.
+ * Local startup with only Docker installed: {@code gradlew bootTestRun}. It starts a Testcontainers Postgres prepared
+ * like production (roles + Flyway) and, if there is no {@code SUPABASE_URL}, a local JWT issuer, and prints a token to
+ * try the API with curl, Postman or Newman. With {@code SUPABASE_URL} it validates the real tokens of the web. The
+ * reference ranges are those of the seed (V5), the same as in production.
  */
 public final class TestSpinTrainerApiApplication {
 

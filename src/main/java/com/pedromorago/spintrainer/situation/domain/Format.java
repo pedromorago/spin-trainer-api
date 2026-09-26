@@ -1,6 +1,6 @@
 package com.pedromorago.spintrainer.situation.domain;
 
-/** Formato de Spin & Go (ADR-0011). */
+/** Spin & Go format (ADR-0011). */
 public enum Format {
     THREE_MAX("3max"),
     HEADS_UP("hu");

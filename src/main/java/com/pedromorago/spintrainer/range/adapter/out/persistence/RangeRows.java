@@ -19,10 +19,10 @@ import java.util.Optional;
 import org.springframework.jdbc.core.simple.JdbcClient.StatementSpec;
 
 /**
- * Monta rangos a partir de una única consulta {@code rango LEFT JOIN manos} (una fila por mano, o una sola fila sin
- * mano si el rango está vacío). Una sola sentencia ve una sola instantánea: la versión y las manos siempre corresponden
- * a la misma escritura, aunque otro PUT termine a mitad de la lectura (si no, el control optimista de versiones podría
- * aceptar como actual un rango leído a medias).
+ * Builds ranges from a single {@code range LEFT JOIN hands} query (one row per hand, or a single row without a hand if
+ * the range is empty). A single statement sees a single snapshot: the version and the hands always correspond to the
+ * same write, even if another PUT finishes midway through the read (otherwise the optimistic version control could
+ * accept a half-read range as current).
  */
 final class RangeRows {
 
@@ -44,8 +44,8 @@ final class RangeRows {
     private RangeRows() {}
 
     /**
-     * @param query columnas {@code situation, stack, version, hand, action} y, si {@code source} es USER, {@code
-     *     updated_at}; ordenada como deben salir los rangos
+     * @param query columns {@code situation, stack, version, hand, action} and, if {@code source} is USER,
+     *     {@code updated_at}; ordered as the ranges must come out
      */
     static List<Range> load(StatementSpec query, RangeSource source) {
         Map<Spot, Builder> ranges = new LinkedHashMap<>();

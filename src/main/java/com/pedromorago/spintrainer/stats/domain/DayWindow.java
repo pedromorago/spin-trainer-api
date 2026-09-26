@@ -7,8 +7,8 @@ import java.time.ZoneId;
 import java.util.List;
 
 /**
- * Los últimos {@code days} días naturales hasta hoy (incluido) en una zona horaria IANA. Los límites son medianoches
- * locales, así que un día de cambio de hora dura 23 o 25 horas y ningún intento cae en el día equivocado.
+ * The last {@code days} calendar days up to today (included) in an IANA time zone. The boundaries are local midnights,
+ * so a DST-change day lasts 23 or 25 hours and no attempt falls on the wrong day.
  */
 public record DayWindow(ZoneId zone, LocalDate first, LocalDate last) {
 
@@ -23,17 +23,17 @@ public record DayWindow(ZoneId zone, LocalDate first, LocalDate last) {
         return new DayWindow(zone, today.minusDays(days - 1L), today);
     }
 
-    /** Primer instante de la ventana (medianoche local del primer día). */
+    /** First instant of the window (local midnight of the first day). */
     public Instant start() {
         return first.atStartOfDay(zone).toInstant();
     }
 
-    /** Fin exclusivo: medianoche local del día siguiente a hoy. */
+    /** Exclusive end: local midnight of the day after today. */
     public Instant end() {
         return last.plusDays(1).atStartOfDay(zone).toInstant();
     }
 
-    /** Cada día de la ventana con sus límites en instantes: la base de datos agrupa sin interpretar zonas horarias. */
+    /** Each day of the window with its boundaries as instants: the database groups without interpreting time zones. */
     public List<Day> days() {
         return first.datesUntil(last.plusDays(1))
                 .map(date -> new Day(
@@ -43,10 +43,10 @@ public record DayWindow(ZoneId zone, LocalDate first, LocalDate last) {
                 .toList();
     }
 
-    /** Un día natural en la zona: de {@code start} (incluido) a {@code end} (excluido). */
+    /** A calendar day in the zone: from {@code start} (included) to {@code end} (excluded). */
     public record Day(LocalDate date, Instant start, Instant end) {}
 
-    /** Solo nombres de zona IANA ({@code Europe/Madrid}, {@code UTC}), como dice el contrato; no desfases fijos. */
+    /** Only IANA zone names ({@code Europe/Madrid}, {@code UTC}), as the contract says; no fixed offsets. */
     private static ZoneId zone(String timeZone) {
         if (timeZone == null || !ZoneId.getAvailableZoneIds().contains(timeZone)) {
             throw DomainException.validation("tz", "zona IANA desconocida");

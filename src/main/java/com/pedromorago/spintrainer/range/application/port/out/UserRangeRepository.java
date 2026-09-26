@@ -13,12 +13,12 @@ public interface UserRangeRepository {
 
     Optional<Range> find(UserId user, SituationKey situation, Stack stack);
 
-    /** Inserta la versión 1. {@code false} si ya existía (otra escritura se adelantó). */
+    /** Inserts version 1. {@code false} if it already existed (another write got there first). */
     boolean insert(UserId user, Range range);
 
     /**
-     * Sustituye el rango si su versión actual es {@code expectedVersion} (en una sola sentencia, sin carreras).
-     * {@code false} si la versión cambió o el rango ya no existe.
+     * Replaces the range if its current version is {@code expectedVersion} (in a single statement, without races).
+     * {@code false} if the version changed or the range no longer exists.
      */
     boolean replace(UserId user, Range range, int expectedVersion);
 

@@ -15,9 +15,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Arquitectura verificada, no solo documentada (ADR-0005): monolito modular hexagonal. Cada módulo de negocio tiene
- * domain · application (port.in, port.out, servicios) · adapter (in.rest, out.persistence). Entre módulos solo se
- * usan los puertos de entrada y el dominio publicado; {@code shared} es la plataforma común.
+ * Architecture verified, not just documented (ADR-0005): hexagonal modular monolith. Each business module has domain ·
+ * application (port.in, port.out, services) · adapter (in.rest, out.persistence). Between modules only the inbound
+ * ports and the published domain are used; {@code shared} is the common platform.
  */
 class ArchitectureTest {
 

@@ -4,7 +4,7 @@ import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/** Reloj inyectable: los casos de uso sellan fechas (rangos guardados, intentos) y los tests fijan la hora. */
+/** Injectable clock: the use cases timestamp dates (saved ranges, attempts) and the tests fix the time. */
 @Configuration(proxyBeanMethods = false)
 class ClockConfig {
 

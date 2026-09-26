@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/** Forma de los errores (RFC 9457) con endpoints de prueba que provocan cada caso. */
+/** Shape of the errors (RFC 9457) with test endpoints that trigger each case. */
 @Import(ProblemDetailsIT.Endpoints.class)
 class ProblemDetailsIT extends ApiIntegrationTest {
 

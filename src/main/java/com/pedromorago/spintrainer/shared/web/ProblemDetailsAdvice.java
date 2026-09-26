@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -67,6 +68,18 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
                 .sorted(Comparator.comparing(FieldError::field))
                 .toList();
         return problem(ProblemType.VALIDATION, invalidFields(errors), errors, new HttpHeaders(), request);
+    }
+
+    // El emisor de los JWT no responde (Supabase caído o SUPABASE_URL mal configurada): 503, no "falta el token".
+    @ExceptionHandler(AuthenticationServiceException.class)
+    ResponseEntity<Object> authenticationUnavailable(AuthenticationServiceException ex, WebRequest request) {
+        log.error("No se pudo validar el JWT: el emisor no responde", ex);
+        return problem(
+                ProblemType.UNAVAILABLE,
+                "No se puede validar el token ahora mismo; inténtalo de nuevo",
+                List.of(),
+                new HttpHeaders(),
+                request);
     }
 
     @ExceptionHandler(AuthenticationException.class)

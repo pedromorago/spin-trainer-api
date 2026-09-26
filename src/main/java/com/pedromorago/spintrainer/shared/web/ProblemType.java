@@ -12,6 +12,8 @@ public enum ProblemType {
     NO_RANGE("no-range", "No range", HttpStatus.UNPROCESSABLE_CONTENT),
     /** Método, tipo de contenido o formato de respuesta no soportados (405, 406, 415); conserva su estado y título. */
     UNSUPPORTED("unsupported", "Unsupported request", HttpStatus.BAD_REQUEST),
+    /** Una dependencia no responde (p. ej. el JWKS de Supabase): no es culpa del cliente y puede reintentar. */
+    UNAVAILABLE("unavailable", "Service unavailable", HttpStatus.SERVICE_UNAVAILABLE),
     INTERNAL("internal", "Internal error", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final URI uri;

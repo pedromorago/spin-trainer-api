@@ -64,6 +64,15 @@ class SupabaseJwtDecodersTest {
     }
 
     @Test
+    void rejectsATokenThatNeverExpires() {
+        String eternal = issuer.token(user, claims -> claims.expirationTime(null));
+
+        assertThatThrownBy(() -> decoder.decode(eternal))
+                .isInstanceOf(JwtValidationException.class)
+                .hasMessageContaining("exp");
+    }
+
+    @Test
     void rejectsAnotherIssuer() {
         String foreign = issuer.token(user, claims -> claims.issuer("https://other.supabase.co/auth/v1"));
 

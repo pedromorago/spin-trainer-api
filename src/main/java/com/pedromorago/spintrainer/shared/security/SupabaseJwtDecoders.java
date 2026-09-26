@@ -1,6 +1,8 @@
 package com.pedromorago.spintrainer.shared.security;
 
+import java.time.Instant;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.UUID;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -15,7 +17,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 /**
  * Valida los JWT de sesión de Supabase Auth: firma ES256 contra el JWKS (claves asimétricas; el secreto HS256 heredado no
- * se acepta), caducidad, emisor, audiencia {@code authenticated}, {@code role = authenticated} (rechaza los tokens
+ * se acepta), caducidad ({@code exp} obligatoria), emisor, audiencia {@code authenticated}, {@code role = authenticated} (rechaza los tokens
  * {@code anon} y {@code service_role}) y {@code sub} con forma de UUID (identifica al usuario).
  */
 public final class SupabaseJwtDecoders {
@@ -37,6 +39,8 @@ public final class SupabaseJwtDecoders {
     static OAuth2TokenValidator<Jwt> validator(AuthProperties properties) {
         return new DelegatingOAuth2TokenValidator<>(
                 JwtValidators.createDefaultWithIssuer(properties.issuer().toString()),
+                // El validador por defecto acepta tokens sin exp: un token de sesión siempre caduca.
+                new JwtClaimValidator<@Nullable Instant>(JwtClaimNames.EXP, Objects::nonNull),
                 new JwtClaimValidator<@Nullable Collection<String>>(
                         JwtClaimNames.AUD, aud -> aud != null && aud.contains(properties.audience())),
                 new JwtClaimValidator<@Nullable String>(ROLE_CLAIM, AUTHENTICATED::equals),

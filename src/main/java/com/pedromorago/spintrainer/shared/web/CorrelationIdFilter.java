@@ -16,10 +16,21 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class CorrelationIdFilter extends OncePerRequestFilter {
 
+    private static final String ATTRIBUTE = CorrelationIdFilter.class.getName();
+
+    @Override
+    protected boolean shouldNotFilterErrorDispatch() {
+        return false;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String id = CorrelationId.accept(request.getHeader(CorrelationId.HEADER));
+        // En un redespacho a /error se reutiliza el de la petición original.
+        String id = request.getAttribute(ATTRIBUTE) instanceof String original
+                ? original
+                : CorrelationId.accept(request.getHeader(CorrelationId.HEADER));
+        request.setAttribute(ATTRIBUTE, id);
         response.setHeader(CorrelationId.HEADER, id);
         MDC.put(CorrelationId.MDC_KEY, id);
         try {

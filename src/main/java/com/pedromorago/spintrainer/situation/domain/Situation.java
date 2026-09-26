@@ -31,10 +31,10 @@ public record Situation(
         actions = List.copyOf(actions);
         Objects.requireNonNull(notes, "notes");
         if (stacks.isEmpty()) {
-            throw new IllegalArgumentException(key + ": sin stacks");
+            throw new IllegalArgumentException(key + ": no stacks");
         }
         if (actions.size() < 2) {
-            throw new IllegalArgumentException(key + ": necesita al menos dos acciones");
+            throw new IllegalArgumentException(key + ": needs at least two actions");
         }
     }
 

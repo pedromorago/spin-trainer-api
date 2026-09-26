@@ -7,7 +7,7 @@ public record ProgressDay(LocalDate date, int attempts, int correct) {
 
     public ProgressDay {
         if (attempts < 1 || correct < 0 || correct > attempts) {
-            throw new IllegalArgumentException("recuentos incoherentes: " + correct + "/" + attempts);
+            throw new IllegalArgumentException("inconsistent counts: " + correct + "/" + attempts);
         }
     }
 }

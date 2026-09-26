@@ -21,6 +21,6 @@ public enum Format {
                 return format;
             }
         }
-        throw new IllegalArgumentException("Formato desconocido: " + code);
+        throw new IllegalArgumentException("Unknown format: " + code);
     }
 }

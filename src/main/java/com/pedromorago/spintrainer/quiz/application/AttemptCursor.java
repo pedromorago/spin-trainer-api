@@ -25,7 +25,7 @@ final class AttemptCursor {
         try {
             String[] parts = new String(Base64.getUrlDecoder().decode(cursor), StandardCharsets.UTF_8).split("\\|");
             if (parts.length != 2) {
-                throw new IllegalArgumentException("formato");
+                throw new IllegalArgumentException("format");
             }
             return new Position(Instant.parse(parts[0]), UUID.fromString(parts[1]));
         } catch (RuntimeException e) {

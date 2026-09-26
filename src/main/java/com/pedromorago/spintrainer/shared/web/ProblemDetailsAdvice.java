@@ -73,7 +73,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
     // The JWT issuer does not respond (Supabase down or SUPABASE_URL misconfigured): 503, not "missing token".
     @ExceptionHandler(AuthenticationServiceException.class)
     ResponseEntity<Object> authenticationUnavailable(AuthenticationServiceException ex, WebRequest request) {
-        log.error("No se pudo validar el JWT: el emisor no responde", ex);
+        log.error("Could not validate the JWT: the issuer is not responding", ex);
         return problem(
                 ProblemType.UNAVAILABLE,
                 "No se puede validar el token ahora mismo; inténtalo de nuevo",
@@ -90,7 +90,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.WWW_AUTHENTICATE, invalidToken ? "Bearer error=\"invalid_token\"" : "Bearer");
         if (invalidToken) {
-            log.info("JWT rechazado: {}", ex.getMessage());
+            log.info("JWT rejected: {}", ex.getMessage());
         }
         String detail = invalidToken
                 ? "El token de acceso no es válido o ha caducado"
@@ -100,7 +100,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     ResponseEntity<Object> unexpected(Exception ex, WebRequest request) {
-        log.error("Error no controlado", ex);
+        log.error("Unhandled error", ex);
         return problem(
                 ProblemType.INTERNAL,
                 "Error interno. Si lo reportas, indica el correlationId.",

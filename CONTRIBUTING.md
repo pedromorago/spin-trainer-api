@@ -11,7 +11,7 @@ Project source of truth: `spin-trainer-web/docs/` (context, `ARCHITECTURE.md`, A
   (`ReferenceSeedIT` requires them to match; web and QA keep copies). Quiz attempts = immutable events.
 - OpenAPI-first: `openapi.yaml` changes before the code (and the web copy, with `npm run spec:sync`).
 - Gradle (Kotlin DSL), never Maven. Discarded: OWASP ZAP, load testing, Pact, pgTAP.
-- Code comments and documentation in English (README, ADRs, CONTRIBUTING.md, docs/, OpenAPI descriptions). In Spanish: app UI text, API error messages, test titles and Gherkin features.
+- In English: code comments, documentation (README, ADRs, CONTRIBUTING.md, docs/, OpenAPI descriptions) and developer-facing messages (logs, internal exceptions, tooling output). In Spanish: app UI text, API error messages, the test report (test titles, Allure names, assertion descriptions) and Gherkin features.
 - Commits **always in Pedro's name** (author and committer: `Pedro Morago López-Vázquez <pedromoragolv@gmail.com>`; check `git config user.name/user.email` before committing). Conventional Commits, no co-author or attribution trailer.
 - Pedro's environment: Windows 10/11 (commands with `gradlew.bat`; nothing that depends on bash).
 

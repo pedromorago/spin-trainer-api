@@ -82,14 +82,14 @@ public final class PostgresTestDatabase {
                 Statement statement = connection.createStatement()) {
             statement.execute(script);
         } catch (SQLException e) {
-            throw new IllegalStateException("Falló db/bootstrap/bootstrap.sql", e);
+            throw new IllegalStateException("db/bootstrap/bootstrap.sql failed", e);
         }
     }
 
     private static String readClasspath(String path) {
         try (InputStream in = PostgresTestDatabase.class.getResourceAsStream(path)) {
             if (in == null) {
-                throw new IllegalStateException("No está en el classpath: " + path);
+                throw new IllegalStateException("Not on the classpath: " + path);
             }
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {

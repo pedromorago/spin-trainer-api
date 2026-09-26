@@ -14,6 +14,6 @@ public class CurrentUser {
         if (SecurityContextHolder.getContext().getAuthentication() instanceof JwtAuthenticationToken token) {
             return new UserId(UUID.fromString(token.getToken().getSubject()));
         }
-        throw new IllegalStateException("No hay un usuario autenticado en la petición");
+        throw new IllegalStateException("No authenticated user in the request");
     }
 }

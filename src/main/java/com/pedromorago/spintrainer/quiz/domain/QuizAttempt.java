@@ -42,7 +42,7 @@ public record QuizAttempt(
         Objects.requireNonNull(rangeSource, "rangeSource");
         Objects.requireNonNull(answeredAt, "answeredAt");
         if (correct != (given == expected)) {
-            throw new IllegalArgumentException("correct no coincide con given/expected");
+            throw new IllegalArgumentException("correct does not match given/expected");
         }
     }
 

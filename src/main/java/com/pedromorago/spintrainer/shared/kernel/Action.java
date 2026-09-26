@@ -45,7 +45,7 @@ public enum Action {
     public static Action fromCode(String code) {
         Action action = BY_CODE.get(code);
         if (action == null) {
-            throw new IllegalArgumentException("Acción desconocida: " + code);
+            throw new IllegalArgumentException("Unknown action: " + code);
         }
         return action;
     }

@@ -30,7 +30,7 @@ public record Range(
         Objects.requireNonNull(updatedAt, "updatedAt");
         hands = Collections.unmodifiableMap(new TreeMap<>(hands));
         if (version < 1) {
-            throw new IllegalArgumentException("version debe ser ≥ 1");
+            throw new IllegalArgumentException("version must be ≥ 1");
         }
     }
 }

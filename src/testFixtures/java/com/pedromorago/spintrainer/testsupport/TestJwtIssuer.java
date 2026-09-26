@@ -45,7 +45,7 @@ public final class TestJwtIssuer implements AutoCloseable {
             key = newKey();
             server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
         } catch (IOException | JOSEException e) {
-            throw new IllegalStateException("No se pudo arrancar el emisor de JWT de prueba", e);
+            throw new IllegalStateException("Could not start the test JWT issuer", e);
         }
         byte[] jwks = new JWKSet(key.toPublicJWK()).toString().getBytes(StandardCharsets.UTF_8);
         server.createContext("/auth/v1/.well-known/jwks.json", exchange -> {

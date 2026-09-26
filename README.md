@@ -18,15 +18,31 @@ Spring Boot 4.1 · Java 21 · Gradle (Kotlin DSL) · OpenAPI-first con openapi-g
 |---|---|---|
 | `.\gradlew.bat check` | `./gradlew check` | Formato, tests unitarios, arquitectura, integración (Testcontainers) y cobertura |
 | `.\gradlew.bat spotlessApply` | `./gradlew spotlessApply` | Aplica el formato (palantir-java-format, ktlint) |
-| `.\gradlew.bat bootRun` | `./gradlew bootRun` | Arranca la API en `http://localhost:8080` |
+| `.\gradlew.bat bootTestRun` | `./gradlew bootTestRun` | API en `http://localhost:8080` con un Postgres en Docker ya migrado; sin `SUPABASE_URL` imprime un token de desarrollo |
+| `.\gradlew.bat bootRun` | `./gradlew bootRun` | API contra la base de datos y el Supabase de las variables de entorno |
 
 ## Configuración
 
 | Variable | Ejemplo | Para qué |
 |---|---|---|
 | `SUPABASE_URL` | `https://<ref>.supabase.co` | Emisor de los JWT; la API valida la firma contra su JWKS (claves asimétricas ES256). Obligatoria |
+| `DB_URL` | `jdbc:postgresql://<host>:5432/postgres` | Postgres (en Supabase, el *session pooler*) |
+| `DB_APP_PASSWORD` / `DB_MIGRATOR_PASSWORD` | | Contraseñas de `spin_app` (la API) y `spin_migrator` (Flyway) |
+| `DB_APP_USER` / `DB_MIGRATOR_USER` | `spin_app` / `spin_migrator` | Opcionales si se usan los nombres por defecto |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,https://spin-trainer.vercel.app` | Orígenes del frontend |
 | `SPRING_PROFILES_ACTIVE` | `prod` | En despliegue: logs JSON (ECS) con `correlationId` |
+
+## Base de datos
+
+Esquema `app` (no expuesto a PostgREST), migrado por Flyway (`src/main/resources/db/migration`, numeración secuencial:
+esquema y seed en el orden en que se aplican). Dos roles con mínimos privilegios (ADR-0015):
+
+- `spin_migrator`: dueño del esquema; solo lo usa Flyway.
+- `spin_app`: el de la API; lectura del catálogo y de los rangos de referencia, escritura solo donde hace falta.
+
+Los roles se crean una vez por entorno con `src/main/resources/db/bootstrap/bootstrap.sql` (tiene las instrucciones);
+los tests de integración ejecutan ese mismo script contra un Postgres 17 de Testcontainers y comprueban la matriz de
+permisos.
 
 ## Errores
 
@@ -48,5 +64,5 @@ gradle/libs.versions.toml          versiones
 src/main/java/.../spintrainer/     aplicación
 src/test/java                      tests sin Spring ni Docker
 src/integrationTest/java           tests con Spring (y Testcontainers)
-src/testFixtures/java              utilidades compartidas por las suites
+src/testFixtures/java              Postgres de pruebas y emisor de JWT, compartidos por las suites y bootTestRun
 ```

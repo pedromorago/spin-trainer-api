@@ -64,12 +64,19 @@ dependencies {
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.boot.starter.actuator)
     implementation(libs.spring.boot.starter.security.oauth2.resource.server)
+    implementation(libs.spring.boot.starter.jdbc)
+    implementation(libs.spring.boot.starter.flyway)
+    implementation(libs.flyway.database.postgresql)
+    runtimeOnly(libs.postgresql)
 
     testImplementation(springBootBom)
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.archunit)
 
     testFixturesImplementation(springBootBom)
     testFixturesApi(libs.spring.security.oauth2.jose)
+    testFixturesApi(libs.testcontainers.postgresql)
+    testFixturesRuntimeOnly(libs.postgresql)
 }
 
 // Dos suites: `test` (dominio, casos de uso, arquitectura; sin Docker) e `integrationTest` (Spring + Testcontainers).
@@ -83,6 +90,7 @@ testing {
                 implementation(project())
                 implementation(testFixtures(project()))
                 implementation(libs.spring.boot.starter.webmvc.test)
+                implementation(libs.json.schema.validator)
             }
             targets.all { testTask.configure { shouldRunAfter(tasks.test) } }
         }
@@ -99,20 +107,40 @@ tasks.withType<Test>().configureEach {
     }
 }
 
-tasks.check { dependsOn(testing.suites.named("integrationTest"), tasks.jacocoTestReport) }
+tasks.check { dependsOn(testing.suites.named("integrationTest"), tasks.jacocoTestCoverageVerification) }
 
-// Cobertura de las dos suites; el código generado no cuenta.
+// Cobertura de las dos suites; el código generado desde la spec no cuenta.
+val coveredClasses =
+    sourceSets.main.map { main ->
+        main.output.classesDirs.asFileTree.matching {
+            exclude("com/pedromorago/spintrainer/api/**", "org/openapitools/**")
+        }
+    }
+
 tasks.jacocoTestReport {
     dependsOn(tasks.test, tasks.named("integrationTest"))
     executionData.setFrom(fileTree(layout.buildDirectory.dir("jacoco")).include("*.exec"))
-    classDirectories.setFrom(
-        sourceSets.main.get().output.classesDirs.asFileTree.matching {
-            exclude("com/pedromorago/spintrainer/api/**")
-        },
-    )
+    classDirectories.setFrom(coveredClasses)
     reports {
         xml.required = true
         html.required = true
+    }
+}
+
+// Mismo listón que la web (90 % en el dominio): dominio, kernel y casos de uso; 85 % en el conjunto.
+tasks.jacocoTestCoverageVerification {
+    dependsOn(tasks.jacocoTestReport)
+    executionData.setFrom(fileTree(layout.buildDirectory.dir("jacoco")).include("*.exec"))
+    classDirectories.setFrom(coveredClasses)
+    violationRules {
+        rule {
+            limit { minimum = "0.85".toBigDecimal() }
+        }
+        rule {
+            element = "PACKAGE"
+            includes = listOf("*.domain", "*.application", "*.shared.kernel")
+            limit { minimum = "0.90".toBigDecimal() }
+        }
     }
 }
 

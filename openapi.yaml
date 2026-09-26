@@ -11,7 +11,8 @@ info:
     - Errores: Problem Details (RFC 9457, antes RFC 7807) con `type` URN `urn:spin-trainer:<tipo>`.
     - Trazabilidad: la cabecera opcional `X-Correlation-Id` se propaga a logs y se devuelve en la respuesta
       (se genera si no llega) y en `Problem.correlationId`.
-    - Caché: `/situations` y `/ranges/default*` cambian solo con una migración de seed; responden con `ETag`.
+    - Caché: `/situations` y `/ranges/default*` cambian solo con una migración de seed; responden con `ETag` y
+      `Cache-Control: no-cache, private`, y con 304 si el `If-None-Match` coincide.
 servers:
   - url: /api/v1
 security:
@@ -35,9 +36,12 @@ paths:
       responses:
         '200':
           description: OK
+          headers:
+            ETag: { $ref: '#/components/headers/ETag' }
           content:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/Situation' } }
+        '304': { $ref: '#/components/responses/NotModified' }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
   /ranges/default:
@@ -49,9 +53,12 @@ paths:
       responses:
         '200':
           description: OK
+          headers:
+            ETag: { $ref: '#/components/headers/ETag' }
           content:
             application/json:
               schema: { type: array, items: { $ref: '#/components/schemas/Range' } }
+        '304': { $ref: '#/components/responses/NotModified' }
         '401': { $ref: '#/components/responses/Unauthorized' }
 
   /ranges/default/{situation}/{stack}:
@@ -65,9 +72,12 @@ paths:
       responses:
         '200':
           description: OK
+          headers:
+            ETag: { $ref: '#/components/headers/ETag' }
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Range' }
+        '304': { $ref: '#/components/responses/NotModified' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
@@ -225,6 +235,11 @@ components:
   securitySchemes:
     bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
 
+  headers:
+    ETag:
+      description: Versión de la representación. Reenviarla en `If-None-Match` para recibir 304 si no cambió.
+      schema: { type: string }
+
   parameters:
     situation:
       name: situation
@@ -239,6 +254,8 @@ components:
       schema: { $ref: '#/components/schemas/Stack' }
 
   responses:
+    NotModified:
+      description: Sin cambios respecto al `ETag` enviado en `If-None-Match`; el cliente reutiliza su copia.
     BadRequest:
       description: Petición inválida (urn:spin-trainer:validation), con detalle por campo en `errors`.
       content:

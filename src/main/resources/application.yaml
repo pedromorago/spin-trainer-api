@@ -4,6 +4,18 @@ spring:
   threads:
     virtual:
       enabled: true
+  # Dos roles (ADR-0015): la API como spin_app, con permisos mínimos; Flyway como spin_migrator, dueño del esquema.
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_APP_USER:spin_app}
+    password: ${DB_APP_PASSWORD}
+  flyway:
+    url: ${DB_URL}
+    user: ${DB_MIGRATOR_USER:spin_migrator}
+    password: ${DB_MIGRATOR_PASSWORD}
+    schemas: app
+    placeholders:
+      app_role: ${DB_APP_USER:spin_app}
   jackson:
     # additionalProperties: false en la spec → un campo desconocido es un 400, no se ignora.
     deserialization:

@@ -15,7 +15,8 @@ spring:
     password: ${DB_MIGRATOR_PASSWORD}
     schemas: app
     placeholders:
-      app_role: ${DB_APP_USER:spin_app}
+      # The role the migrations GRANT to. Not the login user: behind Supabase's pooler that is spin_app.<project-ref>.
+      app_role: ${DB_APP_ROLE:spin_app}
   jackson:
     # Optional fields without a value are omitted (the spec does not declare them nullable). Strict reading: JsonConfig.
     default-property-inclusion: non_null

@@ -29,7 +29,14 @@ docker build -t spin-trainer-api .
 
 Multi-stage: builds with the wrapper and runs the layered jar (dependencies and code separately), as an unprivileged
 user with the `prod` profile (JSON logs). It is the image that spin-trainer-qa starts (`env/docker-compose.yml`) and the
-one that will be deployed.
+one that is deployed.
+
+## Deployment
+
+Fly.io (ADR-0016): `fly.toml` (Paris region, 512 MB machine that stops when idle, readiness check) and
+`.github/workflows/deploy.yml`, which deploys the commit CI validated on `main` and smoke-tests it. Without the
+`FLY_API_TOKEN` secret the workflow deploys nothing. First-time setup (Supabase, roles, secrets, Vercel):
+`spin-trainer-web/docs/DEPLOY.md`.
 
 ## Configuration
 
@@ -38,7 +45,8 @@ one that will be deployed.
 | `SUPABASE_URL` | `https://<ref>.supabase.co` | JWT issuer; the API verifies the signature against its JWKS (ES256 asymmetric keys). Required |
 | `DB_URL` | `jdbc:postgresql://<host>:5432/postgres` | Postgres (on Supabase, the *session pooler*) |
 | `DB_APP_PASSWORD` / `DB_MIGRATOR_PASSWORD` | | Passwords for `spin_app` (the API) and `spin_migrator` (Flyway) |
-| `DB_APP_USER` / `DB_MIGRATOR_USER` | `spin_app` / `spin_migrator` | Optional if the default names are used |
+| `DB_APP_USER` / `DB_MIGRATOR_USER` | `spin_app` / `spin_migrator` | Login users. Behind Supabase's pooler: `spin_app.<ref>` / `spin_migrator.<ref>` |
+| `DB_APP_ROLE` | `spin_app` | Role the migrations grant permissions to; optional unless the role was renamed in `bootstrap.sql` |
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,https://spin-trainer.vercel.app` | Frontend origins |
 | `SPRING_PROFILES_ACTIVE` | `prod` | In deployment: JSON logs (ECS) with `correlationId` |
 
@@ -112,4 +120,4 @@ src/integrationTest/java               full API: Testcontainers, real JWTs, resp
 src/testFixtures/java                  test Postgres and JWT issuer (suites and bootTestRun)
 ```
 
-Architecture, decisions (ADR-0001..0015) and context: `spin-trainer-web/docs/`.
+Architecture, decisions (ADR-0001..0016) and context: `spin-trainer-web/docs/`.

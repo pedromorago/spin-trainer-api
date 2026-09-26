@@ -1,0 +1,35 @@
+# Fly.io deployment of the API (ADR-0016): the same image spin-trainer-qa tests. Secrets (SUPABASE_URL, DB_*,
+# CORS_ALLOWED_ORIGINS) are set with `fly secrets set`, never here. Steps: spin-trainer-web/docs/DEPLOY.md.
+app = "spin-trainer-api"
+primary_region = "cdg"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  SPRING_PROFILES_ACTIVE = "prod"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Sporadic traffic: the machine stops when idle and starts on the next request (cold start, see ADR-0016).
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+  [[http_service.checks]]
+    grace_period = "30s"
+    interval = "15s"
+    timeout = "5s"
+    method = "GET"
+    path = "/actuator/health/readiness"
+
+# Measured under the QA suite with a 512 MB limit: peak RSS ~275 MiB, no OOM.
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

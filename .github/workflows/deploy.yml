@@ -1,0 +1,57 @@
+name: deploy
+
+# Deploys the API to Fly.io (ADR-0016) after a green CI on main, or by hand. Without the FLY_API_TOKEN secret the job
+# only reports that deployment is not configured, so the workflow is harmless until the Fly.io app exists.
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    steps:
+      - name: Deployment configured
+        id: configured
+        run: |
+          if [ -z "$FLY_API_TOKEN" ]; then
+            echo "::notice::FLY_API_TOKEN is not set: nothing is deployed (spin-trainer-web/docs/DEPLOY.md)."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.configured.outputs.enabled == 'true'
+        uses: actions/checkout@v6
+        with:
+          # The commit CI validated, not whatever main points to now.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - if: steps.configured.outputs.enabled == 'true'
+        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # 1.6
+
+      - name: Deploy
+        if: steps.configured.outputs.enabled == 'true'
+        run: flyctl deploy --remote-only
+
+      # Flyway runs at startup: wrong database or issuer secrets fail here, not on the first user.
+      - name: Smoke test
+        if: steps.configured.outputs.enabled == 'true'
+        run: |
+          app=$(sed -n 's/^app = "\(.*\)"/\1/p' fly.toml)
+          curl --fail --silent --show-error --retry 10 --retry-delay 6 --retry-all-errors \
+            "https://$app.fly.dev/actuator/health/readiness"

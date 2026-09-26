@@ -8,7 +8,10 @@ info:
     intentos del Quiz (eventos inmutables) y estadísticas agregadas.
 
     - Autenticación: JWT emitido por Supabase Auth (`Authorization: Bearer`), validado contra su JWKS.
-    - Errores: Problem Details (RFC 9457, antes RFC 7807) con `type` URN `urn:spin-trainer:<tipo>`.
+    - Errores: Problem Details (RFC 9457, antes RFC 7807) con `type` URN `urn:spin-trainer:<tipo>`. Además de los
+      estados declarados en cada operación, cualquiera puede responder 500 (`internal`) o 503 (`unavailable`: el
+      emisor de los JWT no responde; reintentable) con el mismo formato. No se declaran operación a operación para que
+      la validación contra la spec siga rechazando cualquier otro estado no previsto.
     - Trazabilidad: la cabecera opcional `X-Correlation-Id` se propaga a logs y se devuelve en la respuesta
       (se genera si no llega) y en `Problem.correlationId`.
     - Caché: `/situations` y `/ranges/default*` cambian solo con una migración de seed; responden con `ETag` y

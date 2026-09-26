@@ -1,5 +1,6 @@
 package com.pedromorago.spintrainer.shared.persistence;
 
+import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -23,15 +24,20 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 class DatabaseRolesIT extends ApiIntegrationTest {
 
     static final Set<String> READ = Set.of("SELECT");
+    static final Set<String> READ_WRITE = Set.of("SELECT", "INSERT", "UPDATE", "DELETE");
 
     /** Permisos esperados de spin_app en cada tabla del esquema app. */
-    static final Map<String, Set<String>> EXPECTED = Map.of(
-            "flyway_schema_history", Set.of(),
-            "hand", READ,
-            "situation", READ,
-            "situation_prior_action", READ,
-            "situation_stack", READ,
-            "situation_action", READ);
+    static final Map<String, Set<String>> EXPECTED = Map.ofEntries(
+            entry("flyway_schema_history", Set.of()),
+            entry("hand", READ),
+            entry("situation", READ),
+            entry("situation_prior_action", READ),
+            entry("situation_stack", READ),
+            entry("situation_action", READ),
+            entry("default_range", READ),
+            entry("default_range_hand", READ),
+            entry("user_range", READ_WRITE),
+            entry("user_range_hand", READ_WRITE));
 
     @Autowired
     JdbcClient jdbc;

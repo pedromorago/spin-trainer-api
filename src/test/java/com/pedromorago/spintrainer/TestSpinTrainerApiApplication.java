@@ -12,6 +12,7 @@ import org.springframework.boot.SpringApplication;
  * Arranque local con solo Docker instalado: {@code gradlew bootTestRun}. Levanta un Postgres de Testcontainers
  * preparado como producción (roles + Flyway) y, si no hay {@code SUPABASE_URL}, un emisor de JWT local e imprime un
  * token para probar la API con curl, Postman o Newman. Con {@code SUPABASE_URL} valida los tokens reales de la web.
+ * Carga el rango de ejemplo del mock de la web ({@code btn_open@25}) para que la API local se comporte igual.
  */
 public final class TestSpinTrainerApiApplication {
 
@@ -21,6 +22,8 @@ public final class TestSpinTrainerApiApplication {
 
     public static void main(String[] args) {
         PostgresTestDatabase.shared().springProperties().forEach(System::setProperty);
+        // Datos de ejemplo solo para desarrollo (src/test/resources/db/sample): no viajan en el jar.
+        System.setProperty("spring.flyway.locations", "classpath:db/migration,classpath:db/sample");
         String supabaseUrl = System.getenv("SUPABASE_URL");
         if (supabaseUrl == null || supabaseUrl.isBlank()) {
             TestJwtIssuer issuer = TestJwtIssuer.shared();

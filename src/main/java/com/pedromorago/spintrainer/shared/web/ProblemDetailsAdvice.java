@@ -3,8 +3,12 @@ package com.pedromorago.spintrainer.shared.web;
 import com.pedromorago.spintrainer.shared.kernel.DomainException;
 import com.pedromorago.spintrainer.shared.kernel.DomainException.FieldError;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ElementKind;
+import jakarta.validation.Path;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
@@ -52,6 +56,17 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
             case NO_RANGE -> ProblemType.NO_RANGE;
         };
         return problem(type, ex.getMessage(), ex.errors(), new HttpHeaders(), request);
+    }
+
+    // Parámetros de ruta o query que no cumplen la spec: las interfaces generadas llevan @Validated, así que Spring
+    // los valida con un proxy AOP (ConstraintViolationException) y no con la validación propia de MVC.
+    @ExceptionHandler(ConstraintViolationException.class)
+    ResponseEntity<Object> constraintViolation(ConstraintViolationException ex, WebRequest request) {
+        List<FieldError> errors = ex.getConstraintViolations().stream()
+                .map(v -> new FieldError(parameterPath(v.getPropertyPath()), v.getMessage()))
+                .sorted(Comparator.comparing(FieldError::field))
+                .toList();
+        return problem(ProblemType.VALIDATION, invalidFields(errors), errors, new HttpHeaders(), request);
     }
 
     @ExceptionHandler(AuthenticationException.class)
@@ -185,6 +200,17 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
 
     private static String message(MessageSourceResolvable error) {
         return error.getDefaultMessage() != null ? error.getDefaultMessage() : "valor no válido";
+    }
+
+    /** {@code getDefaultRange.situation} → {@code situation}: sin el nombre del método. */
+    private static String parameterPath(Path path) {
+        List<String> names = new ArrayList<>();
+        for (Path.Node node : path) {
+            if (node.getKind() != ElementKind.METHOD && node.getName() != null) {
+                names.add(node.getName());
+            }
+        }
+        return String.join(".", names);
     }
 
     /** {@code hands[AAs]} → {@code hands.AAs}, como en el resto de la API. */

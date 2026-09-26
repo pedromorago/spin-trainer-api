@@ -78,6 +78,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Range' }
         '304': { $ref: '#/components/responses/NotModified' }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 
@@ -108,6 +109,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Range' }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404':
           description: Situación/stack desconocido o sin rango personalizado.
@@ -148,6 +150,7 @@ paths:
       summary: Borra el rango personalizado (vuelve a aplicar el de referencia). Idempotente.
       responses:
         '204': { description: Borrado o inexistente }
+        '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '404': { $ref: '#/components/responses/NotFound' }
 

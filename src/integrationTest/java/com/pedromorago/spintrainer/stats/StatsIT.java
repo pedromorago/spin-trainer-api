@@ -89,6 +89,7 @@ class StatsIT extends ApiIntegrationTest {
             30 | Europe/Madrid       | [{"date":"2026-09-20","attempts":1,"correct":0},{"date":"2026-09-26","attempts":2,"correct":1}]
             1  | UTC                 | [{"date":"2026-09-26","attempts":1,"correct":0}]
             1  | Europe/Madrid       | [{"date":"2026-09-26","attempts":2,"correct":1}]
+            1  | CET                 | [{"date":"2026-09-26","attempts":2,"correct":1}]
             7  | America/Los_Angeles | [{"date":"2026-09-20","attempts":1,"correct":0},{"date":"2026-09-25","attempts":1,"correct":1},{"date":"2026-09-26","attempts":1,"correct":0}]
             90 | UTC                 | [{"date":"2026-08-01","attempts":1,"correct":1},{"date":"2026-09-20","attempts":1,"correct":0},{"date":"2026-09-25","attempts":1,"correct":1},{"date":"2026-09-26","attempts":1,"correct":0}]
             """)

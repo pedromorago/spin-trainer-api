@@ -7,6 +7,7 @@ import com.pedromorago.spintrainer.shared.kernel.DomainException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -36,6 +37,20 @@ class DayWindowTest {
         DayWindow day = DayWindow.lastDays(1, Instant.parse("2026-10-25T12:00:00Z"), "Europe/Madrid");
 
         assertThat(Duration.between(day.start(), day.end())).isEqualTo(Duration.ofHours(25));
+    }
+
+    @Test
+    void listsEveryDayWithItsLocalMidnights() {
+        List<DayWindow.Day> days = DayWindow.lastDays(3, Instant.parse("2026-10-26T12:00:00Z"), "Europe/Madrid")
+                .days();
+
+        assertThat(days)
+                .extracting(DayWindow.Day::date)
+                .containsExactly(
+                        LocalDate.parse("2026-10-24"), LocalDate.parse("2026-10-25"), LocalDate.parse("2026-10-26"));
+        assertThat(days.get(1).start()).isEqualTo(Instant.parse("2026-10-24T22:00:00Z"));
+        assertThat(days.get(1).end()).isEqualTo(Instant.parse("2026-10-25T23:00:00Z"));
+        assertThat(days.get(2).start()).isEqualTo(days.get(1).end());
     }
 
     @ParameterizedTest

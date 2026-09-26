@@ -4,6 +4,7 @@ import com.pedromorago.spintrainer.shared.kernel.DomainException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 
 /**
  * Los últimos {@code days} días naturales hasta hoy (incluido) en una zona horaria IANA. Los límites son medianoches
@@ -32,10 +33,20 @@ public record DayWindow(ZoneId zone, LocalDate first, LocalDate last) {
         return last.plusDays(1).atStartOfDay(zone).toInstant();
     }
 
-    /**
-     * Solo nombres de región IANA ({@code Europe/Madrid}, {@code UTC}): la base de datos corta los días con el mismo
-     * nombre, y un desfase fijo como {@code +01:00} se interpreta con el signo al revés en Postgres.
-     */
+    /** Cada día de la ventana con sus límites en instantes: la base de datos agrupa sin interpretar zonas horarias. */
+    public List<Day> days() {
+        return first.datesUntil(last.plusDays(1))
+                .map(date -> new Day(
+                        date,
+                        date.atStartOfDay(zone).toInstant(),
+                        date.plusDays(1).atStartOfDay(zone).toInstant()))
+                .toList();
+    }
+
+    /** Un día natural en la zona: de {@code start} (incluido) a {@code end} (excluido). */
+    public record Day(LocalDate date, Instant start, Instant end) {}
+
+    /** Solo nombres de zona IANA ({@code Europe/Madrid}, {@code UTC}), como dice el contrato; no desfases fijos. */
     private static ZoneId zone(String timeZone) {
         if (timeZone == null || !ZoneId.getAvailableZoneIds().contains(timeZone)) {
             throw DomainException.validation("tz", "zona IANA desconocida");

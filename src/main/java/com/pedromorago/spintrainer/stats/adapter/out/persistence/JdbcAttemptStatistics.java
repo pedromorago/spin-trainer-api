@@ -10,7 +10,6 @@ import com.pedromorago.spintrainer.stats.domain.HandStat;
 import com.pedromorago.spintrainer.stats.domain.ProgressDay;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -31,22 +30,27 @@ class JdbcAttemptStatistics implements AttemptStatistics {
 
     @Override
     public List<HandStat> byHand(UserId user, Optional<SituationKey> situation, Optional<Stack> stack) {
-        return jdbc.sql("""
-                        SELECT a.situation, a.stack, a.hand,
-                               count(*) AS attempts,
-                               count(*) FILTER (WHERE a.correct) AS correct,
-                               max(a.answered_at) AS last_answered_at
-                        FROM app.quiz_attempt a
-                        JOIN app.situation s ON s.key = a.situation
-                        WHERE a.user_id = :user
-                          AND (CAST(:situation AS text) IS NULL OR a.situation = :situation)
-                          AND (CAST(:stack AS numeric) IS NULL OR a.stack = :stack)
-                        GROUP BY s.position, a.situation, a.stack, a.hand
-                        ORDER BY s.position, a.stack DESC, a.hand""")
-                .param("user", user.value())
-                .param("situation", situation.map(SituationKey::value).orElse(null))
-                .param("stack", stack.map(Stack::bigBlinds).orElse(null))
-                .query((rs, row) -> new HandStat(
+        // Filtros opcionales como fragmentos fijos; los valores van como parámetros.
+        StringBuilder sql = new StringBuilder("""
+                SELECT a.situation, a.stack, a.hand,
+                       count(*) AS attempts,
+                       count(*) FILTER (WHERE a.correct) AS correct,
+                       max(a.answered_at) AS last_answered_at
+                FROM app.quiz_attempt a
+                JOIN app.situation s ON s.key = a.situation
+                WHERE a.user_id = :user""");
+        situation.ifPresent(s -> sql.append(" AND a.situation = :situation"));
+        stack.ifPresent(s -> sql.append(" AND a.stack = :stack"));
+        sql.append(" GROUP BY s.position, a.situation, a.stack, a.hand ORDER BY s.position, a.stack DESC, a.hand");
+
+        JdbcClient.StatementSpec query = jdbc.sql(sql.toString()).param("user", user.value());
+        if (situation.isPresent()) {
+            query = query.param("situation", situation.get().value());
+        }
+        if (stack.isPresent()) {
+            query = query.param("stack", stack.get().bigBlinds());
+        }
+        return query.query((rs, row) -> new HandStat(
                         SituationKey.of(rs.getString("situation")),
                         Stack.of(rs.getBigDecimal("stack")),
                         Hand.of(rs.getString("hand")),
@@ -58,20 +62,21 @@ class JdbcAttemptStatistics implements AttemptStatistics {
 
     @Override
     public List<ProgressDay> byDay(UserId user, DayWindow window) {
-        // El día se corta en la zona pedida (nombre IANA ya validado); el filtro usa instantes para aprovechar el
-        // índice.
+        // Los límites de cada día los calcula java.time (cambios de hora incluidos) y viajan como instantes: Postgres
+        // agrupa sin interpretar nombres de zona (con AT TIME ZONE, "CET" sería un desfase fijo y no la zona europea).
+        List<DayWindow.Day> days = window.days();
         return jdbc.sql("""
-                        SELECT CAST(answered_at AT TIME ZONE :zone AS date) AS day,
-                               count(*) AS attempts,
-                               count(*) FILTER (WHERE correct) AS correct
-                        FROM app.quiz_attempt
-                        WHERE user_id = :user AND answered_at >= :start AND answered_at < :end
-                        GROUP BY day
-                        ORDER BY day""")
-                .param("zone", window.zone().getId())
+                        SELECT d.day, count(*) AS attempts, count(*) FILTER (WHERE a.correct) AS correct
+                        FROM unnest(CAST(:days AS date[]), CAST(:starts AS timestamptz[]), CAST(:ends AS timestamptz[]))
+                             AS d(day, start_at, end_at)
+                        JOIN app.quiz_attempt a
+                          ON a.user_id = :user AND a.answered_at >= d.start_at AND a.answered_at < d.end_at
+                        GROUP BY d.day
+                        ORDER BY d.day""")
                 .param("user", user.value())
-                .param("start", window.start().atOffset(ZoneOffset.UTC))
-                .param("end", window.end().atOffset(ZoneOffset.UTC))
+                .param("days", days.stream().map(d -> d.date().toString()).toArray(String[]::new))
+                .param("starts", days.stream().map(d -> d.start().toString()).toArray(String[]::new))
+                .param("ends", days.stream().map(d -> d.end().toString()).toArray(String[]::new))
                 .query((rs, row) -> new ProgressDay(
                         rs.getObject("day", LocalDate.class), rs.getInt("attempts"), rs.getInt("correct")))
                 .list();

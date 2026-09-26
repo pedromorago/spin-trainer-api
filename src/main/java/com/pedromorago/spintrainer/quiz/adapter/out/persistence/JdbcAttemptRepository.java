@@ -52,27 +52,31 @@ class JdbcAttemptRepository implements AttemptRepository {
     @Override
     public List<QuizAttempt> findPage(
             UserId user, Optional<SituationKey> situation, Optional<Stack> stack, Optional<Position> after, int limit) {
-        // Filtros opcionales con parámetros tipados (sin concatenar SQL): un filtro nulo no restringe.
-        return jdbc.sql("""
-                        SELECT id, user_id, situation, stack, hand, given, expected, correct, range_source,
-                               range_version, answered_at
-                        FROM app.quiz_attempt
-                        WHERE user_id = :user
-                          AND (CAST(:situation AS text) IS NULL OR situation = :situation)
-                          AND (CAST(:stack AS numeric) IS NULL OR stack = :stack)
-                          AND (CAST(:afterAt AS timestamptz) IS NULL OR (answered_at, id) < (:afterAt, :afterId))
-                        ORDER BY answered_at DESC, id DESC
-                        LIMIT :limit""")
-                .param("user", user.value())
-                .param("situation", situation.map(SituationKey::value).orElse(null))
-                .param("stack", stack.map(Stack::bigBlinds).orElse(null))
-                .param(
-                        "afterAt",
-                        after.map(p -> p.answeredAt().atOffset(ZoneOffset.UTC)).orElse(null))
-                .param("afterId", after.map(Position::id).orElse(null))
-                .param("limit", limit)
-                .query(JdbcAttemptRepository::toAttempt)
-                .list();
+        // Condiciones opcionales como fragmentos fijos (nunca texto del usuario; los valores van como parámetros): así
+        // la comparación de fila del cursor usa el índice (user_id, answered_at DESC, id DESC) en todas las páginas.
+        StringBuilder sql = new StringBuilder("""
+                SELECT id, user_id, situation, stack, hand, given, expected, correct, range_source, range_version,
+                       answered_at
+                FROM app.quiz_attempt
+                WHERE user_id = :user""");
+        situation.ifPresent(s -> sql.append(" AND situation = :situation"));
+        stack.ifPresent(s -> sql.append(" AND stack = :stack"));
+        after.ifPresent(p -> sql.append(" AND (answered_at, id) < (:afterAt, :afterId)"));
+        sql.append(" ORDER BY answered_at DESC, id DESC LIMIT :limit");
+
+        JdbcClient.StatementSpec query =
+                jdbc.sql(sql.toString()).param("user", user.value()).param("limit", limit);
+        if (situation.isPresent()) {
+            query = query.param("situation", situation.get().value());
+        }
+        if (stack.isPresent()) {
+            query = query.param("stack", stack.get().bigBlinds());
+        }
+        if (after.isPresent()) {
+            query = query.param("afterAt", after.get().answeredAt().atOffset(ZoneOffset.UTC))
+                    .param("afterId", after.get().id());
+        }
+        return query.query(JdbcAttemptRepository::toAttempt).list();
     }
 
     private static QuizAttempt toAttempt(ResultSet rs, int row) throws SQLException {

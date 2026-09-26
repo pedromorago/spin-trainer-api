@@ -37,12 +37,20 @@ management:
   endpoints:
     web:
       exposure:
-        include: health
+        include: health, info
+  info:
+    env:
+      enabled: true
   endpoint:
     health:
       probes:
         enabled: true
       show-details: never
+
+# /actuator/info: the commit the image was built from (Dockerfile). The deploy waits until the new one answers.
+info:
+  app:
+    revision: ${APP_REVISION:unknown}
 
 logging:
   pattern:

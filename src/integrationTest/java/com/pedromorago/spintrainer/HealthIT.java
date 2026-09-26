@@ -16,6 +16,20 @@ class HealthIT extends ApiIntegrationTest {
     }
 
     @Test
+    void infoIsPublicAndOnlySaysTheRevision() {
+        assertThat(mvc.get().uri("/actuator/info"))
+                .hasStatusOk()
+                .bodyJson()
+                .isEqualTo("{\"app\":{\"revision\":\"unknown\"}}");
+    }
+
+    @Test
+    void theRestOfActuatorIsNotExposed() {
+        assertThat(mvc.get().uri("/actuator/env")).hasStatus(401);
+        assertThat(mvc.get().uri("/actuator")).hasStatus(401);
+    }
+
+    @Test
     void probesArePublic() {
         assertThat(mvc.get().uri("/actuator/health/liveness")).hasStatusOk();
         assertThat(mvc.get().uri("/actuator/health/readiness")).hasStatusOk();

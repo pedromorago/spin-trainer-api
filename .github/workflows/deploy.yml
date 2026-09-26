@@ -24,15 +24,24 @@ env:
 
 jobs:
   deploy:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    # The branches filter matches the head branch name, and CI also runs for pull requests: without the last two
+    # conditions, a fork's PR from its own "main" would build and deploy the fork's code with the production secrets.
+    if: >-
+      github.event_name == 'workflow_dispatch' || (
+        github.event.workflow_run.conclusion == 'success' &&
+        github.event.workflow_run.event == 'push' &&
+        github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: production
+    env:
+      HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      # The commit CI validated, not whatever main points to now.
+      TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
       - uses: actions/checkout@v6
         with:
-          # The commit CI validated, not whatever main points to now.
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: ${{ env.TAG }}
 
       - uses: docker/setup-buildx-action@v4
 
@@ -49,22 +58,49 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ env.IMAGE }}:${{ github.event.workflow_run.head_sha || github.sha }}
+            ${{ env.IMAGE }}:${{ env.TAG }}
             ${{ env.IMAGE }}:latest
+          build-args: REVISION=${{ env.TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Deploy to Render
-        env:
-          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-          TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
           if [ -z "$HOOK" ]; then
             echo "::notice::RENDER_DEPLOY_HOOK_URL is not set: image pushed, nothing deployed (spin-trainer-web/docs/DEPLOY.md)."
             exit 0
           fi
           curl --fail --silent --show-error -X POST "$HOOK&imgURL=$(printf '%s' "$IMAGE:$TAG" | jq -sRr @uri)"
-          # Flyway runs at startup: wrong database or issuer secrets fail here, not on the first user. The free
-          # instance may also be waking up, so the check waits up to five minutes.
-          curl --fail --silent --show-error --retry 30 --retry-delay 10 --retry-all-errors \
-            "$API_URL/actuator/health/readiness"
+
+      # Render keeps the previous version serving until the new one passes its health check, so a green readiness
+      # alone proves nothing: wait until /actuator/info reports this commit. A new version that never starts (Flyway
+      # failing on the database secrets, for instance) fails here instead of looking deployed.
+      - name: Wait for this commit to serve
+        if: env.HOOK != ''
+        run: |
+          for attempt in $(seq 60); do
+            revision=$(curl --silent --max-time 10 "$API_URL/actuator/info" | jq -r '.app.revision // empty' 2>/dev/null || true)
+            if [ "$revision" = "$TAG" ]; then
+              curl --fail --silent --show-error "$API_URL/actuator/health/readiness"
+              echo
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::$TAG is not serving after ten minutes (last revision seen: ${revision:-none}). Check the Render logs."
+          exit 1
+
+      # The JWKS is only fetched on the first authenticated request, so a wrong SUPABASE_URL passes every health
+      # check. A token with a key id the issuer does not have makes the API fetch it: 401 means the issuer answered;
+      # 503 means it could not be reached.
+      - name: Check the JWT issuer is reachable
+        if: env.HOOK != ''
+        run: |
+          b64() { printf '%s' "$1" | base64 -w0 | tr '+/' '-_' | tr -d '='; }
+          token="$(b64 '{"alg":"ES256","typ":"JWT","kid":"deploy-check"}').$(b64 '{}').$(b64 'no-signature')"
+          status=$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 30 \
+            -H "Authorization: Bearer $token" "$API_URL/api/v1/situations")
+          if [ "$status" != "401" ]; then
+            echo "::error::Expected 401 from a token the issuer does not know; got $status (is SUPABASE_URL right?)."
+            exit 1
+          fi

@@ -19,4 +19,7 @@ COPY --from=build /workspace/build/native/nativeCompile/spin-trainer-api /app/sp
 USER spring
 EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=prod
+# The commit being built (deploy.yml): /actuator/info reports it, so the deploy can tell the new version is serving.
+ARG REVISION=unknown
+ENV APP_REVISION=${REVISION}
 ENTRYPOINT ["/app/spin-trainer-api"]

@@ -19,7 +19,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
  * Stateless resource server: each request carries its Supabase JWT (ADR-0003). No sessions or cookies, so there is no
- * CSRF. Only the Actuator health endpoint is public.
+ * CSRF. Only the Actuator health and info (the deployed commit) endpoints are public.
  */
 @Configuration(proxyBeanMethods = false)
 class SecurityConfig {
@@ -37,7 +37,7 @@ class SecurityConfig {
                 (request, response, ex) -> resolver.resolveException(request, response, null, ex);
         http.authorizeHttpRequests(auth -> auth.dispatcherTypeMatchers(DispatcherType.ERROR)
                         .permitAll()
-                        .requestMatchers("/actuator/health", "/actuator/health/**")
+                        .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info")
                         .permitAll()
                         .anyRequest()
                         .authenticated())

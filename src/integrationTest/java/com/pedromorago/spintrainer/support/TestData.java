@@ -41,6 +41,19 @@ public final class TestData {
         }
     }
 
+    /** Quita el rango de referencia de un spot (el seed los trae todos): para probar lo que pasa sin él. */
+    public static void withoutDefaultRange(String situation, double stack) {
+        try (Connection admin = PostgresTestDatabase.shared().adminConnection();
+                PreparedStatement delete =
+                        admin.prepareStatement("DELETE FROM app.default_range WHERE situation = ? AND stack = ?")) {
+            delete.setString(1, situation);
+            delete.setBigDecimal(2, BigDecimal.valueOf(stack));
+            delete.executeUpdate();
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public static void defaultRange(String situation, double stack, int version, Map<String, String> hands) {
         try (Connection admin = PostgresTestDatabase.shared().adminConnection()) {
             admin.setAutoCommit(false);

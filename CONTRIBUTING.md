@@ -7,7 +7,8 @@ Fuente de verdad del proyecto: `spin-trainer-web/docs/` (contexto, `ARCHITECTURE
 - Calidad de portfolio > velocidad. ADRs cerrados; solo se reabren con fallo concreto y justificado (ADR nuevo).
 - Solo Spin & Go (3-max y HU, 16 situaciones). Rango efectivo = personalizado si existe, si no el de referencia (ADR-0012).
 - Supabase solo emite el JWT; la API es el único camino de datos. Tablas en el esquema `app`, no expuesto a PostgREST.
-- Rangos de referencia en BD vía migraciones Flyway (seed versionado). Intentos del Quiz = eventos inmutables.
+- Rangos de referencia en BD vía migraciones Flyway (seed versionado, V5) con su fuente en `reference-ranges.json`
+  (`ReferenceSeedIT` exige que coincidan; web y QA guardan copia). Intentos del Quiz = eventos inmutables.
 - OpenAPI-first: se cambia `openapi.yaml` antes que el código (y la copia de la web con `npm run spec:sync`).
 - Gradle (Kotlin DSL), nunca Maven. Descartados: OWASP ZAP, carga, Pact, pgTAP.
 - Commits **siempre a nombre de Pedro** (autor y committer: `Pedro Morago López-Vázquez <pedromoragolv@gmail.com>`;
@@ -43,6 +44,7 @@ Antes de commitear: `./gradlew check` en verde. Versiones solo en `gradle/libs.v
   `ApiIntegrationTest`: app completa, Postgres de Testcontainers con los roles reales, JWT reales de `TestJwtIssuer`),
   `testFixtures` (`PostgresTestDatabase`, `TestJwtIssuer`).
 - Cada respuesta de un IT se valida con `CONTRACT.assertResponse(method, pathDeLaSpec, result)`.
-- Datos que la API no puede escribir (rangos de referencia, intentos con fecha): `TestData`, como administrador.
+- Datos que la API no puede escribir (rangos de referencia, intentos con fecha): `TestData`, como administrador. Los IT
+  que reemplazan o quitan rangos de referencia lo hacen sobre la base compartida; `ReferenceSeedIT` usa una propia.
 - Aislamiento: un usuario (UUID) nuevo por test; los datos compartidos se preparan en `@BeforeEach` idempotente.
 - JaCoCo: ≥ 90 % en dominio, casos de uso y kernel; ≥ 85 % en total (lo exige `check`).

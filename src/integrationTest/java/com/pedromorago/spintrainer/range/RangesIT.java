@@ -28,11 +28,13 @@ class RangesIT extends ApiIntegrationTest {
 
     final String auth = bearer(UUID.randomUUID());
 
-    // Después de arrancar el contexto (Flyway ya migró): en un @BeforeAll la tabla aún no existiría.
+    // Después de arrancar el contexto (Flyway ya migró): en un @BeforeAll la tabla aún no existiría. Se reemplazan
+    // rangos del seed por otros pequeños y conocidos, y btn_open@8 se queda sin rango de referencia.
     @BeforeEach
     void referenceRanges() {
         TestData.defaultRange("btn_open", 25, 1, Map.of("AA", "MR_4B_C", "KK", "MR_4B_C", "22", "L_C_C"));
         TestData.defaultRange("bb_vs_btn_mr_sb_3bet", 12.5, 2, Map.of("AA", "ALLIN"));
+        TestData.withoutDefaultRange("btn_open", 8);
     }
 
     MvcTestResult get(String uri) {

@@ -41,6 +41,15 @@ public final class PostgresTestDatabase {
         return shared;
     }
 
+    /** Base de datos nueva y solo para quien la pide (p. ej. aplicar las migraciones desde cero); pararla al acabar. */
+    public static PostgresTestDatabase fresh() {
+        return new PostgresTestDatabase();
+    }
+
+    public void stop() {
+        container.stop();
+    }
+
     public String jdbcUrl() {
         return container.getJdbcUrl();
     }

@@ -1,6 +1,7 @@
 package com.pedromorago.spintrainer.situation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.MAP;
 
 import com.pedromorago.spintrainer.support.ApiIntegrationTest;
 import java.util.UUID;
@@ -70,7 +71,13 @@ class SituationsIT extends ApiIntegrationTest {
                 .singleElement()
                 .asString()
                 .startsWith("Amarillo parte suited");
-        assertThat(result).bodyJson().extractingPath("$[0]").asMap().doesNotContainKey("notes");
+        assertThat(result)
+                .bodyJson()
+                .extractingPath("$[?(@.key == 'sb_vs_btn_limp')]")
+                .asArray()
+                .singleElement()
+                .asInstanceOf(MAP)
+                .doesNotContainKey("notes");
     }
 
     @Test

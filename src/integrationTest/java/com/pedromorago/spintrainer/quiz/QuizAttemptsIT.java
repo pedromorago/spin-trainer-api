@@ -29,6 +29,7 @@ class QuizAttemptsIT extends ApiIntegrationTest {
     void referenceRanges() {
         TestData.defaultRange("btn_open", 25, 3, Map.of("AA", "MR_4B_C", "A5s", "MR_F_F"));
         TestData.defaultRange("bb_vs_sb_limp", 10, 1, Map.of("AA", "ALLIN"));
+        TestData.withoutDefaultRange("btn_open", 8);
     }
 
     MvcTestResult record(String body) {

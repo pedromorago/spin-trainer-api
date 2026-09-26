@@ -50,6 +50,18 @@ esquema y seed en el orden en que se aplican). Dos roles con mínimos privilegio
 - `spin_migrator`: dueño del esquema; solo lo usa Flyway.
 - `spin_app`: el de la API; lectura del catálogo y de los rangos de referencia, escritura solo donde hace falta.
 
+### Rangos de referencia
+
+Las 73 tablas de `Tablasmentov3.pdf` (16 situaciones, un rango por stack) están en `reference-ranges.json`, una línea
+por fila del grid 13×13 con las manos de acción explícita; las demás llevan la implícita (FOLD, o CHECK si FOLD no
+es posible). `V5__seed_reference_ranges.sql` las carga con esos mismos objetos JSON y `ReferenceSeedIT` comprueba,
+migrando una base de datos vacía, que el resultado es exactamente el fichero y que cada spot del catálogo tiene rango.
+
+El fichero se extrajo del PDF por el color de relleno de cada celda contra la leyenda de su tabla (colores exactos de
+la hoja de cálculo original) y se revisó superponiendo la reconstrucción al original. La web (mock) y spin-trainer-qa
+(oráculos) guardan copias con su comprobación, como el contrato. Cambiar un rango = migración nueva y el fichero en el
+mismo commit; el test obliga a que coincidan.
+
 Los roles se crean una vez por entorno con `src/main/resources/db/bootstrap/bootstrap.sql` (tiene las instrucciones);
 los tests de integración ejecutan ese mismo script contra un Postgres 17 de Testcontainers y comprueban la matriz de
 permisos.

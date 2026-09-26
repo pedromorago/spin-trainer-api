@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 
@@ -341,6 +342,54 @@ class RangesIT extends ApiIntegrationTest {
             assertThat(deleted).hasStatus(404);
             CONTRACT.assertResponse("DELETE", USER_PATH, deleted);
             CONTRACT.assertResponse("DELETE", USER_PATH, delete("/api/v1/ranges/user/btn_open/12.3"));
+        }
+    }
+
+    /**
+     * La web manda {@code Accept: application/json}; los errores son {@code application/problem+json} (RFC 9457). El
+     * DELETE, cuya única representación es un Problem, respondía 406 a esos clientes (hallado por los E2E de QA).
+     */
+    @Nested
+    class JsonOnlyClients {
+
+        static final String URI = "/api/v1/ranges/user/btn_open/25";
+
+        MvcTestResult send(String method, String uri, MediaType accept) {
+            return mvc.method(HttpMethod.valueOf(method))
+                    .uri(uri)
+                    .header(HttpHeaders.AUTHORIZATION, auth)
+                    .accept(accept)
+                    .exchange();
+        }
+
+        @Test
+        void getDataAsJsonAndErrorsAsProblemDetails() {
+            MvcTestResult reference = send("GET", "/api/v1/ranges/default/btn_open/25", MediaType.APPLICATION_JSON);
+            MvcTestResult missing = send("GET", URI, MediaType.APPLICATION_JSON);
+
+            assertThat(reference).hasStatus(200).hasContentType(MediaType.APPLICATION_JSON);
+            assertThat(missing).hasStatus(404).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+            CONTRACT.assertResponse("GET", USER_PATH, missing);
+        }
+
+        @Test
+        void canDeleteARange() {
+            put(URI, "{\"hands\":{},\"version\":0}");
+
+            MvcTestResult deleted = send("DELETE", URI, MediaType.APPLICATION_JSON);
+            MvcTestResult unknown = send("DELETE", "/api/v1/ranges/user/btn_open/12.5", MediaType.APPLICATION_JSON);
+
+            assertThat(deleted).hasStatus(204);
+            assertThat(get(URI)).hasStatus(404);
+            assertThat(unknown).hasStatus(404).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+            CONTRACT.assertResponse("DELETE", USER_PATH, unknown);
+        }
+
+        @Test
+        void aClientThatAcceptsNoJsonStillGetsA406() {
+            assertThat(send("GET", "/api/v1/ranges/default/btn_open/25", MediaType.TEXT_HTML))
+                    .hasStatus(406);
+            assertThat(send("DELETE", URI, MediaType.TEXT_HTML)).hasStatus(406);
         }
     }
 }

@@ -5,7 +5,10 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Datos que la API no puede escribir (spin_app solo lee los rangos de referencia): se insertan como administrador,
@@ -14,6 +17,29 @@ import java.util.Map;
 public final class TestData {
 
     private TestData() {}
+
+    /** Un intento con fecha elegida (la API siempre usa la hora actual), para probar las estadísticas por día. */
+    public static void attempt(
+            UUID user, String situation, double stack, String hand, String given, String expected, Instant answeredAt) {
+        try (Connection admin = PostgresTestDatabase.shared().adminConnection();
+                PreparedStatement insert = admin.prepareStatement("""
+                        INSERT INTO app.quiz_attempt (id, user_id, situation, stack, hand, given, expected, correct,
+                                                      range_source, range_version, answered_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'default', 1, ?)""")) {
+            insert.setObject(1, UUID.randomUUID());
+            insert.setObject(2, user);
+            insert.setString(3, situation);
+            insert.setBigDecimal(4, BigDecimal.valueOf(stack));
+            insert.setString(5, hand);
+            insert.setString(6, given);
+            insert.setString(7, expected);
+            insert.setBoolean(8, given.equals(expected));
+            insert.setObject(9, answeredAt.atOffset(ZoneOffset.UTC));
+            insert.executeUpdate();
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     public static void defaultRange(String situation, double stack, int version, Map<String, String> hands) {
         try (Connection admin = PostgresTestDatabase.shared().adminConnection()) {

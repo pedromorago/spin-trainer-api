@@ -21,7 +21,8 @@ JUnit 6 + AssertJ · Testcontainers 2 · Spotless (palantir-java-format) · JaCo
 ```
 ./gradlew check          # formato + test + integrationTest + cobertura (necesita Docker)
 ./gradlew spotlessApply  # formatear
-./gradlew bootRun
+./gradlew bootTestRun     # API local: Postgres en Docker y token de desarrollo impreso
+./gradlew bootRun         # con las variables de entorno reales
 ```
 Antes de commitear: `./gradlew check` en verde. Versiones solo en `gradle/libs.versions.toml` (sin versión si la gestiona el BOM de Boot).
 

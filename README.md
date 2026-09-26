@@ -21,6 +21,16 @@ Spring Boot 4.1 · Java 21 · Gradle (Kotlin DSL) · OpenAPI-first con openapi-g
 | `.\gradlew.bat bootTestRun` | `./gradlew bootTestRun` | API en `http://localhost:8080` con un Postgres en Docker ya migrado; sin `SUPABASE_URL` imprime un token de desarrollo |
 | `.\gradlew.bat bootRun` | `./gradlew bootRun` | API contra la base de datos y el Supabase de las variables de entorno |
 
+## Imagen Docker
+
+```
+docker build -t spin-trainer-api .
+```
+
+Multi-stage: compila con el wrapper y ejecuta el jar por capas (dependencias y código por separado), con un usuario sin
+privilegios y el perfil `prod` (logs JSON). Es la imagen que levanta spin-trainer-qa (`env/docker-compose.yml`) y la
+que se desplegará.
+
 ## Configuración
 
 | Variable | Ejemplo | Para qué |

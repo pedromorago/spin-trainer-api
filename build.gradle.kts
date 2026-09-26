@@ -158,7 +158,17 @@ spotless {
         ktlint()
     }
     format("misc") {
-        target("*.md", "*.yaml", ".gitignore", ".gitattributes", ".github/**/*.yml", "src/**/*.sql", "src/**/*.yaml")
+        target(
+            "*.md",
+            "*.yaml",
+            "Dockerfile",
+            ".dockerignore",
+            ".gitignore",
+            ".gitattributes",
+            ".github/**/*.yml",
+            "src/**/*.sql",
+            "src/**/*.yaml",
+        )
         trimTrailingWhitespace()
         endWithNewline()
     }

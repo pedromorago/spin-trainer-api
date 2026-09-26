@@ -1,0 +1,9 @@
+# Solo lo que necesita la imagen: el wrapper, la configuración de Gradle, la spec y src/main.
+*
+!gradlew
+!gradle/
+!settings.gradle.kts
+!build.gradle.kts
+!gradle.properties
+!openapi.yaml
+!src/main/

@@ -74,6 +74,10 @@ class RangeService implements ReadDefaultRanges, ManageUserRanges, ResolveEffect
             throw DomainException.validation("version", "la versión debe ser un entero ≥ 0");
         }
         Map<Hand, Action> normalized = RangeRules.normalize(hands, spot);
+        if (version == Integer.MAX_VALUE) {
+            // No puede ser la versión actual de nada que se pueda reemplazar (y version + 1 desbordaría).
+            throw conflict(user, situation, stack);
+        }
         // Milisegundos, como el navegador: lo que devuelve el PUT es exactamente lo que devolverá un GET posterior.
         Instant now = clock.instant().truncatedTo(ChronoUnit.MILLIS);
         Range next = new Range(situation, stack, normalized, RangeSource.USER, version + 1, Optional.of(now));

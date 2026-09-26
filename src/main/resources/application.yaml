@@ -17,10 +17,7 @@ spring:
     placeholders:
       app_role: ${DB_APP_USER:spin_app}
   jackson:
-    # additionalProperties: false en la spec → un campo desconocido es un 400, no se ignora.
-    deserialization:
-      fail-on-unknown-properties: true
-    # Los campos opcionales sin valor no se envían (la spec no los declara nullable).
+    # Los campos opcionales sin valor no se envían (la spec no los declara nullable). Lectura estricta: JsonConfig.
     default-property-inclusion: non_null
 
 server:

@@ -22,6 +22,15 @@ import org.springframework.stereotype.Repository;
 @Repository
 class JdbcUserRangeRepository implements UserRangeRepository {
 
+    // Versión y manos en una sola sentencia (misma instantánea): ver RangeRows.
+    private static final String SELECT = """
+            SELECT r.situation, r.stack, r.version, r.updated_at, h.hand, h.action
+            FROM app.user_range r
+            JOIN app.situation s ON s.key = r.situation
+            LEFT JOIN app.user_range_hand h
+                   ON h.user_id = r.user_id AND h.situation = r.situation AND h.stack = r.stack
+            """;
+
     private final JdbcClient jdbc;
 
     JdbcUserRangeRepository(JdbcClient jdbc) {
@@ -30,53 +39,22 @@ class JdbcUserRangeRepository implements UserRangeRepository {
 
     @Override
     public List<Range> findAll(UserId user) {
-        HandRows hands = HandRows.load(
-                jdbc.sql("SELECT situation, stack, hand, action FROM app.user_range_hand WHERE user_id = :user")
-                        .param("user", user.value()));
-        return jdbc.sql("""
-                        SELECT r.situation, r.stack, r.version, r.updated_at
-                        FROM app.user_range r JOIN app.situation s ON s.key = r.situation
-                        WHERE r.user_id = :user
-                        ORDER BY s.position, r.stack DESC""")
-                .param("user", user.value())
-                .query((rs, row) -> {
-                    SituationKey situation = SituationKey.of(rs.getString("situation"));
-                    Stack stack = Stack.of(rs.getBigDecimal("stack"));
-                    return new Range(
-                            situation,
-                            stack,
-                            hands.of(situation, stack),
-                            RangeSource.USER,
-                            rs.getInt("version"),
-                            Optional.of(rs.getObject("updated_at", OffsetDateTime.class)
-                                    .toInstant()));
-                })
-                .list();
+        return RangeRows.load(
+                jdbc.sql(SELECT + "WHERE r.user_id = :user ORDER BY s.position, r.stack DESC")
+                        .param("user", user.value()),
+                RangeSource.USER);
     }
 
     @Override
     public Optional<Range> find(UserId user, SituationKey situation, Stack stack) {
-        HandRows hands = HandRows.load(jdbc.sql("""
-                        SELECT situation, stack, hand, action FROM app.user_range_hand
-                        WHERE user_id = :user AND situation = :situation AND stack = :stack""")
-                .param("user", user.value())
-                .param("situation", situation.value())
-                .param("stack", stack.bigBlinds()));
-        return jdbc.sql("""
-                        SELECT version, updated_at FROM app.user_range
-                        WHERE user_id = :user AND situation = :situation AND stack = :stack""")
-                .param("user", user.value())
-                .param("situation", situation.value())
-                .param("stack", stack.bigBlinds())
-                .query((rs, row) -> new Range(
-                        situation,
-                        stack,
-                        hands.of(situation, stack),
-                        RangeSource.USER,
-                        rs.getInt("version"),
-                        Optional.of(
-                                rs.getObject("updated_at", OffsetDateTime.class).toInstant())))
-                .optional();
+        return RangeRows.load(
+                        jdbc.sql(SELECT + "WHERE r.user_id = :user AND r.situation = :situation AND r.stack = :stack")
+                                .param("user", user.value())
+                                .param("situation", situation.value())
+                                .param("stack", stack.bigBlinds()),
+                        RangeSource.USER)
+                .stream()
+                .findFirst();
     }
 
     @Override

@@ -160,6 +160,19 @@ class QuizAttemptsIT extends ApiIntegrationTest {
     }
 
     @Test
+    void rejectsValuesJacksonWouldOtherwiseCoerce() {
+        for (String body : List.of(
+                "{\"situation\":\"btn_open\",\"stack\":\"25\",\"hand\":\"AA\",\"given\":\"FOLD\"}",
+                "{\"situation\":\"btn_open\",\"stack\":25,\"hand\":\"AA\",\"given\":17}",
+                "{\"situation\":\"btn_open\",\"stack\":25,\"hand\":\"AA\",\"given\":null}",
+                "{\"situation\":\"btn_open\",\"stack\":true,\"hand\":\"AA\",\"given\":\"FOLD\"}")) {
+            MvcTestResult result = record(body);
+            assertThat(result).as(body).hasStatus(400);
+            CONTRACT.assertResponse("POST", PATH, result);
+        }
+    }
+
+    @Test
     void pagesFromNewestToOldestWithoutGapsOrDuplicates() {
         for (int i = 0; i < 5; i++) {
             assertThat(record("btn_open", "25", "AA", i % 2 == 0 ? "MR_4B_C" : "FOLD"))

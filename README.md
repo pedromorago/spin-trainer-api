@@ -47,7 +47,8 @@ permisos.
 ## Errores
 
 Todas las respuestas de error son Problem Details (RFC 9457, `application/problem+json`) con `type`
-`urn:spin-trainer:<tipo>` (`validation`, `unauthorized`, `not-found`, `conflict`, `no-range`, `unsupported`, `internal`),
+`urn:spin-trainer:<tipo>` (`validation`, `unauthorized`, `not-found`, `conflict`, `no-range`, `unsupported`,
+`unavailable`, `internal`),
 `correlationId` (el de la cabecera `X-Correlation-Id`, que se acepta o se genera) y, en los 400, `errors` por campo.
 
 ## Contrato

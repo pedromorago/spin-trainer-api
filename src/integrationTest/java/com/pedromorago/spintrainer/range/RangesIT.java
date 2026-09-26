@@ -287,6 +287,51 @@ class RangesIT extends ApiIntegrationTest {
         }
 
         @Test
+        void rejectsValuesJacksonWouldOtherwiseCoerce() {
+            for (String body : List.of(
+                    "{\"hands\":{\"AA\":null},\"version\":0}",
+                    "{\"hands\":{},\"version\":0.9}",
+                    "{\"hands\":{},\"version\":\"0\"}",
+                    "{\"hands\":{\"AA\":9},\"version\":0}",
+                    "{\"hands\":[],\"version\":0}")) {
+                MvcTestResult result = put(URI, body);
+                assertThat(result).as(body).hasStatus(400);
+                CONTRACT.assertResponse("PUT", USER_PATH, result);
+            }
+            assertThat(get(URI)).as("no se guardó nada").hasStatus(404);
+        }
+
+        @Test
+        void aNullActionIsReportedForItsHand() {
+            assertThat(put(URI, "{\"hands\":{\"AA\":null},\"version\":0}"))
+                    .bodyJson()
+                    .isLenientlyEqualTo("{\"errors\":[{\"field\":\"hands.AA\"}]}");
+        }
+
+        @Test
+        void theHighestVersionCannotBeReplaced() {
+            MvcTestResult result = put(URI, "{\"hands\":{},\"version\":2147483647}");
+
+            assertThat(result).hasStatus(409);
+            CONTRACT.assertResponse("PUT", USER_PATH, result);
+        }
+
+        @Test
+        void oversizedDocumentsAreRejectedWithoutReadingThemWhole() {
+            // JSON válido (espacios entre tokens) que sin el límite de tamaño daría 201.
+            String huge = "{\"hands\":{}," + " ".repeat(70_000) + "\"version\":0}";
+
+            MvcTestResult result = put(URI, huge);
+
+            assertThat(result).hasStatus(400);
+            CONTRACT.assertResponse("PUT", USER_PATH, result);
+            assertThat(result).bodyJson().extractingPath("$.errors[0].field").isEqualTo("body");
+            assertThat(put(URI, "{\"hands\":{}," + " ".repeat(1_000) + "\"version\":0}"))
+                    .as("un documento normal con espacios sí vale")
+                    .hasStatus(201);
+        }
+
+        @Test
         void anUnknownSpotIsNotFoundForEveryOperation() {
             String unknown = "/api/v1/ranges/user/btn_open/12.5";
 

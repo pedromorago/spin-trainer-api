@@ -88,6 +88,15 @@ class RangeServiceTest {
     }
 
     @Test
+    void theHighestVersionIsAConflictNotAnOverflow() {
+        service.save(pedro, BTN_OPEN, BB25, Map.of(), 0);
+
+        assertConflict(
+                () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), Integer.MAX_VALUE),
+                "El rango está en la versión 1; recarga");
+    }
+
+    @Test
     void replacingADeletedRangeIsAConflict() {
         service.save(pedro, BTN_OPEN, BB25, Map.of(), 0);
         service.delete(pedro, BTN_OPEN, BB25);

@@ -14,6 +14,13 @@ import org.springframework.stereotype.Repository;
 @Repository
 class JdbcDefaultRangeRepository implements DefaultRangeRepository {
 
+    private static final String SELECT = """
+            SELECT r.situation, r.stack, r.version, h.hand, h.action
+            FROM app.default_range r
+            JOIN app.situation s ON s.key = r.situation
+            LEFT JOIN app.default_range_hand h ON h.situation = r.situation AND h.stack = r.stack
+            """;
+
     private final JdbcClient jdbc;
 
     JdbcDefaultRangeRepository(JdbcClient jdbc) {
@@ -22,31 +29,17 @@ class JdbcDefaultRangeRepository implements DefaultRangeRepository {
 
     @Override
     public List<Range> findAll() {
-        HandRows hands = HandRows.load(jdbc.sql("SELECT situation, stack, hand, action FROM app.default_range_hand"));
-        return jdbc.sql("""
-                        SELECT r.situation, r.stack, r.version
-                        FROM app.default_range r JOIN app.situation s ON s.key = r.situation
-                        ORDER BY s.position, r.stack DESC""")
-                .query((rs, row) -> toRange(
-                        rs.getString("situation"), Stack.of(rs.getBigDecimal("stack")), rs.getInt("version"), hands))
-                .list();
+        return RangeRows.load(jdbc.sql(SELECT + "ORDER BY s.position, r.stack DESC"), RangeSource.DEFAULT);
     }
 
     @Override
     public Optional<Range> find(SituationKey situation, Stack stack) {
-        HandRows hands = HandRows.load(
-                jdbc.sql("""
-                        SELECT situation, stack, hand, action FROM app.default_range_hand
-                        WHERE situation = :situation AND stack = :stack""").param("situation", situation.value()).param("stack", stack.bigBlinds()));
-        return jdbc.sql("SELECT version FROM app.default_range WHERE situation = :situation AND stack = :stack")
-                .param("situation", situation.value())
-                .param("stack", stack.bigBlinds())
-                .query((rs, row) -> toRange(situation.value(), stack, rs.getInt("version"), hands))
-                .optional();
-    }
-
-    private static Range toRange(String situation, Stack stack, int version, HandRows hands) {
-        SituationKey key = SituationKey.of(situation);
-        return new Range(key, stack, hands.of(key, stack), RangeSource.DEFAULT, version, Optional.empty());
+        return RangeRows.load(
+                        jdbc.sql(SELECT + "WHERE r.situation = :situation AND r.stack = :stack")
+                                .param("situation", situation.value())
+                                .param("stack", stack.bigBlinds()),
+                        RangeSource.DEFAULT)
+                .stream()
+                .findFirst();
     }
 }

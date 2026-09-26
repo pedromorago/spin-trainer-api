@@ -64,7 +64,9 @@ class RangeController implements RangeApi {
     @Override
     public ResponseEntity<RangeDto> putUserRange(String situation, BigDecimal stack, RangeWriteDto body) {
         Map<String, Action> hands = new LinkedHashMap<>();
-        body.getHands().forEach((hand, action) -> hands.put(hand, Action.fromCode(action.getValue())));
+        // Una acción null ({"AA": null}) llega al dominio como tal y es un 400 por mano, no un 500.
+        body.getHands()
+                .forEach((hand, action) -> hands.put(hand, action == null ? null : Action.fromCode(action.getValue())));
         SavedRange saved = userRanges.save(
                 currentUser.id(), SituationKey.of(situation), Stack.of(stack), hands, body.getVersion());
         return ResponseEntity.status(saved.created() ? HttpStatus.CREATED : HttpStatus.OK)

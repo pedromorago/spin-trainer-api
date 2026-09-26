@@ -124,9 +124,42 @@ class ProblemDetailsIT extends ApiIntegrationTest {
                 .content("{\"name\":\"toolong\"}"));
 
         assertThat(result).hasStatus(400);
+        assertThat(result).bodyJson().isLenientlyEqualTo("""
+                        {"type":"urn:spin-trainer:validation","errors":[{"field":"name","message":"tamaño máximo 3"}]}""");
+    }
+
+    // The messages of the spec's constraints are Spanish whatever the client or the JVM speak (they were Hibernate
+    // Validator's, in the JVM's language: English in the container).
+    @ParameterizedTest
+    @CsvSource(
+            delimiter = '|',
+            value = {
+                "/api/v1/quiz/attempts?limit=0              | limit     | debe ser ≥ 1",
+                "/api/v1/quiz/attempts?limit=201            | limit     | debe ser ≤ 200",
+                "/api/v1/ranges/default/BTN_OPEN/25          | situation | formato no válido",
+                "/api/v1/stats/hands?stack=0.5              | stack     | debe ser ≥ 1"
+            })
+    void constraintMessagesAreSpanishWhateverTheLocale(String uri, String field, String message) {
+        MvcTestResult result = send(mvc.get().uri(uri).header(HttpHeaders.ACCEPT_LANGUAGE, "en-US"));
+
+        assertThat(result).hasStatus(400);
         assertThat(result)
                 .bodyJson()
-                .isLenientlyEqualTo("{\"type\":\"urn:spin-trainer:validation\",\"errors\":[{\"field\":\"name\"}]}");
+                .isLenientlyEqualTo("{\"errors\":[{\"field\":\"%s\",\"message\":\"%s\"}]}".formatted(field, message));
+    }
+
+    // URLs rejected by Spring Security's firewall never reach a controller: they got Spring Boot's own error body.
+    // (MockMvc normalizes "//" before the firewall sees it: spin-trainer-qa checks that one against the real server.)
+    @Test
+    void urlsTheFirewallRejectsAreProblemsToo() {
+        MvcTestResult result = send(mvc.get().uri("/api/v1/situations;jsessionid=1"));
+
+        assertThat(result).hasStatus(400).hasContentType(MediaType.APPLICATION_PROBLEM_JSON);
+        assertThat(result)
+                .bodyJson()
+                .isLenientlyEqualTo(
+                        "{\"type\":\"urn:spin-trainer:validation\",\"status\":400,\"detail\":\"Ruta no válida\"}");
+        assertThat(result).bodyJson().extractingPath("$.correlationId").isNotNull();
     }
 
     @Test

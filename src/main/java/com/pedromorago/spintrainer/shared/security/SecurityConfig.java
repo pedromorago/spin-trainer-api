@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.server.resource.web.authentication.Be
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.firewall.RequestRejectedHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
@@ -55,6 +56,13 @@ class SecurityConfig {
                 .requestCache(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults());
         return http.build();
+    }
+
+    /** URLs the firewall rejects (//, ;, encoded slashes...) also get a Problem, not Spring Boot's error body. */
+    @Bean
+    RequestRejectedHandler problemRequestRejectedHandler(
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) {
+        return (request, response, ex) -> resolver.resolveException(request, response, null, ex);
     }
 
     @Bean

@@ -3,6 +3,7 @@ package com.pedromorago.spintrainer.shared.web;
 import com.pedromorago.spintrainer.shared.kernel.DomainException;
 import com.pedromorago.spintrainer.shared.kernel.DomainException.FieldError;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ElementKind;
 import jakarta.validation.Path;
@@ -10,6 +11,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -26,6 +28,9 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.web.firewall.RequestRejectedException;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.method.ParameterValidationResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -66,7 +71,8 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     ResponseEntity<Object> constraintViolation(ConstraintViolationException ex, WebRequest request) {
         List<FieldError> errors = ex.getConstraintViolations().stream()
-                .map(v -> new FieldError(parameterPath(v.getPropertyPath()), v.getMessage()))
+                .map(v -> new FieldError(
+                        parameterPath(v.getPropertyPath()), ConstraintMessages.of(v.getConstraintDescriptor())))
                 .sorted(Comparator.comparing(FieldError::field))
                 .toList();
         return problem(ProblemType.VALIDATION, invalidFields(errors), errors, new HttpHeaders(), request);
@@ -100,6 +106,14 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         return problem(ProblemType.UNAUTHORIZED, detail, List.of(), headers, request);
     }
 
+    // URLs the Spring Security firewall rejects (//, ;, encoded slashes...) before they reach any controller; without
+    // this they got Spring Boot's own error body, with neither a type nor a correlationId.
+    @ExceptionHandler(RequestRejectedException.class)
+    ResponseEntity<Object> rejected(RequestRejectedException ex, WebRequest request) {
+        log.info("Request rejected by the firewall: {}", ex.getMessage());
+        return problem(ProblemType.VALIDATION, "Ruta no válida", List.of(), new HttpHeaders(), request);
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<Object> unexpected(Exception ex, WebRequest request) {
         log.error("Unhandled error", ex);
@@ -118,10 +132,8 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         List<FieldError> errors = new ArrayList<>();
         ex.getBindingResult()
                 .getFieldErrors()
-                .forEach(e -> errors.add(new FieldError(fieldPath(e.getField()), e.getDefaultMessage())));
-        ex.getBindingResult()
-                .getGlobalErrors()
-                .forEach(e -> errors.add(new FieldError(e.getObjectName(), e.getDefaultMessage())));
+                .forEach(e -> errors.add(new FieldError(fieldPath(e.getField()), message(e))));
+        ex.getBindingResult().getGlobalErrors().forEach(e -> errors.add(new FieldError(e.getObjectName(), message(e))));
         return problem(ProblemType.VALIDATION, invalidFields(errors), errors, headers, request);
     }
 
@@ -131,7 +143,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
             HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         List<FieldError> errors = ex.getParameterValidationResults().stream()
                 .flatMap(r -> r.getResolvableErrors().stream()
-                        .map(e -> new FieldError(r.getMethodParameter().getParameterName(), message(e))))
+                        .map(e -> new FieldError(r.getMethodParameter().getParameterName(), message(r, e))))
                 .toList();
         return problem(ProblemType.VALIDATION, invalidFields(errors), errors, headers, request);
     }
@@ -200,10 +212,19 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         if (problem.getInstance() == null && request instanceof NativeWebRequest web) {
             HttpServletRequest servlet = web.getNativeRequest(HttpServletRequest.class);
             if (servlet != null) {
-                problem.setInstance(URI.create(servlet.getRequestURI()));
+                instance(servlet.getRequestURI()).ifPresent(problem::setInstance);
             }
         }
         problem.setProperty("correlationId", CorrelationId.current());
+    }
+
+    /** The request path, if it is a valid URI (a request the firewall rejected may not be). */
+    private static Optional<URI> instance(String path) {
+        try {
+            return Optional.of(URI.create(path));
+        } catch (IllegalArgumentException invalid) {
+            return Optional.empty();
+        }
     }
 
     private static String invalidFields(List<FieldError> errors) {
@@ -213,8 +234,19 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
                         + errors.stream().map(FieldError::field).distinct().collect(Collectors.joining(", "));
     }
 
-    private static String message(MessageSourceResolvable error) {
-        return error.getDefaultMessage() != null ? error.getDefaultMessage() : "valor no válido";
+    private static String message(ObjectError error) {
+        return error.contains(ConstraintViolation.class)
+                ? ConstraintMessages.of(error.unwrap(ConstraintViolation.class).getConstraintDescriptor())
+                : ConstraintMessages.FALLBACK;
+    }
+
+    private static String message(ParameterValidationResult result, MessageSourceResolvable error) {
+        try {
+            return ConstraintMessages.of(
+                    result.unwrap(error, ConstraintViolation.class).getConstraintDescriptor());
+        } catch (IllegalArgumentException notAConstraint) {
+            return ConstraintMessages.FALLBACK;
+        }
     }
 
     /** {@code getDefaultRange.situation} → {@code situation}: without the method name. */

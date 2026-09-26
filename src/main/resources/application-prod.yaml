@@ -1,0 +1,5 @@
+# Despliegue: logs JSON (ECS) con el correlationId de cada petición.
+logging:
+  structured:
+    format:
+      console: ecs

@@ -2,24 +2,22 @@ package com.pedromorago.spintrainer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.pedromorago.spintrainer.support.ApiIntegrationTest;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-class HealthIT {
-
-    @Autowired
-    MockMvcTester mvc;
+class HealthIT extends ApiIntegrationTest {
 
     @Test
-    void healthIsUpWithoutDetails() {
+    void healthIsPublicAndHidesDetails() {
         assertThat(mvc.get().uri("/actuator/health"))
                 .hasStatusOk()
                 .bodyJson()
-                .isLenientlyEqualTo("{\"status\":\"UP\"}");
+                .isEqualTo("{\"status\":\"UP\",\"groups\":[\"liveness\",\"readiness\"]}");
+    }
+
+    @Test
+    void probesArePublic() {
+        assertThat(mvc.get().uri("/actuator/health/liveness")).hasStatusOk();
+        assertThat(mvc.get().uri("/actuator/health/readiness")).hasStatusOk();
     }
 }

@@ -63,11 +63,13 @@ dependencies {
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.spring.boot.starter.actuator)
+    implementation(libs.spring.boot.starter.security.oauth2.resource.server)
 
     testImplementation(springBootBom)
     testImplementation(libs.spring.boot.starter.test)
 
     testFixturesImplementation(springBootBom)
+    testFixturesApi(libs.spring.security.oauth2.jose)
 }
 
 // Dos suites: `test` (dominio, casos de uso, arquitectura; sin Docker) e `integrationTest` (Spring + Testcontainers).

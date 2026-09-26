@@ -20,6 +20,20 @@ Spring Boot 4.1 · Java 21 · Gradle (Kotlin DSL) · OpenAPI-first con openapi-g
 | `.\gradlew.bat spotlessApply` | `./gradlew spotlessApply` | Aplica el formato (palantir-java-format, ktlint) |
 | `.\gradlew.bat bootRun` | `./gradlew bootRun` | Arranca la API en `http://localhost:8080` |
 
+## Configuración
+
+| Variable | Ejemplo | Para qué |
+|---|---|---|
+| `SUPABASE_URL` | `https://<ref>.supabase.co` | Emisor de los JWT; la API valida la firma contra su JWKS (claves asimétricas ES256). Obligatoria |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,https://spin-trainer.vercel.app` | Orígenes del frontend |
+| `SPRING_PROFILES_ACTIVE` | `prod` | En despliegue: logs JSON (ECS) con `correlationId` |
+
+## Errores
+
+Todas las respuestas de error son Problem Details (RFC 9457, `application/problem+json`) con `type`
+`urn:spin-trainer:<tipo>` (`validation`, `unauthorized`, `not-found`, `conflict`, `no-range`, `unsupported`, `internal`),
+`correlationId` (el de la cabecera `X-Correlation-Id`, que se acepta o se genera) y, en los 400, `errors` por campo.
+
 ## Contrato
 
 `openapi.yaml` es la fuente de verdad (ADR-0004). En cada build se generan las interfaces `*Api` y los DTOs

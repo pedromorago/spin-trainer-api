@@ -57,4 +57,31 @@ class SituationTest {
                         Optional.empty()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    /** Boundary value: one stack and exactly two actions make a valid situation. */
+    @Test
+    void oneStackAndTwoActionsAreEnough() {
+        Situation minimal = new Situation(
+                SituationKey.of("x"),
+                "X",
+                Format.HEADS_UP,
+                Position.SB,
+                List.of(),
+                List.of(Stack.of(25)),
+                List.of(Action.ALLIN, Action.FOLD),
+                Optional.empty());
+
+        assertThat(minimal.actions()).containsExactly(Action.ALLIN, Action.FOLD);
+    }
+
+    /** The codes are the contract's `format` values and the database's. */
+    @Test
+    void formatsRoundTripThroughTheirCodes() {
+        assertThat(Format.THREE_MAX.code()).isEqualTo("3max");
+        assertThat(Format.HEADS_UP.code()).isEqualTo("hu");
+        for (Format format : Format.values()) {
+            assertThat(Format.fromCode(format.code())).isEqualTo(format);
+        }
+        assertThatThrownBy(() -> Format.fromCode("6max")).isInstanceOf(IllegalArgumentException.class);
+    }
 }

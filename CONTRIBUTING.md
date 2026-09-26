@@ -17,7 +17,7 @@ Project source of truth: `spin-trainer-web/docs/` (context, `ARCHITECTURE.md`, A
 
 ## Stack and commands
 Spring Boot 4.1 (ADR-0014) · Java 21 · Spring Security 7 · Jackson 3 · JdbcClient without JPA (ADR-0015) · Flyway · ArchUnit ·
-JUnit 6 + AssertJ · Testcontainers 2 · Spotless (palantir-java-format) · JaCoCo.
+JUnit 6 + AssertJ · Testcontainers 2 · Spotless (palantir-java-format) · JaCoCo · PIT.
 
 ```
 ./gradlew check          # formatting + test + integrationTest + coverage (requires Docker)
@@ -48,3 +48,5 @@ Before committing: `./gradlew check` must pass. Versions only in `gradle/libs.ve
   that replace or remove reference ranges do so on the shared database; `ReferenceSeedIT` uses its own.
 - Isolation: a new user (UUID) per test; shared data is prepared in an idempotent `@BeforeEach`.
 - JaCoCo: ≥ 90 % on domain, use cases and kernel; ≥ 85 % overall (enforced by `check`).
+- PIT (ADR-0017): mutation score ≥ 95 % on the same packages with the unit tests (enforced by `check`; today 100 %).
+  A surviving mutant usually means a missing boundary value: add the test rather than lowering the bar.

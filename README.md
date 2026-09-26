@@ -16,7 +16,8 @@ Spring Boot 4.1 · Java 21 · Gradle (Kotlin DSL) · OpenAPI-first with openapi-
 
 | Windows | Linux/macOS | What it does |
 |---|---|---|
-| `.\gradlew.bat check` | `./gradlew check` | Formatting, unit tests, architecture, integration (Testcontainers) and coverage |
+| `.\gradlew.bat check` | `./gradlew check` | Formatting, unit tests, architecture, integration (Testcontainers), coverage and mutation testing |
+| `.\gradlew.bat pitest` | `./gradlew pitest` | Mutation testing only (PIT, ADR-0017); report in `build/reports/pitest` |
 | `.\gradlew.bat spotlessApply` | `./gradlew spotlessApply` | Applies formatting (palantir-java-format, ktlint) |
 | `.\gradlew.bat bootTestRun` | `./gradlew bootTestRun` | API at `http://localhost:8080` with an already migrated Postgres in Docker; without `SUPABASE_URL` it prints a development token |
 | `.\gradlew.bat bootRun` | `./gradlew bootRun` | API against the database and Supabase set in the environment variables |

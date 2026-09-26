@@ -53,6 +53,14 @@ class DayWindowTest {
         assertThat(days.get(2).start()).isEqualTo(days.get(1).end());
     }
 
+    @Test
+    void aYearIsTheLongestWindow() {
+        DayWindow year = DayWindow.lastDays(365, NOW, "UTC");
+
+        assertThat(year.first()).isEqualTo(LocalDate.parse("2025-09-26"));
+        assertThat(year.last()).isEqualTo(LocalDate.parse("2026-09-25"));
+    }
+
     @ParameterizedTest
     @ValueSource(ints = {0, -1, 366})
     void daysAreBetweenOneAnd365(int days) {

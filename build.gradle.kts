@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.openapi.generator)
     alias(libs.plugins.spotless)
+    alias(libs.plugins.pitest)
 }
 
 group = "com.pedromorago"
@@ -107,7 +108,7 @@ tasks.withType<Test>().configureEach {
     }
 }
 
-tasks.check { dependsOn(testing.suites.named("integrationTest"), tasks.jacocoTestCoverageVerification) }
+tasks.check { dependsOn(testing.suites.named("integrationTest"), tasks.jacocoTestCoverageVerification, tasks.pitest) }
 
 // Coverage of both suites; the code generated from the spec does not count.
 val coveredClasses =
@@ -142,6 +143,28 @@ tasks.jacocoTestCoverageVerification {
             limit { minimum = "0.90".toBigDecimal() }
         }
     }
+}
+
+// Mutation testing (ADR-0017): do the unit tests fail when a rule changes? Same scope as the 90 % coverage bar; unit
+// tests only (no Docker, ~30 s), so check runs it. Report: build/reports/pitest. 95 % leaves room for equivalent mutants.
+pitest {
+    pitestVersion =
+        libs.versions.pitest.core
+            .get()
+    junit5PluginVersion =
+        libs.versions.pitest.junit5
+            .get()
+    targetClasses =
+        setOf(
+            "com.pedromorago.spintrainer.*.domain.*",
+            "com.pedromorago.spintrainer.*.application.*",
+            "com.pedromorago.spintrainer.shared.kernel.*",
+        )
+    excludedTestClasses = setOf("*ArchitectureTest")
+    threads = 4
+    outputFormats = setOf("HTML", "XML")
+    timestampedReports = false
+    mutationThreshold = 95
 }
 
 spotless {

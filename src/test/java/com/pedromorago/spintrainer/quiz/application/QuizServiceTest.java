@@ -2,6 +2,7 @@ package com.pedromorago.spintrainer.quiz.application;
 
 import static com.pedromorago.spintrainer.situation.SituationFixtures.btnOpen;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.pedromorago.spintrainer.quiz.application.port.in.ListAttempts.Page;
@@ -154,16 +155,35 @@ class QuizServiceTest {
 
     @Test
     void anExactlyFullLastPageHasNoNextCursor() {
-        assertThat(service.list(user, Optional.empty(), Optional.empty(), 50, Optional.empty())
-                        .nextCursor())
-                .isEmpty();
+        referenceRange();
+        for (int i = 0; i < 3; i++) {
+            attempts.insert(QuizAttempt.grade(
+                    UUID.randomUUID(),
+                    user,
+                    btnOpen(),
+                    BB25,
+                    Hand.of("AA"),
+                    Action.FOLD,
+                    effective.get(BB25),
+                    Instant.parse("2026-09-26T10:00:00Z").plusSeconds(i)));
+        }
+
+        Page page = service.list(user, Optional.empty(), Optional.empty(), 3, Optional.empty());
+
+        assertThat(page.items()).hasSize(3);
+        assertThat(page.nextCursor()).isEmpty();
     }
 
+    /** Boundary values: 1 and 200 are valid, 0 and 201 are not. */
     @Test
     void theLimitIsBetweenOneAnd200() {
         assertKind(() -> service.list(user, Optional.empty(), Optional.empty(), 0, Optional.empty()), Kind.VALIDATION);
         assertKind(
                 () -> service.list(user, Optional.empty(), Optional.empty(), 201, Optional.empty()), Kind.VALIDATION);
+        assertThatCode(() -> service.list(user, Optional.empty(), Optional.empty(), 1, Optional.empty()))
+                .doesNotThrowAnyException();
+        assertThatCode(() -> service.list(user, Optional.empty(), Optional.empty(), 200, Optional.empty()))
+                .doesNotThrowAnyException();
     }
 
     private static void assertKind(ThrowingCallable call, Kind kind) {

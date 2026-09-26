@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -40,9 +41,10 @@ class HandTest {
 
     @Test
     void readingOrderIsPairsThenSuitedThenOffsuit() {
-        assertThat(List.of(Hand.of("AKo"), Hand.of("22"), Hand.of("AKs"), Hand.of("AA"), Hand.of("KQs")).stream()
+        assertThat(Stream.of("AKo", "22", "A2s", "KQs", "AA", "AKs", "32o")
+                        .map(Hand::of)
                         .sorted()
-                        .map(Hand::code))
-                .containsExactly("AA", "22", "AKs", "KQs", "AKo");
+                        .map(Hand::toString))
+                .containsExactly("AA", "22", "AKs", "A2s", "KQs", "AKo", "32o");
     }
 }

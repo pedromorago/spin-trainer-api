@@ -7,6 +7,7 @@ import com.networknt.schema.InputFormat;
 import com.networknt.schema.Schema;
 import com.networknt.schema.SchemaLocation;
 import com.networknt.schema.SchemaRegistry;
+import com.networknt.schema.SchemaRegistryConfig;
 import com.networknt.schema.SpecificationVersion;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -14,7 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.dataformat.yaml.YAMLMapper;
@@ -33,8 +36,14 @@ public final class OpenApiContract {
 
     private OpenApiContract(String specText) {
         spec = YAMLMapper.builder().build().readTree(specText);
+        // En 2020-12 "format" es solo una anotación: se activa como aserción (uuid, date, date-time, uri-reference).
         registry = SchemaRegistry.withDefaultDialect(
-                SpecificationVersion.DRAFT_2020_12, builder -> builder.schemas(Map.of(SPEC_IRI, specText)));
+                SpecificationVersion.DRAFT_2020_12,
+                builder -> builder.schemas(Map.of(SPEC_IRI, specText))
+                        .schemaRegistryConfig(SchemaRegistryConfig.builder()
+                                .formatAssertionsEnabled(true)
+                                .locale(Locale.ENGLISH)
+                                .build()));
     }
 
     public static OpenApiContract load() {
@@ -53,13 +62,13 @@ public final class OpenApiContract {
     public void assertResponse(String method, String path, MvcTestResult result) {
         int status = result.getResponse().getStatus();
         String body = contentAsString(result);
-        assertThat(violations(method, path, status, body))
+        assertThat(violations(method, path, status, result.getResponse().getContentType(), body))
                 .as("%s %s → %d no cumple openapi.yaml:%n%s", method, path, status, body)
                 .isEmpty();
     }
 
-    /** Incumplimientos del contrato de una respuesta; vacío si la cumple. */
-    public List<String> violations(String method, String path, int status, String body) {
+    /** Incumplimientos del contrato de una respuesta (estado, tipo de contenido y cuerpo); vacío si la cumple. */
+    public List<String> violations(String method, String path, int status, @Nullable String contentType, String body) {
         String responsePointer = "/paths/" + escape(path) + "/" + method.toLowerCase() + "/responses/" + status;
         JsonNode response = spec.at(responsePointer);
         if (response.isMissingNode()) {
@@ -72,7 +81,11 @@ public final class OpenApiContract {
         if (!response.has("content")) {
             return body.isEmpty() ? List.of() : List.of("la respuesta " + status + " no debe tener cuerpo");
         }
-        String mediaType = status >= 400 ? "application/problem+json" : "application/json";
+        String mediaType = contentType == null ? "" : contentType.split(";")[0].trim();
+        if (!response.get("content").has(mediaType)) {
+            return List.of(
+                    "Content-Type '" + mediaType + "' no declarado para " + status + " en " + method + " " + path);
+        }
         Schema schema = registry.getSchema(
                 SchemaLocation.of(SPEC_IRI + "#" + responsePointer + "/content/" + escape(mediaType) + "/schema"));
         return schema.validate(body, InputFormat.JSON).stream()

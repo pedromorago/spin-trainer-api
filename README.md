@@ -1,7 +1,7 @@
 # spin-trainer-api
 
 Spin Trainer API: a preflop range trainer for Spin & Go (3-max and heads-up). A study and QA portfolio project.
-Frontend in [spin-trainer-web](https://github.com/pedromorago/spin-trainer-web), black-box tests in
+Frontend in [spin-trainer-web](https://github.com/pedromorago/spin-trainer-web), black-box tests (and the portfolio overview: what they found and how) in
 [spin-trainer-qa](https://github.com/pedromorago/spin-trainer-qa). Context, architecture and ADRs: `spin-trainer-web/docs/`.
 
 Spring Boot 4.1 · Java 21 · Gradle (Kotlin DSL) · OpenAPI-first with openapi-generator · Spring Security (Supabase JWT)

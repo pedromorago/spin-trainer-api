@@ -1,0 +1,19 @@
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+out/
+bin/
+
+# SO
+.DS_Store
+Thumbs.db
+
+# Entorno local (secretos)
+.env
+*.local.yaml

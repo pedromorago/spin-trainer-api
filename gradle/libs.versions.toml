@@ -1,0 +1,22 @@
+# Versiones en un solo sitio (ADR-0002). Las librerías sin versión las gestiona el BOM de Spring Boot.
+[versions]
+spring-boot = "4.1.1"
+openapi-generator = "7.25.0"
+spotless = "8.10.3"
+palantir-java-format = "2.99.0"
+archunit = "1.5.1"
+json-schema-validator = "3.0.7"
+
+[libraries]
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-actuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+archunit = { module = "com.tngtech.archunit:archunit", version.ref = "archunit" }
+json-schema-validator = { module = "com.networknt:json-schema-validator", version.ref = "json-schema-validator" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+openapi-generator = { id = "org.openapi.generator", version.ref = "openapi-generator" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

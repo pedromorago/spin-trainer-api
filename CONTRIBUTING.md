@@ -1,51 +1,50 @@
 # spin-trainer-api
 
-API de Spin Trainer. Reglas comunes a los tres repos, resumidas aquí para que este repo sea autosuficiente.
-Fuente de verdad del proyecto: `spin-trainer-web/docs/` (contexto, `ARCHITECTURE.md`, ADRs 0001..0015).
+Spin Trainer API. Rules shared by the three repos, summarized here so this repo is self-contained.
+Project source of truth: `spin-trainer-web/docs/` (context, `ARCHITECTURE.md`, ADRs 0001..0015).
 
-## Reglas globales (resumen)
-- Calidad de portfolio > velocidad. ADRs cerrados; solo se reabren con fallo concreto y justificado (ADR nuevo).
-- Solo Spin & Go (3-max y HU, 16 situaciones). Rango efectivo = personalizado si existe, si no el de referencia (ADR-0012).
-- Supabase solo emite el JWT; la API es el único camino de datos. Tablas en el esquema `app`, no expuesto a PostgREST.
-- Rangos de referencia en BD vía migraciones Flyway (seed versionado, V5) con su fuente en `reference-ranges.json`
-  (`ReferenceSeedIT` exige que coincidan; web y QA guardan copia). Intentos del Quiz = eventos inmutables.
-- OpenAPI-first: se cambia `openapi.yaml` antes que el código (y la copia de la web con `npm run spec:sync`).
-- Gradle (Kotlin DSL), nunca Maven. Descartados: OWASP ZAP, carga, Pact, pgTAP.
-- Comentarios de código en inglés (Java, JS/TS, SQL, YAML, Gradle, scripts). En español: documentación (README, ADRs, CONTRIBUTING.md), textos de la app, mensajes de error de la API, títulos de tests y features de Gherkin.
-- Commits **siempre a nombre de Pedro** (autor y committer: `Pedro Morago López-Vázquez <pedromoragolv@gmail.com>`;
-  verificar `git config user.name/user.email` antes de commitear). Conventional Commits, sin trailer de coautoría ni de atribución.
-- Entorno de Pedro: Windows 10/11 (comandos con `gradlew.bat`; nada que dependa de bash).
+## Global rules (summary)
+- Portfolio quality > speed. ADRs are closed; they are reopened only for a concrete, justified flaw (new ADR).
+- Spin & Go only (3-max and HU, 16 situations). Effective range = custom if it exists, otherwise the reference one (ADR-0012).
+- Supabase only issues the JWT; the API is the only data path. Tables in the `app` schema, not exposed to PostgREST.
+- Reference ranges in the DB via Flyway migrations (versioned seed, V5) with their source in `reference-ranges.json`
+  (`ReferenceSeedIT` requires them to match; web and QA keep copies). Quiz attempts = immutable events.
+- OpenAPI-first: `openapi.yaml` changes before the code (and the web copy, with `npm run spec:sync`).
+- Gradle (Kotlin DSL), never Maven. Discarded: OWASP ZAP, load testing, Pact, pgTAP.
+- Code comments and documentation in English (README, ADRs, CONTRIBUTING.md, docs/, OpenAPI descriptions). In Spanish: app UI text, API error messages, test titles and Gherkin features.
+- Commits **always in Pedro's name** (author and committer: `Pedro Morago López-Vázquez <pedromoragolv@gmail.com>`; check `git config user.name/user.email` before committing). Conventional Commits, no co-author or attribution trailer.
+- Pedro's environment: Windows 10/11 (commands with `gradlew.bat`; nothing that depends on bash).
 
-## Stack y comandos
-Spring Boot 4.1 (ADR-0014) · Java 21 · Spring Security 7 · Jackson 3 · JdbcClient sin JPA (ADR-0015) · Flyway · ArchUnit ·
+## Stack and commands
+Spring Boot 4.1 (ADR-0014) · Java 21 · Spring Security 7 · Jackson 3 · JdbcClient without JPA (ADR-0015) · Flyway · ArchUnit ·
 JUnit 6 + AssertJ · Testcontainers 2 · Spotless (palantir-java-format) · JaCoCo.
 
 ```
-./gradlew check          # formato + test + integrationTest + cobertura (necesita Docker)
-./gradlew spotlessApply  # formatear
-./gradlew bootTestRun     # API local: Postgres en Docker y token de desarrollo impreso
-./gradlew bootRun         # con las variables de entorno reales
+./gradlew check          # formatting + test + integrationTest + coverage (requires Docker)
+./gradlew spotlessApply  # format
+./gradlew bootTestRun     # local API: Postgres in Docker and a printed development token
+./gradlew bootRun         # with the real environment variables
 ```
-Antes de commitear: `./gradlew check` en verde. Versiones solo en `gradle/libs.versions.toml` (sin versión si la gestiona el BOM de Boot).
+Before committing: `./gradlew check` must pass. Versions only in `gradle/libs.versions.toml` (no version if Boot's BOM manages it).
 
-## Arquitectura (la verifica `ArchitectureTest`; si cambia, se cambia ahí y en `spin-trainer-web/docs/ARCHITECTURE.md`)
-- Módulos `situation`, `range`, `quiz`, `stats`, cada uno con `domain` · `application` (`port.in`, `port.out`, servicio)
+## Architecture (enforced by `ArchitectureTest`; if it changes, change it there and in `spin-trainer-web/docs/ARCHITECTURE.md`)
+- Modules `situation`, `range`, `quiz`, `stats`, each with `domain` · `application` (`port.in`, `port.out`, service)
   · `adapter.in.rest` · `adapter.out.persistence`. `shared`: `kernel` (value objects + `DomainException`), `security`, `web`, `config`.
-- `domain` y `shared.kernel`: Java puro (sin Spring, Jakarta, Jackson ni JDBC). Entre módulos solo `application.port.in` y `domain`.
-- Código generado desde la spec en `com.pedromorago.spintrainer.api` (interfaces `*Api`) y `.api.model` (`*Dto`); nunca se
-  edita ni se versiona. Solo lo usan los controllers (`adapter.in.rest`), que implementan esas interfaces y mapean a dominio.
-- Errores de negocio: `DomainException` (`VALIDATION`, `NOT_FOUND`, `CONFLICT`, `NO_RANGE`); la web los traduce a Problem Details.
-- La acción efectiva de una mano solo se calcula con `range/domain/RangeRules#actionFor` (igual que `domain/range.js` en la web).
-- Persistencia: `JdbcClient` + SQL explícito en `adapter.out.persistence`; tablas en `app.*`. Migración nueva = número
-  siguiente (nunca editar una aplicada) con sus `GRANT` a `${app_role}` y la fila correspondiente en `DatabaseRolesIT`.
-- Fechas: `Clock` inyectado y truncado a milisegundos (lo que devuelve un POST/PUT es lo que devolverá un GET).
+- `domain` and `shared.kernel`: plain Java (no Spring, Jakarta, Jackson or JDBC). Across modules, only `application.port.in` and `domain`.
+- Code generated from the spec in `com.pedromorago.spintrainer.api` (`*Api` interfaces) and `.api.model` (`*Dto`); never
+  edited or committed. Used only by the controllers (`adapter.in.rest`), which implement those interfaces and map to the domain.
+- Business errors: `DomainException` (`VALIDATION`, `NOT_FOUND`, `CONFLICT`, `NO_RANGE`); the web layer translates them into Problem Details.
+- The effective action of a hand is computed only with `range/domain/RangeRules#actionFor` (same as `domain/range.js` in the web app).
+- Persistence: `JdbcClient` + explicit SQL in `adapter.out.persistence`; tables in `app.*`. New migration = next
+  number (never edit an applied one) with its `GRANT`s to `${app_role}` and the matching row in `DatabaseRolesIT`.
+- Dates: injected `Clock`, truncated to milliseconds (what a POST/PUT returns is what a GET will return).
 
 ## Tests
-- Suites: `test` (JUnit 6 + AssertJ, sin Spring ni Docker), `integrationTest` (clases `*IT` que extienden
-  `ApiIntegrationTest`: app completa, Postgres de Testcontainers con los roles reales, JWT reales de `TestJwtIssuer`),
+- Suites: `test` (JUnit 6 + AssertJ, no Spring or Docker), `integrationTest` (`*IT` classes extending
+  `ApiIntegrationTest`: full app, Testcontainers Postgres with the real roles, real JWTs from `TestJwtIssuer`),
   `testFixtures` (`PostgresTestDatabase`, `TestJwtIssuer`).
-- Cada respuesta de un IT se valida con `CONTRACT.assertResponse(method, pathDeLaSpec, result)`.
-- Datos que la API no puede escribir (rangos de referencia, intentos con fecha): `TestData`, como administrador. Los IT
-  que reemplazan o quitan rangos de referencia lo hacen sobre la base compartida; `ReferenceSeedIT` usa una propia.
-- Aislamiento: un usuario (UUID) nuevo por test; los datos compartidos se preparan en `@BeforeEach` idempotente.
-- JaCoCo: ≥ 90 % en dominio, casos de uso y kernel; ≥ 85 % en total (lo exige `check`).
+- Every IT response is validated with `CONTRACT.assertResponse(method, specPath, result)`.
+- Data the API cannot write (reference ranges, attempts with a chosen date): `TestData`, as administrator. ITs
+  that replace or remove reference ranges do so on the shared database; `ReferenceSeedIT` uses its own.
+- Isolation: a new user (UUID) per test; shared data is prepared in an idempotent `@BeforeEach`.
+- JaCoCo: ≥ 90 % on domain, use cases and kernel; ≥ 85 % overall (enforced by `check`).

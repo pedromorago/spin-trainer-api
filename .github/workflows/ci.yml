@@ -31,10 +31,10 @@ jobs:
       - name: Check
         run: ./gradlew check
 
-      - name: Lint del contrato
+      - name: Contract lint
         run: npx --yes @redocly/cli@2 lint openapi.yaml
 
-      - name: Informes
+      - name: Reports
         if: always()
         uses: actions/upload-artifact@v7
         with:

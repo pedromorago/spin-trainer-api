@@ -1,115 +1,115 @@
 # spin-trainer-api
 
-API de Spin Trainer: entrenador de rangos preflop para Spin & Go (3-max y heads-up). Proyecto de estudio y portfolio QA.
-Frontend en [spin-trainer-web](https://github.com/pedromorago/spin-trainer-web), pruebas de caja negra en
-[spin-trainer-qa](https://github.com/pedromorago/spin-trainer-qa). Contexto, arquitectura y ADRs: `spin-trainer-web/docs/`.
+Spin Trainer API: a preflop range trainer for Spin & Go (3-max and heads-up). A study and QA portfolio project.
+Frontend in [spin-trainer-web](https://github.com/pedromorago/spin-trainer-web), black-box tests in
+[spin-trainer-qa](https://github.com/pedromorago/spin-trainer-qa). Context, architecture and ADRs: `spin-trainer-web/docs/`.
 
-Spring Boot 4.1 · Java 21 · Gradle (Kotlin DSL) · OpenAPI-first con openapi-generator · Spring Security (JWT de Supabase)
+Spring Boot 4.1 · Java 21 · Gradle (Kotlin DSL) · OpenAPI-first with openapi-generator · Spring Security (Supabase JWT)
 · Postgres + Flyway · JdbcClient · ArchUnit · Testcontainers.
 
-## Requisitos
+## Requirements
 
-- JDK 21 (Gradle lo descarga si falta) y Docker (Docker Desktop con WSL 2 en Windows) para los tests de integración.
-- No hace falta instalar Gradle: se usa el wrapper (`gradlew` / `gradlew.bat`).
+- JDK 21 (Gradle downloads it if missing) and Docker (Docker Desktop with WSL 2 on Windows) for the integration tests.
+- No need to install Gradle: the wrapper is used (`gradlew` / `gradlew.bat`).
 
-## Comandos
+## Commands
 
-| Windows | Linux/macOS | Qué hace |
+| Windows | Linux/macOS | What it does |
 |---|---|---|
-| `.\gradlew.bat check` | `./gradlew check` | Formato, tests unitarios, arquitectura, integración (Testcontainers) y cobertura |
-| `.\gradlew.bat spotlessApply` | `./gradlew spotlessApply` | Aplica el formato (palantir-java-format, ktlint) |
-| `.\gradlew.bat bootTestRun` | `./gradlew bootTestRun` | API en `http://localhost:8080` con un Postgres en Docker ya migrado; sin `SUPABASE_URL` imprime un token de desarrollo |
-| `.\gradlew.bat bootRun` | `./gradlew bootRun` | API contra la base de datos y el Supabase de las variables de entorno |
+| `.\gradlew.bat check` | `./gradlew check` | Formatting, unit tests, architecture, integration (Testcontainers) and coverage |
+| `.\gradlew.bat spotlessApply` | `./gradlew spotlessApply` | Applies formatting (palantir-java-format, ktlint) |
+| `.\gradlew.bat bootTestRun` | `./gradlew bootTestRun` | API at `http://localhost:8080` with an already migrated Postgres in Docker; without `SUPABASE_URL` it prints a development token |
+| `.\gradlew.bat bootRun` | `./gradlew bootRun` | API against the database and Supabase set in the environment variables |
 
-## Imagen Docker
+## Docker image
 
 ```
 docker build -t spin-trainer-api .
 ```
 
-Multi-stage: compila con el wrapper y ejecuta el jar por capas (dependencias y código por separado), con un usuario sin
-privilegios y el perfil `prod` (logs JSON). Es la imagen que levanta spin-trainer-qa (`env/docker-compose.yml`) y la
-que se desplegará.
+Multi-stage: builds with the wrapper and runs the layered jar (dependencies and code separately), as an unprivileged
+user with the `prod` profile (JSON logs). It is the image that spin-trainer-qa starts (`env/docker-compose.yml`) and the
+one that will be deployed.
 
-## Configuración
+## Configuration
 
-| Variable | Ejemplo | Para qué |
+| Variable | Example | Purpose |
 |---|---|---|
-| `SUPABASE_URL` | `https://<ref>.supabase.co` | Emisor de los JWT; la API valida la firma contra su JWKS (claves asimétricas ES256). Obligatoria |
-| `DB_URL` | `jdbc:postgresql://<host>:5432/postgres` | Postgres (en Supabase, el *session pooler*) |
-| `DB_APP_PASSWORD` / `DB_MIGRATOR_PASSWORD` | | Contraseñas de `spin_app` (la API) y `spin_migrator` (Flyway) |
-| `DB_APP_USER` / `DB_MIGRATOR_USER` | `spin_app` / `spin_migrator` | Opcionales si se usan los nombres por defecto |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,https://spin-trainer.vercel.app` | Orígenes del frontend |
-| `SPRING_PROFILES_ACTIVE` | `prod` | En despliegue: logs JSON (ECS) con `correlationId` |
+| `SUPABASE_URL` | `https://<ref>.supabase.co` | JWT issuer; the API verifies the signature against its JWKS (ES256 asymmetric keys). Required |
+| `DB_URL` | `jdbc:postgresql://<host>:5432/postgres` | Postgres (on Supabase, the *session pooler*) |
+| `DB_APP_PASSWORD` / `DB_MIGRATOR_PASSWORD` | | Passwords for `spin_app` (the API) and `spin_migrator` (Flyway) |
+| `DB_APP_USER` / `DB_MIGRATOR_USER` | `spin_app` / `spin_migrator` | Optional if the default names are used |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,https://spin-trainer.vercel.app` | Frontend origins |
+| `SPRING_PROFILES_ACTIVE` | `prod` | In deployment: JSON logs (ECS) with `correlationId` |
 
-## Base de datos
+## Database
 
-Esquema `app` (no expuesto a PostgREST), migrado por Flyway (`src/main/resources/db/migration`, numeración secuencial:
-esquema y seed en el orden en que se aplican). Dos roles con mínimos privilegios (ADR-0015):
+Schema `app` (not exposed to PostgREST), migrated by Flyway (`src/main/resources/db/migration`, sequential numbering:
+schema and seed in the order they are applied). Two least-privilege roles (ADR-0015):
 
-- `spin_migrator`: dueño del esquema; solo lo usa Flyway.
-- `spin_app`: el de la API; lectura del catálogo y de los rangos de referencia, escritura solo donde hace falta.
+- `spin_migrator`: owns the schema; used only by Flyway.
+- `spin_app`: the API's role; reads the catalog and the reference ranges, writes only where needed.
 
-### Rangos de referencia
+### Reference ranges
 
-Las 73 tablas de `Tablasmentov3.pdf` (16 situaciones, un rango por stack) están en `reference-ranges.json`, una línea
-por fila del grid 13×13 con las manos de acción explícita; las demás llevan la implícita (FOLD, o CHECK si FOLD no
-es posible). `V5__seed_reference_ranges.sql` las carga con esos mismos objetos JSON y `ReferenceSeedIT` comprueba,
-migrando una base de datos vacía, que el resultado es exactamente el fichero y que cada spot del catálogo tiene rango.
+The 73 tables of `Tablasmentov3.pdf` (16 situations, one range per stack) are in `reference-ranges.json`, one line
+per row of the 13×13 grid with the explicit-action hands; the rest take the implicit action (FOLD, or CHECK if FOLD
+is not possible). `V5__seed_reference_ranges.sql` loads them with those same JSON objects, and `ReferenceSeedIT` checks,
+by migrating an empty database, that the result is exactly the file and that every spot in the catalog has a range.
 
-El fichero se extrajo del PDF por el color de relleno de cada celda contra la leyenda de su tabla (colores exactos de
-la hoja de cálculo original) y se revisó superponiendo la reconstrucción al original. La web (mock) y spin-trainer-qa
-(oráculos) guardan copias con su comprobación, como el contrato. Cambiar un rango = migración nueva y el fichero en el
-mismo commit; el test obliga a que coincidan.
+The file was extracted from the PDF by matching each cell's fill color against its table's legend (the exact colors of
+the original spreadsheet) and reviewed by overlaying the reconstruction on the original. The web app (mock) and
+spin-trainer-qa (oracles) keep copies with their own check, as with the contract. Changing a range = a new migration
+and the file in the same commit; the test forces them to match.
 
-Los roles se crean una vez por entorno con `src/main/resources/db/bootstrap/bootstrap.sql` (tiene las instrucciones);
-los tests de integración ejecutan ese mismo script contra un Postgres 17 de Testcontainers y comprueban la matriz de
-permisos.
+The roles are created once per environment with `src/main/resources/db/bootstrap/bootstrap.sql` (it has the
+instructions); the integration tests run that same script against a Testcontainers Postgres 17 and check the
+permission matrix.
 
-## Errores
+## Errors
 
-Todas las respuestas de error son Problem Details (RFC 9457, `application/problem+json`) con `type`
-`urn:spin-trainer:<tipo>` (`validation`, `unauthorized`, `not-found`, `conflict`, `no-range`, `unsupported`,
+Every error response is a Problem Details object (RFC 9457, `application/problem+json`) with `type`
+`urn:spin-trainer:<type>` (`validation`, `unauthorized`, `not-found`, `conflict`, `no-range`, `unsupported`,
 `unavailable`, `internal`),
-`correlationId` (el de la cabecera `X-Correlation-Id`, que se acepta o se genera) y, en los 400, `errors` por campo.
+`correlationId` (the one from the `X-Correlation-Id` header, which is accepted or generated) and, on 400s, per-field `errors`.
 
-## Contrato
+## Contract
 
-`openapi.yaml` es la fuente de verdad (ADR-0004). En cada build se generan las interfaces `*Api` y los DTOs
-(`build/generated/openapi`); los controllers las implementan, así que el código no puede desviarse de la spec.
-Un cambio de API empieza en la spec; la web trae la copia con `npm run spec:sync`.
+`openapi.yaml` is the source of truth (ADR-0004). Every build generates the `*Api` interfaces and the DTOs
+(`build/generated/openapi`); the controllers implement them, so the code cannot drift from the spec.
+An API change starts in the spec; the web app pulls the copy with `npm run spec:sync`.
 
-## Endpoints (`/api/v1`, todos con `Authorization: Bearer <JWT>`)
+## Endpoints (`/api/v1`, all with `Authorization: Bearer <JWT>`)
 
-| Método | Ruta | Qué hace |
+| Method | Path | What it does |
 |---|---|---|
-| GET | `/situations` | Catálogo de las 16 situaciones (ETag) |
-| GET | `/ranges/default`, `/ranges/default/{situation}/{stack}` | Rangos de referencia (ETag) |
-| GET | `/ranges/user`, `/ranges/user/{situation}/{stack}` | Rangos personalizados del usuario |
-| PUT | `/ranges/user/{situation}/{stack}` | Crea (`version: 0` → 201) o reemplaza la versión N (200); 409 si cambió |
-| DELETE | `/ranges/user/{situation}/{stack}` | Vuelve al de referencia (204, idempotente) |
-| POST | `/quiz/attempts` | Registra una respuesta; el servidor la corrige (201; 422 sin rango) |
-| GET | `/quiz/attempts` | Intentos, del más reciente al más antiguo, por cursor |
-| GET | `/stats/hands`, `/stats/progress` | Agregados por mano y por día (zona IANA) |
+| GET | `/situations` | Catalog of the 16 situations (ETag) |
+| GET | `/ranges/default`, `/ranges/default/{situation}/{stack}` | Reference ranges (ETag) |
+| GET | `/ranges/user`, `/ranges/user/{situation}/{stack}` | The user's custom ranges |
+| PUT | `/ranges/user/{situation}/{stack}` | Creates (`version: 0` → 201) or replaces version N (200); 409 if it changed |
+| DELETE | `/ranges/user/{situation}/{stack}` | Reverts to the reference range (204, idempotent) |
+| POST | `/quiz/attempts` | Records an answer; the server grades it (201; 422 without a range) |
+| GET | `/quiz/attempts` | Attempts, newest first, with cursor pagination |
+| GET | `/stats/hands`, `/stats/progress` | Aggregates per hand and per day (IANA time zone) |
 
-Contrato completo en `openapi.yaml`. Con `bootTestRun`:
-
-```
-curl -H "Authorization: Bearer <token impreso al arrancar>" http://localhost:8080/api/v1/situations
-```
-
-## Estructura
+Full contract in `openapi.yaml`. With `bootTestRun`:
 
 ```
-openapi.yaml                           contrato (fuente de verdad)
-gradle/libs.versions.toml              versiones
+curl -H "Authorization: Bearer <token printed at startup>" http://localhost:8080/api/v1/situations
+```
+
+## Structure
+
+```
+openapi.yaml                           contract (source of truth)
+gradle/libs.versions.toml              versions
 src/main/java/com/pedromorago/spintrainer/
-  situation/ range/ quiz/ stats/       módulos: domain · application (port.in, port.out) · adapter (in.rest, out.persistence)
+  situation/ range/ quiz/ stats/       modules: domain · application (port.in, port.out) · adapter (in.rest, out.persistence)
   shared/                              kernel · security · web · config
-src/main/resources/db/                 migration/ (Flyway) · bootstrap/ (roles, una vez por entorno)
-src/test/java                          dominio, casos de uso y ArchUnit (sin Spring ni Docker)
-src/integrationTest/java               API completa: Testcontainers, JWT reales, respuestas validadas contra la spec
-src/testFixtures/java                  Postgres de pruebas y emisor de JWT (suites y bootTestRun)
+src/main/resources/db/                 migration/ (Flyway) · bootstrap/ (roles, once per environment)
+src/test/java                          domain, use cases and ArchUnit (no Spring or Docker)
+src/integrationTest/java               full API: Testcontainers, real JWTs, responses validated against the spec
+src/testFixtures/java                  test Postgres and JWT issuer (suites and bootTestRun)
 ```
 
-Arquitectura, decisiones (ADR-0001..0015) y contexto: `spin-trainer-web/docs/`.
+Architecture, decisions (ADR-0001..0015) and context: `spin-trainer-web/docs/`.

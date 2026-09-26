@@ -13,7 +13,14 @@ public interface UserRangeRepository {
 
     Optional<Range> find(UserId user, SituationKey situation, Stack stack);
 
-    /** Inserts version 1. {@code false} if it already existed (another write got there first). */
+    /**
+     * Reserves the version of a range about to be created: one more than the highest the spot ever had for the user,
+     * a deleted range included, so a version is never reused. Within the caller's transaction: if the creation fails,
+     * the reservation is undone with it.
+     */
+    int reserveVersion(UserId user, SituationKey situation, Stack stack);
+
+    /** Inserts the range with its reserved version. {@code false} if it already existed (another write won). */
     boolean insert(UserId user, Range range);
 
     /**

@@ -17,7 +17,8 @@ import org.springframework.stereotype.Repository;
 
 /**
  * Custom ranges. The version is checked in the statement itself ({@code UPDATE ... WHERE version = ?}), so two
- * concurrent writes on the same version cannot both win.
+ * concurrent writes on the same version cannot both win; {@code app.user_range_version} keeps the highest version of
+ * each spot, so the count goes on after a delete.
  */
 @Repository
 class JdbcUserRangeRepository implements UserRangeRepository {
@@ -58,6 +59,22 @@ class JdbcUserRangeRepository implements UserRangeRepository {
     }
 
     @Override
+    public int reserveVersion(UserId user, SituationKey situation, Stack stack) {
+        // The upsert locks the counter row until the transaction ends: concurrent creations take turns.
+        return jdbc.sql("""
+                        INSERT INTO app.user_range_version (user_id, situation, stack, last_version)
+                        VALUES (:user, :situation, :stack, 1)
+                        ON CONFLICT (user_id, situation, stack)
+                        DO UPDATE SET last_version = app.user_range_version.last_version + 1
+                        RETURNING last_version""")
+                .param("user", user.value())
+                .param("situation", situation.value())
+                .param("stack", stack.bigBlinds())
+                .query(Integer.class)
+                .single();
+    }
+
+    @Override
     public boolean insert(UserId user, Range range) {
         int inserted = jdbc.sql("""
                         INSERT INTO app.user_range (user_id, situation, stack, version, updated_at)
@@ -92,6 +109,14 @@ class JdbcUserRangeRepository implements UserRangeRepository {
         if (updated == 0) {
             return false;
         }
+        jdbc.sql("""
+                        UPDATE app.user_range_version SET last_version = :version
+                        WHERE user_id = :user AND situation = :situation AND stack = :stack""")
+                .param("user", user.value())
+                .param("situation", range.situation().value())
+                .param("stack", range.stack().bigBlinds())
+                .param("version", range.version())
+                .update();
         jdbc.sql("DELETE FROM app.user_range_hand WHERE user_id = :user AND situation = :situation AND stack = :stack")
                 .param("user", user.value())
                 .param("situation", range.situation().value())

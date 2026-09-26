@@ -38,6 +38,7 @@ class DatabaseRolesIT extends ApiIntegrationTest {
             entry("default_range_hand", READ),
             entry("user_range", READ_WRITE),
             entry("user_range_hand", READ_WRITE),
+            entry("user_range_version", Set.of("SELECT", "INSERT", "UPDATE")),
             entry("quiz_attempt", Set.of("SELECT", "INSERT")));
 
     @Autowired

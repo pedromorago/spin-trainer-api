@@ -106,6 +106,25 @@ class RangeServiceTest {
     }
 
     @Test
+    void aRangeCreatedAgainAfterADeleteDoesNotReuseItsVersions() {
+        service.save(pedro, BTN_OPEN, BB25, Map.of("AA", Action.MR_C_C), 0);
+        service.save(pedro, BTN_OPEN, BB25, Map.of("AA", Action.ALLIN), 1);
+        service.delete(pedro, BTN_OPEN, BB25);
+
+        SavedRange again = service.save(pedro, BTN_OPEN, BB25, Map.of("KK", Action.ALLIN), 0);
+
+        assertThat(again.created()).isTrue();
+        assertThat(again.range().version()).isEqualTo(3);
+        // A tab that read version 1 or 2 of the deleted range cannot overwrite the new one (it was an ABA).
+        assertConflict(
+                () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 1), "El rango está en la versión 3; recarga");
+        assertConflict(
+                () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 2), "El rango está en la versión 3; recarga");
+        assertThat(service.save(other, BTN_OPEN, BB25, Map.of(), 0).range().version())
+                .isEqualTo(1);
+    }
+
+    @Test
     void validatesTheSpotTheVersionAndTheHands() {
         assertKind(() -> service.save(pedro, SituationKey.of("mtt"), BB25, Map.of(), 0), Kind.NOT_FOUND);
         assertKind(() -> service.save(pedro, BTN_OPEN, Stack.of(12.5), Map.of(), 0), Kind.NOT_FOUND);

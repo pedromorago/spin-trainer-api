@@ -222,6 +222,42 @@ class RangesIT extends ApiIntegrationTest {
         }
 
         @Test
+        void aRangeCreatedAgainKeepsCountingSoAStaleTabCannotOverwriteIt() {
+            put(URI, "{\"hands\":{\"AA\":\"ALLIN\"},\"version\":0}");
+            delete(URI);
+
+            MvcTestResult recreated = put(URI, "{\"hands\":{\"KK\":\"ALLIN\"},\"version\":0}");
+            MvcTestResult stale = put(URI, "{\"hands\":{\"AA\":\"MR_F_F\"},\"version\":1}");
+
+            assertThat(recreated)
+                    .hasStatus(201)
+                    .bodyJson()
+                    .extractingPath("$.version")
+                    .isEqualTo(2);
+            assertThat(stale)
+                    .hasStatus(409)
+                    .bodyJson()
+                    .extractingPath("$.detail")
+                    .isEqualTo("El rango está en la versión 2; recarga");
+            assertThat(get(URI)).bodyJson().extractingPath("$.hands").isEqualTo(Map.of("KK", "ALLIN"));
+        }
+
+        @Test
+        void aFailedCreationDoesNotUseUpAVersion() {
+            put(URI, "{\"hands\":{},\"version\":0}");
+
+            assertThat(put(URI, "{\"hands\":{},\"version\":0}")).hasStatus(409);
+            delete(URI);
+
+            // The 409 rolled back its reservation: the next creation is 2, not 3.
+            assertThat(put(URI, "{\"hands\":{},\"version\":0}"))
+                    .hasStatus(201)
+                    .bodyJson()
+                    .extractingPath("$.version")
+                    .isEqualTo(2);
+        }
+
+        @Test
         void concurrentWritesOnTheSameVersionHaveExactlyOneWinner() throws Exception {
             put(URI, "{\"hands\":{},\"version\":0}");
             int writers = 8;

@@ -7,6 +7,7 @@ import com.pedromorago.spintrainer.shared.kernel.SituationKey;
 import com.pedromorago.spintrainer.shared.kernel.Stack;
 import com.pedromorago.spintrainer.shared.kernel.UserId;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ final class InMemoryRanges implements DefaultRangeRepository, UserRangeRepositor
 
     private final List<Range> defaults = new ArrayList<>();
     private final Map<Key, Range> userRanges = new LinkedHashMap<>();
+    private final Map<Key, Integer> lastVersions = new HashMap<>();
 
     void addDefault(Range range) {
         defaults.add(range);
@@ -50,6 +52,11 @@ final class InMemoryRanges implements DefaultRangeRepository, UserRangeRepositor
     }
 
     @Override
+    public int reserveVersion(UserId user, SituationKey situation, Stack stack) {
+        return lastVersions.merge(new Key(user, situation, stack), 1, Integer::sum);
+    }
+
+    @Override
     public boolean insert(UserId user, Range range) {
         return userRanges.putIfAbsent(new Key(user, range.situation(), range.stack()), range) == null;
     }
@@ -62,6 +69,7 @@ final class InMemoryRanges implements DefaultRangeRepository, UserRangeRepositor
             return false;
         }
         userRanges.put(key, range);
+        lastVersions.put(key, range.version());
         return true;
     }
 

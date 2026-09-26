@@ -80,7 +80,9 @@ class RangeService implements ReadDefaultRanges, ManageUserRanges, ResolveEffect
         }
         // Milliseconds, like the browser: what the PUT returns is exactly what a later GET will return.
         Instant now = clock.instant().truncatedTo(ChronoUnit.MILLIS);
-        Range next = new Range(situation, stack, normalized, RangeSource.USER, version + 1, Optional.of(now));
+        // A new range continues after the last version the spot had, even if it was deleted (V6): never 1 again.
+        int nextVersion = version == 0 ? userRanges.reserveVersion(user, situation, stack) : version + 1;
+        Range next = new Range(situation, stack, normalized, RangeSource.USER, nextVersion, Optional.of(now));
         boolean saved = version == 0 ? userRanges.insert(user, next) : userRanges.replace(user, next, version);
         if (!saved) {
             throw conflict(user, situation, stack);

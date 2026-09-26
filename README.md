@@ -28,16 +28,20 @@ Spring Boot 4.1 · Java 21 · Gradle (Kotlin DSL) · OpenAPI-first with openapi-
 docker build -t spin-trainer-api .
 ```
 
-Multi-stage: builds with the wrapper and runs the layered jar (dependencies and code separately), as an unprivileged
-user with the `prod` profile (JSON logs). It is the image that spin-trainer-qa starts (`env/docker-compose.yml`) and the
-one that is deployed.
+A GraalVM native executable (ADR-0018): Spring AOT and `nativeCompile` in a GraalVM 25 build stage, run as an
+unprivileged user with the `prod` profile (JSON logs). With 0.1 CPU and 512 MB it is ready in about 4 s, migrations
+included, and uses about 64 MiB (the JVM took almost two minutes there). The build takes about four minutes and a few
+GB of memory (on Windows, give Docker Desktop at least 8 GB). It is the image that spin-trainer-qa starts
+(`env/docker-compose.yml`) and the one that is deployed. `./gradlew nativeCompile` builds the same executable outside
+Docker if GraalVM is installed (`GRAALVM_HOME`).
 
 ## Deployment
 
-Fly.io (ADR-0016): `fly.toml` (Paris region, 512 MB machine that stops when idle, readiness check) and
-`.github/workflows/deploy.yml`, which deploys the commit CI validated on `main` and smoke-tests it. Without the
-`FLY_API_TOKEN` secret the workflow deploys nothing. First-time setup (Supabase, roles, secrets, Vercel):
-`spin-trainer-web/docs/DEPLOY.md`.
+Render's free plan, no card on file (ADR-0018): `render.yaml` (web service in Frankfurt, image from GHCR, readiness
+check) and `.github/workflows/deploy.yml`, which builds the native image of the commit CI validated on `main`, pushes it
+to GHCR, triggers Render's deploy hook with that image and waits until it answers. Without the
+`RENDER_DEPLOY_HOOK_URL` secret it only builds and pushes the image. The listening port comes from `PORT` when the
+platform sets it (8080 otherwise). First-time setup (Supabase, roles, secrets, Vercel): `spin-trainer-web/docs/DEPLOY.md`.
 
 ## Configuration
 
@@ -121,4 +125,4 @@ src/integrationTest/java               full API: Testcontainers, real JWTs, resp
 src/testFixtures/java                  test Postgres and JWT issuer (suites and bootTestRun)
 ```
 
-Architecture, decisions (ADR-0001..0017) and context: `spin-trainer-web/docs/`.
+Architecture, decisions (ADR-0001..0018) and context: `spin-trainer-web/docs/`.

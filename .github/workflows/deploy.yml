@@ -1,7 +1,8 @@
 name: deploy
 
-# Deploys the API to Fly.io (ADR-0016) after a green CI on main, or by hand. Without the FLY_API_TOKEN secret the job
-# only reports that deployment is not configured, so the workflow is harmless until the Fly.io app exists.
+# Deploys the API to Render (ADR-0018) after a green CI on main, or by hand: builds the native image, pushes it to
+# GHCR and triggers Render's deploy hook with that exact image, then waits until it answers. Without the
+# RENDER_DEPLOY_HOOK_URL secret it only builds and pushes the image, so the workflow is harmless until Render is set up.
 on:
   workflow_run:
     workflows: [ci]
@@ -11,47 +12,59 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 concurrency:
   group: deploy-production
   cancel-in-progress: false
 
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/spin-trainer-api
+  API_URL: https://spin-trainer-api.onrender.com
+
 jobs:
   deploy:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     environment: production
-    env:
-      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
     steps:
-      - name: Deployment configured
-        id: configured
-        run: |
-          if [ -z "$FLY_API_TOKEN" ]; then
-            echo "::notice::FLY_API_TOKEN is not set: nothing is deployed (spin-trainer-web/docs/DEPLOY.md)."
-            echo "enabled=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "enabled=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - if: steps.configured.outputs.enabled == 'true'
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v6
         with:
           # The commit CI validated, not whatever main points to now.
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
-      - if: steps.configured.outputs.enabled == 'true'
-        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # 1.6
+      - uses: docker/setup-buildx-action@v4
 
-      - name: Deploy
-        if: steps.configured.outputs.enabled == 'true'
-        run: flyctl deploy --remote-only
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Flyway runs at startup: wrong database or issuer secrets fail here, not on the first user.
-      - name: Smoke test
-        if: steps.configured.outputs.enabled == 'true'
+      # GraalVM compiles the whole application: several minutes and a few GB of memory.
+      - name: Native image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.event.workflow_run.head_sha || github.sha }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy to Render
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          TAG: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
-          app=$(sed -n 's/^app = "\(.*\)"/\1/p' fly.toml)
-          curl --fail --silent --show-error --retry 10 --retry-delay 6 --retry-all-errors \
-            "https://$app.fly.dev/actuator/health/readiness"
+          if [ -z "$HOOK" ]; then
+            echo "::notice::RENDER_DEPLOY_HOOK_URL is not set: image pushed, nothing deployed (spin-trainer-web/docs/DEPLOY.md)."
+            exit 0
+          fi
+          curl --fail --silent --show-error -X POST "$HOOK&imgURL=$(printf '%s' "$IMAGE:$TAG" | jq -sRr @uri)"
+          # Flyway runs at startup: wrong database or issuer secrets fail here, not on the first user. The free
+          # instance may also be waking up, so the check waits up to five minutes.
+          curl --fail --silent --show-error --retry 30 --retry-delay 10 --retry-all-errors \
+            "$API_URL/actuator/health/readiness"

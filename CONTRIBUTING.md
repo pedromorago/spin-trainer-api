@@ -1,7 +1,7 @@
 # spin-trainer-api
 
 Spin Trainer API. Rules shared by the three repos, summarized here so this repo is self-contained.
-Project source of truth: `spin-trainer-web/docs/` (context, `ARCHITECTURE.md`, ADRs 0001..0017).
+Project source of truth: `spin-trainer-web/docs/` (context, `ARCHITECTURE.md`, ADRs 0001..0018).
 
 ## Global rules (summary)
 - Portfolio quality > speed. ADRs are closed; they are reopened only for a concrete, justified flaw (new ADR).
@@ -38,6 +38,9 @@ Before committing: `./gradlew check` must pass. Versions only in `gradle/libs.ve
 - Persistence: `JdbcClient` + explicit SQL in `adapter.out.persistence`; tables in `app.*`. New migration = next
   number (never edit an applied one) with its `GRANT`s to `${app_role}` and the matching row in `DatabaseRolesIT`.
 - Dates: injected `Clock`, truncated to milliseconds (what a POST/PUT returns is what a GET will return).
+- Native image (ADR-0018): the `Dockerfile` builds it with Spring AOT + GraalVM. Reflection, resources or proxies that AOT
+  cannot see need `RuntimeHints`; the QA suite running against the image is the check. `processAot` resolves the
+  placeholders with dummy values: conditions are fixed at build time, values are read at runtime.
 
 ## Tests
 - Suites: `test` (JUnit 6 + AssertJ, no Spring or Docker), `integrationTest` (`*IT` classes extending

@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.openapi.generator)
     alias(libs.plugins.spotless)
     alias(libs.plugins.pitest)
+    alias(libs.plugins.graalvm.native)
 }
 
 group = "com.pedromorago"
@@ -143,6 +144,31 @@ tasks.jacocoTestCoverageVerification {
             limit { minimum = "0.90".toBigDecimal() }
         }
     }
+}
+
+// Native image (ADR-0018): `nativeCompile` turns the AOT-processed app into one executable that starts in milliseconds
+// on a free 0.1 vCPU instance. The GraalVM of the build image (GRAALVM_HOME) compiles it; javac stays on the Java 21
+// toolchain.
+graalvmNative {
+    toolchainDetection = false
+    binaries.named("main") {
+        imageName = "spin-trainer-api"
+        // Runs on any x86-64 CPU: the default (x86-64-v3) needs AVX2, and the host's hardware is not guaranteed.
+        buildArgs.add("-march=compatibility")
+    }
+}
+
+// AOT evaluates the auto-configuration conditions at build time, so the placeholders must resolve; these values are
+// not kept: at runtime the real ones come from the environment.
+tasks.processAot {
+    environment(
+        mapOf(
+            "DB_URL" to "jdbc:postgresql://aot.invalid:5432/aot",
+            "DB_APP_PASSWORD" to "aot",
+            "DB_MIGRATOR_PASSWORD" to "aot",
+            "SUPABASE_URL" to "https://aot.invalid",
+        ),
+    )
 }
 
 // Mutation testing (ADR-0017): do the unit tests fail when a rule changes? Same scope as the 90 % coverage bar; unit

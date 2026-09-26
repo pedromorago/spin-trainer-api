@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.context.MessageSourceResolvable;
+import org.springframework.context.annotation.ImportRuntimeHints;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -43,6 +44,7 @@ import tools.jackson.databind.exc.UnrecognizedPropertyException;
  * is a single place that shapes the errors.
  */
 @RestControllerAdvice
+@ImportRuntimeHints(ProblemDetailsHints.class)
 class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(ProblemDetailsAdvice.class);

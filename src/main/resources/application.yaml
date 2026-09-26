@@ -22,6 +22,8 @@ spring:
     default-property-inclusion: non_null
 
 server:
+  # Platforms such as Render set PORT; locally and in the QA environment it is 8080.
+  port: ${PORT:8080}
   shutdown: graceful
 
 spin-trainer:

@@ -52,7 +52,7 @@ platform sets it (8080 otherwise). First-time setup (Supabase, roles, secrets, V
 | `DB_APP_PASSWORD` / `DB_MIGRATOR_PASSWORD` | | Passwords for `spin_app` (the API) and `spin_migrator` (Flyway) |
 | `DB_APP_USER` / `DB_MIGRATOR_USER` | `spin_app` / `spin_migrator` | Login users. Behind Supabase's pooler: `spin_app.<ref>` / `spin_migrator.<ref>` |
 | `DB_APP_ROLE` | `spin_app` | Role the migrations grant permissions to; optional unless the role was renamed in `bootstrap.sql` |
-| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,https://spin-trainer.vercel.app` | Frontend origins |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173,https://spin-trainer-web.vercel.app` | Frontend origins |
 | `SPRING_PROFILES_ACTIVE` | `prod` | In deployment: JSON logs (ECS) with `correlationId` |
 
 ## Database

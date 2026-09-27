@@ -1,15 +1,13 @@
 # Render Blueprint (ADR-0018): the API as a free web service in Frankfurt, next to Supabase (eu-central-1).
 # It runs the native image that .github/workflows/deploy.yml builds and pushes to GHCR; the deploy hook triggers each
-# deploy. Secrets are entered in the dashboard (sync: false), never here. Steps: spin-trainer-web/docs/DEPLOY.md.
+# deploy. The image is public (so is the repo), so Render pulls it without registry credentials. Secrets are entered
+# in the dashboard (sync: false), never here. Steps: spin-trainer-web/docs/DEPLOY.md.
 services:
   - type: web
     name: spin-trainer-api
     runtime: image
     image:
       url: ghcr.io/pedromorago/spin-trainer-api:latest
-      creds:
-        fromRegistryCreds:
-          name: ghcr
     plan: free
     region: frankfurt
     healthCheckPath: /actuator/health/readiness

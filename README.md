@@ -48,7 +48,7 @@ platform sets it (8080 otherwise). First-time setup (Supabase, roles, secrets, V
 | Variable | Example | Purpose |
 |---|---|---|
 | `SUPABASE_URL` | `https://<ref>.supabase.co` | JWT issuer; the API verifies the signature against its JWKS (ES256 asymmetric keys). Required |
-| `DB_URL` | `jdbc:postgresql://<host>:5432/postgres` | Postgres (on Supabase, the *session pooler*) |
+| `DB_URL` | `jdbc:postgresql://<host>:5432/postgres?sslmode=require` | Postgres (on Supabase, the *session pooler*; TLS required) |
 | `DB_APP_PASSWORD` / `DB_MIGRATOR_PASSWORD` | | Passwords for `spin_app` (the API) and `spin_migrator` (Flyway) |
 | `DB_APP_USER` / `DB_MIGRATOR_USER` | `spin_app` / `spin_migrator` | Login users. Behind Supabase's pooler: `spin_app.<ref>` / `spin_migrator.<ref>` |
 | `DB_APP_ROLE` | `spin_app` | Role the migrations grant permissions to; optional unless the role was renamed in `bootstrap.sql` |

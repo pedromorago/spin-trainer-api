@@ -73,7 +73,7 @@ class SituationsIT extends ApiIntegrationTest {
                 .asArray()
                 .singleElement()
                 .asString()
-                .startsWith("Amarillo parte suited");
+                .startsWith("The suited part of yellow");
         assertThat(result)
                 .bodyJson()
                 .extractingPath("$[?(@.key == 'sb_vs_btn_limp')]")
@@ -81,6 +81,17 @@ class SituationsIT extends ApiIntegrationTest {
                 .singleElement()
                 .asInstanceOf(MAP)
                 .doesNotContainKey("notes");
+    }
+
+    /** The app is in English (ADR-0021, migration V8): no note keeps the Spanish of the first seed. */
+    @Test
+    void everyNoteIsInEnglish() {
+        assertThat(listSituations())
+                .bodyJson()
+                .extractingPath("$[*].notes")
+                .asArray()
+                .hasSize(4)
+                .allSatisfy(note -> assertThat((String) note).matches("[\\x20-\\x7E]+"));
     }
 
     @Test

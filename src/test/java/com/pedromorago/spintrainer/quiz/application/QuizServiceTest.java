@@ -51,7 +51,7 @@ class QuizServiceTest {
         @Override
         public Situation spot(SituationKey key, Stack stack) {
             if (!key.equals(BTN_OPEN) || !btnOpen().hasStack(stack)) {
-                throw DomainException.notFound("Situación/stack desconocido");
+                throw DomainException.notFound("Unknown situation/stack");
             }
             return btnOpen();
         }

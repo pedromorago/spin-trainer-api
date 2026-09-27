@@ -15,7 +15,7 @@ public record Hand(String code) implements Comparable<Hand> {
 
     public Hand {
         if (!isCanonical(code)) {
-            throw DomainException.validation("hand", "mano no válida");
+            throw DomainException.validation("hand", "invalid hand");
         }
     }
 

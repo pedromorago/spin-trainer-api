@@ -96,10 +96,7 @@ class RangesIT extends ApiIntegrationTest {
 
             assertThat(result).hasStatus(404);
             CONTRACT.assertResponse("GET", DEFAULT_PATH, result);
-            assertThat(result)
-                    .bodyJson()
-                    .extractingPath("$.detail")
-                    .isEqualTo("Sin rango de referencia para btn_open@8");
+            assertThat(result).bodyJson().extractingPath("$.detail").isEqualTo("No reference range for btn_open@8");
         }
 
         @Test
@@ -204,7 +201,7 @@ class RangesIT extends ApiIntegrationTest {
 
             assertThat(stale).hasStatus(409);
             CONTRACT.assertResponse("PUT", USER_PATH, stale);
-            assertThat(stale).bodyJson().extractingPath("$.detail").isEqualTo("El rango está en la versión 2; recarga");
+            assertThat(stale).bodyJson().extractingPath("$.detail").isEqualTo("The range is at version 2; reload");
             assertThat(recreate).hasStatus(409);
             assertThat(get(URI)).bodyJson().extractingPath("$.hands").isEqualTo(Map.of());
         }
@@ -218,7 +215,7 @@ class RangesIT extends ApiIntegrationTest {
                     .hasStatus(409)
                     .bodyJson()
                     .extractingPath("$.detail")
-                    .isEqualTo("El rango personalizado ya no existe; recarga");
+                    .isEqualTo("The custom range no longer exists; reload");
         }
 
         @Test
@@ -238,7 +235,7 @@ class RangesIT extends ApiIntegrationTest {
                     .hasStatus(409)
                     .bodyJson()
                     .extractingPath("$.detail")
-                    .isEqualTo("El rango está en la versión 2; recarga");
+                    .isEqualTo("The range is at version 2; reload");
             assertThat(get(URI)).bodyJson().extractingPath("$.hands").isEqualTo(Map.of("KK", "ALLIN"));
         }
 
@@ -294,10 +291,10 @@ class RangesIT extends ApiIntegrationTest {
             assertThat(result).hasStatus(400);
             CONTRACT.assertResponse("PUT", USER_PATH, result);
             assertThat(result).bodyJson().isLenientlyEqualTo("""
-                            {"type":"urn:spin-trainer:validation","detail":"3 entradas no válidas en hands","errors":[
-                              {"field":"hands.AAs","message":"mano no válida"},
-                              {"field":"hands.KAs","message":"mano no válida"},
-                              {"field":"hands.QQ","message":"acción CHECK no permitida en btn_open"}]}""");
+                            {"type":"urn:spin-trainer:validation","detail":"3 invalid entries in hands","errors":[
+                              {"field":"hands.AAs","message":"invalid hand"},
+                              {"field":"hands.KAs","message":"invalid hand"},
+                              {"field":"hands.QQ","message":"action CHECK not allowed in btn_open"}]}""");
             assertThat(get(URI)).as("no se guardó nada").hasStatus(404);
         }
 

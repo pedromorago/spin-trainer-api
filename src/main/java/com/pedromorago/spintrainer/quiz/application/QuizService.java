@@ -43,11 +43,11 @@ class QuizService implements RecordAttempt, ListAttempts {
         Situation situation = catalog.spot(situationKey, stack);
         Hand parsed = Hand.of(hand);
         if (!situation.allows(given)) {
-            throw DomainException.validation("given", "acción " + given.code() + " no permitida en " + situationKey);
+            throw DomainException.validation("given", "action " + given.code() + " not allowed in " + situationKey);
         }
         Range range = ranges.effectiveRange(user, situationKey, stack)
                 .orElseThrow(() -> DomainException.noRange(
-                        "Sin rango para " + situationKey + "@" + stack + ": no se puede corregir"));
+                        "No range for " + situationKey + "@" + stack + ": the answer cannot be graded"));
         QuizAttempt attempt = QuizAttempt.grade(
                 UUID.randomUUID(),
                 user,
@@ -65,7 +65,7 @@ class QuizService implements RecordAttempt, ListAttempts {
     public Page list(
             UserId user, Optional<SituationKey> situation, Optional<Stack> stack, int limit, Optional<String> cursor) {
         if (limit < 1 || limit > MAX_LIMIT) {
-            throw DomainException.validation("limit", "limit debe estar entre 1 y " + MAX_LIMIT);
+            throw DomainException.validation("limit", "limit must be between 1 and " + MAX_LIMIT);
         }
         // One extra row is requested to know whether there is a next page without counting all the rows.
         List<QuizAttempt> rows =

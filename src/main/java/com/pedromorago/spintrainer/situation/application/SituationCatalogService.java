@@ -35,7 +35,7 @@ class SituationCatalogService implements SituationCatalog {
     public Situation spot(SituationKey key, Stack stack) {
         Situation situation = catalog().byKey().get(key);
         if (situation == null || !situation.hasStack(stack)) {
-            throw DomainException.notFound("Situación/stack desconocido: " + key + "@" + stack);
+            throw DomainException.notFound("Unknown situation/stack: " + key + "@" + stack);
         }
         return situation;
     }

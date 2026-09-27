@@ -33,18 +33,18 @@ public final class RangeRules {
         hands.forEach((code, action) -> {
             String field = "hands." + code;
             if (!Hand.isCanonical(code)) {
-                errors.add(new FieldError(field, "mano no válida"));
+                errors.add(new FieldError(field, "invalid hand"));
             } else if (action == null || !situation.allows(action)) {
                 errors.add(new FieldError(
                         field,
-                        "acción " + (action == null ? "vacía" : action.code()) + " no permitida en "
+                        (action == null ? "empty action" : "action " + action.code()) + " not allowed in "
                                 + situation.key()));
             } else if (action != situation.implicitAction()) {
                 normalized.put(Hand.of(code), action);
             }
         });
         if (!errors.isEmpty()) {
-            throw DomainException.validation(errors.size() + " entradas no válidas en hands", errors);
+            throw DomainException.validation(errors.size() + " invalid entries in hands", errors);
         }
         return normalized;
     }

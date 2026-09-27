@@ -60,7 +60,7 @@ class AttemptCursorTest {
     void rejectsYearsTheDatabaseCouldNotCompare(String answeredAt) {
         assertThatThrownBy(() -> AttemptCursor.decode(cursor(answeredAt + "|" + UUID.randomUUID())))
                 .isInstanceOfSatisfying(
-                        DomainException.class, e -> assertThat(e.getMessage()).isEqualTo("cursor no válido"));
+                        DomainException.class, e -> assertThat(e.getMessage()).isEqualTo("invalid cursor"));
     }
 
     private static String cursor(String position) {

@@ -38,7 +38,7 @@ final class AttemptCursor {
             }
             return new Position(answeredAt, UUID.fromString(parts[1]));
         } catch (RuntimeException e) {
-            throw DomainException.validation("cursor", "cursor no válido");
+            throw DomainException.validation("cursor", "invalid cursor");
         }
     }
 }

@@ -16,7 +16,7 @@ public record DayWindow(ZoneId zone, LocalDate first, LocalDate last) {
 
     public static DayWindow lastDays(int days, Instant now, String timeZone) {
         if (days < 1 || days > MAX_DAYS) {
-            throw DomainException.validation("days", "days debe estar entre 1 y " + MAX_DAYS);
+            throw DomainException.validation("days", "days must be between 1 and " + MAX_DAYS);
         }
         ZoneId zone = zone(timeZone);
         LocalDate today = LocalDate.ofInstant(now, zone);
@@ -49,7 +49,7 @@ public record DayWindow(ZoneId zone, LocalDate first, LocalDate last) {
     /** Only IANA zone names ({@code Europe/Madrid}, {@code UTC}), as the contract says; no fixed offsets. */
     private static ZoneId zone(String timeZone) {
         if (timeZone == null || !ZoneId.getAvailableZoneIds().contains(timeZone)) {
-            throw DomainException.validation("tz", "zona IANA desconocida");
+            throw DomainException.validation("tz", "unknown IANA time zone");
         }
         return ZoneId.of(timeZone);
     }

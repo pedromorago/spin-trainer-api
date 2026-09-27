@@ -55,7 +55,7 @@ public record QuizAttempt(
     public static QuizAttempt grade(
             UUID id, UserId user, Situation situation, Stack stack, Hand hand, Action given, Range range, Instant at) {
         if (!situation.allows(given)) {
-            throw DomainException.validation("given", "acción " + given.code() + " no permitida en " + situation.key());
+            throw DomainException.validation("given", "action " + given.code() + " not allowed in " + situation.key());
         }
         Action expected = RangeRules.actionFor(range.hands(), hand, situation);
         return new QuizAttempt(

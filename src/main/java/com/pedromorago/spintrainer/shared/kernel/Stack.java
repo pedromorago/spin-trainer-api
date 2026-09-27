@@ -12,20 +12,20 @@ public record Stack(int halfBigBlinds) implements Comparable<Stack> {
 
     public Stack {
         if (halfBigBlinds < 2 || halfBigBlinds > 200) {
-            throw DomainException.validation("stack", "el stack debe estar entre 1 y 100 BB");
+            throw DomainException.validation("stack", "the stack must be between 1 and 100 BB");
         }
     }
 
     public static Stack of(BigDecimal bigBlinds) {
         if (bigBlinds == null) {
-            throw DomainException.validation("stack", "el stack es obligatorio");
+            throw DomainException.validation("stack", "the stack is required");
         }
         BigDecimal halves = bigBlinds.multiply(TWO);
         if (halves.stripTrailingZeros().scale() > 0) {
-            throw DomainException.validation("stack", "el stack debe ser múltiplo de 0,5 BB");
+            throw DomainException.validation("stack", "the stack must be a multiple of 0.5 BB");
         }
         if (halves.compareTo(BigDecimal.valueOf(2)) < 0 || halves.compareTo(BigDecimal.valueOf(200)) > 0) {
-            throw DomainException.validation("stack", "el stack debe estar entre 1 y 100 BB");
+            throw DomainException.validation("stack", "the stack must be between 1 and 100 BB");
         }
         return new Stack(halves.intValueExact());
     }

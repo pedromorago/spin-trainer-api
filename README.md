@@ -92,8 +92,8 @@ Every error response is a Problem Details object (RFC 9457, `application/problem
 `unavailable`, `internal`),
 `correlationId` (the one from the `X-Correlation-Id` header, which is accepted or generated) and, on 400s, per-field `errors`.
 That includes URLs rejected before any controller (Spring Security's firewall: `;`, encoded slashes). Messages are in
-Spanish, those of the spec's constraints too (`ConstraintMessages`: not Hibernate Validator's, which follow the JVM's
-locale).
+English (ADR-0021), those of the spec's constraints too (`ConstraintMessages`: not Hibernate Validator's, which follow
+the JVM's locale).
 
 Public without a token: `/actuator/health` (and its probes) and `/actuator/info`, which only says the commit the image
 was built from (the deploy waits for it).

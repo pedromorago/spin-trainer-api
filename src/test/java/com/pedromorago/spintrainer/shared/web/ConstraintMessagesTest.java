@@ -51,7 +51,7 @@ class ConstraintMessagesTest {
     }
 
     @Test
-    void everyConstraintOfTheSpecHasItsSpanishMessage() {
+    void everyConstraintOfTheSpecHasItsEnglishMessage() {
         Map<String, String> messages = messages(new Sample(
                 null,
                 "BTN",
@@ -65,14 +65,14 @@ class ConstraintMessagesTest {
 
         assertThat(messages)
                 .containsExactlyInAnyOrderEntriesOf(Map.of(
-                        "required", "obligatorio",
-                        "key", "formato no válido",
-                        "limit", "debe ser ≥ 1",
-                        "stack", "debe ser < 100",
-                        "positive", "debe ser > 0",
-                        "shortText", "tamaño máximo 3",
-                        "atLeastTwo", "tamaño mínimo 2",
-                        "oneOrTwo", "tamaño entre 1 y 2",
+                        "required", "required",
+                        "key", "invalid format",
+                        "limit", "must be ≥ 1",
+                        "stack", "must be < 100",
+                        "positive", "must be > 0",
+                        "shortText", "size must be at most 3",
+                        "atLeastTwo", "size must be at least 2",
+                        "oneOrTwo", "size must be between 1 and 2",
                         "email", ConstraintMessages.FALLBACK));
     }
 
@@ -82,7 +82,7 @@ class ConstraintMessagesTest {
                 messages(new Sample("ok", "btn", 201, new BigDecimal("0.5"), BigDecimal.ONE, "abc", null, null, null));
 
         assertThat(messages)
-                .containsExactlyInAnyOrderEntriesOf(Map.of("limit", "debe ser ≤ 200", "stack", "debe ser ≥ 1"));
+                .containsExactlyInAnyOrderEntriesOf(Map.of("limit", "must be ≤ 200", "stack", "must be ≥ 1"));
     }
 
     @Test
@@ -91,7 +91,7 @@ class ConstraintMessagesTest {
         try {
             Locale.setDefault(Locale.ENGLISH);
             assertThat(messages(new Sample(null, "btn", 1, BigDecimal.ONE, BigDecimal.ONE, "", null, null, null)))
-                    .containsExactly(Map.entry("required", "obligatorio"));
+                    .containsExactly(Map.entry("required", "required"));
         } finally {
             Locale.setDefault(previous);
         }

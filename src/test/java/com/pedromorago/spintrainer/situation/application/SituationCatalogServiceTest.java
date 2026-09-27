@@ -44,7 +44,7 @@ class SituationCatalogServiceTest {
         assertThatThrownBy(() -> catalog.spot(SituationKey.of("bb_vs_sb_limp"), Stack.of(8)))
                 .isInstanceOfSatisfying(
                         DomainException.class,
-                        e -> assertThat(e.getMessage()).isEqualTo("Situación/stack desconocido: bb_vs_sb_limp@8"));
+                        e -> assertThat(e.getMessage()).isEqualTo("Unknown situation/stack: bb_vs_sb_limp@8"));
     }
 
     @Test

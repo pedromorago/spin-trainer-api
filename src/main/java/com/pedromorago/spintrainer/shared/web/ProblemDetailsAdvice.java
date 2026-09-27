@@ -84,7 +84,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         log.error("Could not validate the JWT: the issuer is not responding", ex);
         return problem(
                 ProblemType.UNAVAILABLE,
-                "No se puede validar el token ahora mismo; inténtalo de nuevo",
+                "The token cannot be validated right now; please try again",
                 List.of(),
                 new HttpHeaders(),
                 request);
@@ -101,8 +101,8 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
             log.info("JWT rejected: {}", ex.getMessage());
         }
         String detail = invalidToken
-                ? "El token de acceso no es válido o ha caducado"
-                : "Falta el token de acceso (Authorization: Bearer)";
+                ? "The access token is invalid or has expired"
+                : "Missing access token (Authorization: Bearer)";
         return problem(ProblemType.UNAUTHORIZED, detail, List.of(), headers, request);
     }
 
@@ -111,7 +111,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(RequestRejectedException.class)
     ResponseEntity<Object> rejected(RequestRejectedException ex, WebRequest request) {
         log.info("Request rejected by the firewall: {}", ex.getMessage());
-        return problem(ProblemType.VALIDATION, "Ruta no válida", List.of(), new HttpHeaders(), request);
+        return problem(ProblemType.VALIDATION, "Invalid path", List.of(), new HttpHeaders(), request);
     }
 
     @ExceptionHandler(Exception.class)
@@ -119,7 +119,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         log.error("Unhandled error", ex);
         return problem(
                 ProblemType.INTERNAL,
-                "Error interno. Si lo reportas, indica el correlationId.",
+                "Internal error. If you report it, include the correlationId.",
                 List.of(),
                 new HttpHeaders(),
                 request);
@@ -155,11 +155,11 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
         JacksonException jackson = findCause(ex, JacksonException.class);
         FieldError error;
         if (jackson == null || jackson.getPath().isEmpty()) {
-            error = new FieldError("body", "JSON mal formado o de tipo incorrecto");
+            error = new FieldError("body", "malformed JSON or wrong type");
         } else if (jackson instanceof UnrecognizedPropertyException) {
-            error = new FieldError(jsonPath(jackson), "campo no permitido");
+            error = new FieldError(jsonPath(jackson), "field not allowed");
         } else {
-            error = new FieldError(jsonPath(jackson), "valor no válido");
+            error = new FieldError(jsonPath(jackson), "invalid value");
         }
         return problem(
                 ProblemType.VALIDATION, error.message() + ": " + error.field(), List.of(error), headers, request);
@@ -169,14 +169,14 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleTypeMismatch(
             TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         String field = ex instanceof MethodArgumentTypeMismatchException m ? m.getName() : ex.getPropertyName();
-        List<FieldError> errors = List.of(new FieldError(field, "valor no válido"));
+        List<FieldError> errors = List.of(new FieldError(field, "invalid value"));
         return problem(ProblemType.VALIDATION, invalidFields(errors), errors, headers, request);
     }
 
     @Override
     protected ResponseEntity<Object> handleNoResourceFoundException(
             NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        return problem(ProblemType.NOT_FOUND, "Ruta desconocida", List.of(), headers, request);
+        return problem(ProblemType.NOT_FOUND, "Unknown path", List.of(), headers, request);
     }
 
     // Other Spring MVC errors (405, 406, 415...): their ProblemDetail, with a type of its own (the spec requires it and
@@ -230,7 +230,7 @@ class ProblemDetailsAdvice extends ResponseEntityExceptionHandler {
     private static String invalidFields(List<FieldError> errors) {
         return errors.size() == 1
                 ? errors.getFirst().field() + ": " + errors.getFirst().message()
-                : errors.size() + " campos no válidos: "
+                : errors.size() + " invalid fields: "
                         + errors.stream().map(FieldError::field).distinct().collect(Collectors.joining(", "));
     }
 

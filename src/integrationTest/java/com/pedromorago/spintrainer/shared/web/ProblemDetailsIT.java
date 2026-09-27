@@ -46,19 +46,19 @@ class ProblemDetailsIT extends ApiIntegrationTest {
             throw switch (kind) {
                 case VALIDATION ->
                     DomainException.validation(
-                            "2 entradas inválidas en hands",
+                            "2 invalid entries in hands",
                             List.of(
-                                    new FieldError("hands.AAs", "mano inválida"),
-                                    new FieldError("hands.KK", "acción no permitida")));
-                case NOT_FOUND -> DomainException.notFound("Situación/stack desconocido: x@25");
-                case CONFLICT -> DomainException.conflict("El rango está en la versión 3; recarga");
-                case NO_RANGE -> DomainException.noRange("Sin rango para btn_open@8");
+                                    new FieldError("hands.AAs", "invalid hand"),
+                                    new FieldError("hands.KK", "action not allowed")));
+                case NOT_FOUND -> DomainException.notFound("Unknown situation/stack: x@25");
+                case CONFLICT -> DomainException.conflict("The range is at version 3; reload");
+                case NO_RANGE -> DomainException.noRange("No range for btn_open@8");
             };
         }
 
         @GetMapping("/_test/boom")
         void boom() {
-            throw new IllegalStateException("detalle interno que no debe salir");
+            throw new IllegalStateException("internal detail that must not leak");
         }
 
         @PostMapping("/_test/samples")
@@ -95,9 +95,9 @@ class ProblemDetailsIT extends ApiIntegrationTest {
         assertThat(send(mvc.get().uri("/api/v1/_test/domain/VALIDATION")))
                 .bodyJson()
                 .isLenientlyEqualTo("""
-                        {"detail":"2 entradas inválidas en hands","errors":[
-                          {"field":"hands.AAs","message":"mano inválida"},
-                          {"field":"hands.KK","message":"acción no permitida"}]}""");
+                        {"detail":"2 invalid entries in hands","errors":[
+                          {"field":"hands.AAs","message":"invalid hand"},
+                          {"field":"hands.KK","message":"action not allowed"}]}""");
     }
 
     @Test
@@ -125,22 +125,22 @@ class ProblemDetailsIT extends ApiIntegrationTest {
 
         assertThat(result).hasStatus(400);
         assertThat(result).bodyJson().isLenientlyEqualTo("""
-                        {"type":"urn:spin-trainer:validation","errors":[{"field":"name","message":"tamaño máximo 3"}]}""");
+                        {"type":"urn:spin-trainer:validation","errors":[{"field":"name","message":"size must be at most 3"}]}""");
     }
 
-    // The messages of the spec's constraints are Spanish whatever the client or the JVM speak (they were Hibernate
-    // Validator's, in the JVM's language: English in the container).
+    // The messages of the spec's constraints are English whatever the client or the JVM speak (ADR-0021): they are the
+    // API's own, not Hibernate Validator's, which follow the JVM's language (Spanish on a Spanish Windows machine).
     @ParameterizedTest
     @CsvSource(
             delimiter = '|',
             value = {
-                "/api/v1/quiz/attempts?limit=0              | limit     | debe ser ≥ 1",
-                "/api/v1/quiz/attempts?limit=201            | limit     | debe ser ≤ 200",
-                "/api/v1/ranges/default/BTN_OPEN/25          | situation | formato no válido",
-                "/api/v1/stats/hands?stack=0.5              | stack     | debe ser ≥ 1"
+                "/api/v1/quiz/attempts?limit=0              | limit     | must be ≥ 1",
+                "/api/v1/quiz/attempts?limit=201            | limit     | must be ≤ 200",
+                "/api/v1/ranges/default/BTN_OPEN/25          | situation | invalid format",
+                "/api/v1/stats/hands?stack=0.5              | stack     | must be ≥ 1"
             })
-    void constraintMessagesAreSpanishWhateverTheLocale(String uri, String field, String message) {
-        MvcTestResult result = send(mvc.get().uri(uri).header(HttpHeaders.ACCEPT_LANGUAGE, "en-US"));
+    void constraintMessagesAreEnglishWhateverTheLocale(String uri, String field, String message) {
+        MvcTestResult result = send(mvc.get().uri(uri).header(HttpHeaders.ACCEPT_LANGUAGE, "es-ES"));
 
         assertThat(result).hasStatus(400);
         assertThat(result)
@@ -158,7 +158,7 @@ class ProblemDetailsIT extends ApiIntegrationTest {
         assertThat(result)
                 .bodyJson()
                 .isLenientlyEqualTo(
-                        "{\"type\":\"urn:spin-trainer:validation\",\"status\":400,\"detail\":\"Ruta no válida\"}");
+                        "{\"type\":\"urn:spin-trainer:validation\",\"status\":400,\"detail\":\"Invalid path\"}");
         assertThat(result).bodyJson().extractingPath("$.correlationId").isNotNull();
     }
 
@@ -172,7 +172,7 @@ class ProblemDetailsIT extends ApiIntegrationTest {
         assertThat(result).hasStatus(400);
         assertThat(result)
                 .bodyJson()
-                .isLenientlyEqualTo("{\"errors\":[{\"field\":\"correct\",\"message\":\"campo no permitido\"}]}");
+                .isLenientlyEqualTo("{\"errors\":[{\"field\":\"correct\",\"message\":\"field not allowed\"}]}");
     }
 
     @Test
@@ -185,7 +185,7 @@ class ProblemDetailsIT extends ApiIntegrationTest {
         assertThat(result).hasStatus(400);
         assertThat(result)
                 .bodyJson()
-                .isLenientlyEqualTo("{\"errors\":[{\"field\":\"colours.AA\",\"message\":\"valor no válido\"}]}");
+                .isLenientlyEqualTo("{\"errors\":[{\"field\":\"colours.AA\",\"message\":\"invalid value\"}]}");
     }
 
     @Test

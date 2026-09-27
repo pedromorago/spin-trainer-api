@@ -9,7 +9,7 @@ public record SituationKey(String value) {
 
     public SituationKey {
         if (value == null || !FORMAT.matcher(value).matches()) {
-            throw DomainException.validation("situation", "clave de situación no válida");
+            throw DomainException.validation("situation", "invalid situation key");
         }
     }
 

@@ -44,7 +44,7 @@ class RangeServiceTest {
         @Override
         public Situation spot(SituationKey key, Stack stack) {
             if (!key.equals(BTN_OPEN) || !btnOpen().hasStack(stack)) {
-                throw DomainException.notFound("Situación/stack desconocido: " + key + "@" + stack);
+                throw DomainException.notFound("Unknown situation/stack: " + key + "@" + stack);
             }
             return btnOpen();
         }
@@ -81,10 +81,8 @@ class RangeServiceTest {
         service.save(pedro, BTN_OPEN, BB25, Map.of(), 0);
         service.save(pedro, BTN_OPEN, BB25, Map.of(), 1);
 
-        assertConflict(
-                () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 1), "El rango está en la versión 2; recarga");
-        assertConflict(
-                () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 0), "El rango está en la versión 2; recarga");
+        assertConflict(() -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 1), "The range is at version 2; reload");
+        assertConflict(() -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 0), "The range is at version 2; reload");
     }
 
     @Test
@@ -93,7 +91,7 @@ class RangeServiceTest {
 
         assertConflict(
                 () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), Integer.MAX_VALUE),
-                "El rango está en la versión 1; recarga");
+                "The range is at version 1; reload");
     }
 
     @Test
@@ -102,7 +100,7 @@ class RangeServiceTest {
         service.delete(pedro, BTN_OPEN, BB25);
 
         assertConflict(
-                () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 1), "El rango personalizado ya no existe; recarga");
+                () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 1), "The custom range no longer exists; reload");
     }
 
     @Test
@@ -116,10 +114,8 @@ class RangeServiceTest {
         assertThat(again.created()).isTrue();
         assertThat(again.range().version()).isEqualTo(3);
         // A tab that read version 1 or 2 of the deleted range cannot overwrite the new one (it was an ABA).
-        assertConflict(
-                () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 1), "El rango está en la versión 3; recarga");
-        assertConflict(
-                () -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 2), "El rango está en la versión 3; recarga");
+        assertConflict(() -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 1), "The range is at version 3; reload");
+        assertConflict(() -> service.save(pedro, BTN_OPEN, BB25, Map.of(), 2), "The range is at version 3; reload");
         assertThat(service.save(other, BTN_OPEN, BB25, Map.of(), 0).range().version())
                 .isEqualTo(1);
     }

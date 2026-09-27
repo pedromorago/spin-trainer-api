@@ -50,7 +50,7 @@ class RangeService implements ReadDefaultRanges, ManageUserRanges, ResolveEffect
     public Range get(SituationKey situation, Stack stack) {
         catalog.spot(situation, stack);
         return defaults.find(situation, stack)
-                .orElseThrow(() -> DomainException.notFound("Sin rango de referencia para " + situation + "@" + stack));
+                .orElseThrow(() -> DomainException.notFound("No reference range for " + situation + "@" + stack));
     }
 
     @Override
@@ -63,7 +63,7 @@ class RangeService implements ReadDefaultRanges, ManageUserRanges, ResolveEffect
         catalog.spot(situation, stack);
         return userRanges
                 .find(user, situation, stack)
-                .orElseThrow(() -> DomainException.notFound("Sin rango personalizado para " + situation + "@" + stack));
+                .orElseThrow(() -> DomainException.notFound("No custom range for " + situation + "@" + stack));
     }
 
     @Override
@@ -71,7 +71,7 @@ class RangeService implements ReadDefaultRanges, ManageUserRanges, ResolveEffect
     public SavedRange save(UserId user, SituationKey situation, Stack stack, Map<String, Action> hands, int version) {
         Situation spot = catalog.spot(situation, stack);
         if (version < 0) {
-            throw DomainException.validation("version", "la versión debe ser un entero ≥ 0");
+            throw DomainException.validation("version", "the version must be an integer ≥ 0");
         }
         Map<Hand, Action> normalized = RangeRules.normalize(hands, spot);
         if (version == Integer.MAX_VALUE) {
@@ -105,8 +105,7 @@ class RangeService implements ReadDefaultRanges, ManageUserRanges, ResolveEffect
     private DomainException conflict(UserId user, SituationKey situation, Stack stack) {
         return userRanges
                 .find(user, situation, stack)
-                .map(current ->
-                        DomainException.conflict("El rango está en la versión " + current.version() + "; recarga"))
-                .orElseGet(() -> DomainException.conflict("El rango personalizado ya no existe; recarga"));
+                .map(current -> DomainException.conflict("The range is at version " + current.version() + "; reload"))
+                .orElseGet(() -> DomainException.conflict("The custom range no longer exists; reload"));
     }
 }

@@ -55,12 +55,12 @@ class RangeRulesTest {
         assertThatThrownBy(() -> RangeRules.normalize(hands, btnOpen()))
                 .isInstanceOfSatisfying(DomainException.class, e -> {
                     assertThat(e.kind()).isEqualTo(DomainException.Kind.VALIDATION);
-                    assertThat(e.getMessage()).isEqualTo("3 entradas no válidas en hands");
+                    assertThat(e.getMessage()).isEqualTo("3 invalid entries in hands");
                     assertThat(e.errors())
                             .containsExactly(
-                                    new FieldError("hands.AAs", "mano no válida"),
-                                    new FieldError("hands.KAs", "mano no válida"),
-                                    new FieldError("hands.QQ", "acción CHECK no permitida en btn_open"));
+                                    new FieldError("hands.AAs", "invalid hand"),
+                                    new FieldError("hands.KAs", "invalid hand"),
+                                    new FieldError("hands.QQ", "action CHECK not allowed in btn_open"));
                 });
     }
 }

@@ -70,7 +70,16 @@ jobs:
             echo "::notice::RENDER_DEPLOY_HOOK_URL is not set: image pushed, nothing deployed (spin-trainer-web/docs/DEPLOY.md)."
             exit 0
           fi
-          curl --fail --silent --show-error -X POST "$HOOK&imgURL=$(printf '%s' "$IMAGE:$TAG" | jq -sRr @uri)"
+          # A secret pasted with surrounding spaces or a line break made curl reject the URL ("Bad hostname").
+          hook=$(printf '%s' "$HOOK" | tr -d '[:space:]')
+          case "$hook" in
+            https://api.render.com/deploy/srv-*'?key='*) ;;
+            *)
+              echo "::error::RENDER_DEPLOY_HOOK_URL is not a Render deploy hook (https://api.render.com/deploy/srv-...?key=...). Copy it again from the service's Settings → Deploy Hook."
+              exit 1
+              ;;
+          esac
+          curl --fail --silent --show-error -X POST "$hook&imgURL=$(printf '%s' "$IMAGE:$TAG" | jq -sRr @uri)"
 
       # Render keeps the previous version serving until the new one passes its health check, so a green readiness
       # alone proves nothing: wait until /actuator/info reports this commit. A new version that never starts (Flyway
@@ -78,7 +87,7 @@ jobs:
       - name: Wait for this commit to serve
         if: env.HOOK != ''
         run: |
-          for attempt in $(seq 60); do
+          for _ in $(seq 60); do
             revision=$(curl --silent --max-time 10 "$API_URL/actuator/info" | jq -r '.app.revision // empty' 2>/dev/null || true)
             if [ "$revision" = "$TAG" ]; then
               curl --fail --silent --show-error "$API_URL/actuator/health/readiness"

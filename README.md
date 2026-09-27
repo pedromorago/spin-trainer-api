@@ -70,6 +70,12 @@ per row of the 13×13 grid with the explicit-action hands; the rest take the imp
 is not possible). `V5__seed_reference_ranges.sql` loads them with those same JSON objects, and `ReferenceSeedIT` checks,
 by migrating an empty database, that the result is exactly the file and that every spot in the catalog has a range.
 
+The PDF's "3H OS call" table (page 19) is not a coloured range but one threshold per hand: call an open-shove when the
+effective stack is at most that many BB. Its 169 cells are in `reference-os-call-thresholds.json`, and V7 turns them
+into the situation `bb_vs_sb_os` (BB vs SB open-shove, the 3-max counterpart of `hu_bb_vs_os`) with one range per stack
+(20, 15, 12, 10, 8, 6 and 4 BB). `ReferenceThresholdsTest` checks that those 7 ranges are exactly the derivation:
+80 reference ranges in all.
+
 The file was extracted from the PDF by matching each cell's fill color against its table's legend (the exact colors of
 the original spreadsheet) and reviewed by overlaying the reconstruction on the original. The web app (mock) and
 spin-trainer-qa (oracles) keep copies with their own check, as with the contract. Changing a range = a new migration
@@ -102,7 +108,7 @@ An API change starts in the spec; the web app pulls the copy with `npm run spec:
 
 | Method | Path | What it does |
 |---|---|---|
-| GET | `/situations` | Catalog of the 16 situations (ETag) |
+| GET | `/situations` | Catalog of the 17 situations (ETag) |
 | GET | `/ranges/default`, `/ranges/default/{situation}/{stack}` | Reference ranges (ETag) |
 | GET | `/ranges/user`, `/ranges/user/{situation}/{stack}` | The user's custom ranges |
 | PUT | `/ranges/user/{situation}/{stack}` | Creates (`version: 0` → 201) or replaces version N (200); 409 if it changed. Versions keep counting after a delete |

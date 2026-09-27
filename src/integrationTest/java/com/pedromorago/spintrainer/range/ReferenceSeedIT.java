@@ -71,7 +71,7 @@ class ReferenceSeedIT {
                 "SELECT situation, stack, hand, action FROM app.default_range_hand",
                 row -> seeded.get(spot(row)).put(row.getString("hand"), row.getString("action")));
 
-        assertThat(seeded).hasSize(73).isEqualTo(expected);
+        assertThat(seeded).hasSize(80).isEqualTo(expected);
     }
 
     @Test

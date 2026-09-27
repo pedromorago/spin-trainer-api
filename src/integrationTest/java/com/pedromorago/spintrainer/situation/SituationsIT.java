@@ -21,14 +21,17 @@ class SituationsIT extends ApiIntegrationTest {
     }
 
     @Test
-    void servesTheSixteenSituationsInPresentationOrderAsTheContractSays() {
+    void servesTheSeventeenSituationsInPresentationOrderAsTheContractSays() {
         MvcTestResult result = listSituations();
 
         assertThat(result).hasStatusOk();
         CONTRACT.assertResponse("GET", "/situations", result);
-        assertThat(result).bodyJson().extractingPath("$.length()").isEqualTo(16);
+        assertThat(result).bodyJson().extractingPath("$.length()").isEqualTo(17);
         assertThat(result).bodyJson().extractingPath("$[0].key").isEqualTo("btn_open");
-        assertThat(result).bodyJson().extractingPath("$[15].key").isEqualTo("hu_bb_vs_os");
+        // V7: the "3H OS call" table, right after the other BB vs SB spots.
+        assertThat(result).bodyJson().extractingPath("$[6].key").isEqualTo("bb_vs_sb_os");
+        assertThat(result).bodyJson().extractingPath("$[7].key").isEqualTo("bb_vs_btn_mr_sb_fold");
+        assertThat(result).bodyJson().extractingPath("$[16].key").isEqualTo("hu_bb_vs_os");
     }
 
     @Test

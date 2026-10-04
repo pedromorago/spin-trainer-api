@@ -65,21 +65,25 @@ schema and seed in the order they are applied). Two least-privilege roles (ADR-0
 
 ### Reference ranges
 
-The 73 tables of `Tablasmentov3.pdf` (16 situations, one range per stack) are in `reference-ranges.json`, one line
-per row of the 13×13 grid with the explicit-action hands; the rest take the implicit action (FOLD, or CHECK if FOLD
-is not possible). `V5__seed_reference_ranges.sql` loads them with those same JSON objects, and `ReferenceSeedIT` checks,
-by migrating an empty database, that the result is exactly the file and that every spot in the catalog has a range.
+The reference ranges are **examples** (ADR-0024): 80 ranges, one per spot of the catalog (17 situations, one range per
+stack), built by a public, reproducible rule rather than taken from any school's charts. The 169 hands are ranked by
+their all-in equity against a random hand (Monte Carlo with a fixed seed), and each range in
+`reference-ranges-recipe.json` lists bands of actions with their share of the 1326 two-card combos: the hands fill the
+bands in ranking order, and the rest take the implicit action (FOLD, or CHECK if FOLD is not possible). Examples to
+train with, not a strategy; each player can replace any of them with their own (custom ranges, ADR-0012).
 
-The PDF's "3H OS call" table (page 19) is not a coloured range but one threshold per hand: call an open-shove when the
-effective stack is at most that many BB. Its 169 cells are in `reference-os-call-thresholds.json`, and V7 turns them
-into the situation `bb_vs_sb_os` (BB vs SB open-shove, the 3-max counterpart of `hu_bb_vs_os`) with one range per stack
-(20, 15, 12, 10, 8, 6 and 4 BB). `ReferenceThresholdsTest` checks that those 7 ranges are exactly the derivation:
-80 reference ranges in all.
+`ExampleRanges` (test sources) turns the recipe into `reference-ranges.json` (`./gradlew generateReferenceRanges`), one
+line per row of the 13×13 grid with the explicit-action hands, and `ExampleRangesTest` fails while the file and the
+recipe disagree. `V9__example_reference_ranges.sql` loads those same JSON objects (version 2), and `ReferenceSeedIT`
+checks, by migrating an empty database, that the result is exactly the file and that every spot in the catalog has a
+range. The web app (mock and bundled previews) and spin-trainer-qa (oracles) keep copies with their own check, as with
+the contract. Changing a range = the recipe, the file and a new migration in the same commit; the tests force them to
+match.
 
-The file was extracted from the PDF by matching each cell's fill color against its table's legend (the exact colors of
-the original spreadsheet) and reviewed by overlaying the reconstruction on the original. The web app (mock) and
-spin-trainer-qa (oracles) keep copies with their own check, as with the contract. Changing a range = a new migration
-and the file in the same commit; the test forces them to match.
+The first reference ranges were a third party's charts. They were taken out of the repository (ADR-0024): migrations
+V2, V5, V7 and V8 were rewritten without them, and V9 replaces them in a database that still has them. Such a database
+(production) recorded the first contents' checksums, so `RewrittenMigrations` repairs its Flyway history once, when it
+recognises them, before migrating (`RewrittenMigrationsIT`).
 
 The roles are created once per environment with `src/main/resources/db/bootstrap/bootstrap.sql` (it has the
 instructions); the integration tests run that same script against a Testcontainers Postgres 17 and check the
@@ -137,4 +141,4 @@ src/integrationTest/java               full API: Testcontainers, real JWTs, resp
 src/testFixtures/java                  test Postgres and JWT issuer (suites and bootTestRun)
 ```
 
-Architecture, decisions (ADR-0001..0023) and context: `spin-trainer-web/docs/`.
+Architecture, decisions (ADR-0001..0024) and context: `spin-trainer-web/docs/`.

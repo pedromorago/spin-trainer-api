@@ -74,12 +74,13 @@ class ReferenceSeedIT {
         assertThat(seeded).hasSize(80).isEqualTo(expected);
     }
 
+    /** V9 (ADR-0024): the examples are the second contents of every reference range. */
     @Test
-    void everyReferenceRangeIsVersionOne() throws Exception {
+    void everyReferenceRangeIsVersionTwo() throws Exception {
         List<String> versions = new ArrayList<>();
         query("SELECT DISTINCT version FROM app.default_range", row -> versions.add(row.getString("version")));
 
-        assertThat(versions).containsExactly("1");
+        assertThat(versions).containsExactly("2");
     }
 
     @Test
@@ -93,8 +94,9 @@ class ReferenceSeedIT {
         assertThat(missing).isEmpty();
     }
 
+    /** V5 corrected the V2 catalog: sb_open limps and folds (L/F), hu_sb_open can open-shove. */
     @Test
-    void theCatalogHasTheActionsOfThePdfLegends() throws Exception {
+    void theOpeningSituationsHaveTheirCorrectedActions() throws Exception {
         Map<String, List<String>> actions = new LinkedHashMap<>();
         query(
                 "SELECT situation, action FROM app.situation_action WHERE situation IN ('sb_open', 'hu_sb_open') "

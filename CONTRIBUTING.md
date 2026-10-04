@@ -1,14 +1,15 @@
 # spin-trainer-api
 
 Spin Trainer API. Rules shared by the three repos, summarized here so this repo is self-contained.
-Project source of truth: `spin-trainer-web/docs/` (context, `ARCHITECTURE.md`, ADRs 0001..0023).
+Project source of truth: `spin-trainer-web/docs/` (context, `ARCHITECTURE.md`, ADRs 0001..0024).
 
 ## Global rules (summary)
 - Portfolio quality > speed. ADRs are closed; they are reopened only for a concrete, justified flaw (new ADR).
 - Spin & Go only (3-max and HU, 17 situations). Effective range = custom if it exists, otherwise the reference one (ADR-0012).
 - Supabase only issues the JWT; the API is the only data path. Tables in the `app` schema, not exposed to PostgREST.
-- Reference ranges in the DB via Flyway migrations (versioned seed, V5 and V7) with their source in `reference-ranges.json`
-  (`ReferenceSeedIT` requires them to match; web and QA keep copies). Quiz attempts = immutable events.
+- Reference ranges in the DB via Flyway migrations (versioned seed, V9) with their source in `reference-ranges.json`,
+  generated from `reference-ranges-recipe.json`: examples, not a school's charts (ADR-0024). `ExampleRangesTest` and
+  `ReferenceSeedIT` require them to match; web and QA keep copies. Quiz attempts = immutable events.
 - OpenAPI-first: `openapi.yaml` changes before the code (and the web copy, with `npm run spec:sync`).
 - Gradle (Kotlin DSL), never Maven. Discarded: OWASP ZAP, load testing, Pact, pgTAP.
 - Everything in English (ADR-0021): code, comments, documentation (README, ADRs, CONTRIBUTING.md, docs/, OpenAPI descriptions), developer-facing messages, the app's UI and data, the API's error messages, and the test report (test titles, Allure names, assertion descriptions, Gherkin features).

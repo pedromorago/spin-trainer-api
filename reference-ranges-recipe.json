@@ -1,0 +1,101 @@
+{
+  "description": "Recipe of the example reference ranges (ADR-0024). Each range lists bands of actions with their share, in percent, of the 1326 two-card combos; the 169 hands, ranked by all-in equity against a random hand, fill the bands in order and the hands left take the implicit action (FOLD, or CHECK if FOLD is not possible). ExampleRanges turns it into reference-ranges.json (./gradlew generateReferenceRanges). Examples to train with, not a strategy.",
+  "ranges": [
+    { "situation": "btn_open", "stack": 25, "bands": [["MR_4B_C", 8], ["MR_C_C", 7], ["MR_C_F", 10], ["MR_F_F", 15], ["L_C_F", 5]] },
+    { "situation": "btn_open", "stack": 20, "bands": [["MR_4B_C", 10], ["MR_C_C", 6], ["MR_C_F", 10], ["MR_F_F", 12], ["L_C_C", 3], ["L_C_F", 4]] },
+    { "situation": "btn_open", "stack": 15, "bands": [["MR_4B_C", 10], ["ALLIN", 12], ["MR_F_F", 10], ["L_C_F", 8]] },
+    { "situation": "btn_open", "stack": 12, "bands": [["MR_4B_C", 8], ["ALLIN", 22], ["L_C_F", 8]] },
+    { "situation": "btn_open", "stack": 10, "bands": [["MR_4B_C", 6], ["ALLIN", 30], ["L_C_F", 4]] },
+    { "situation": "btn_open", "stack": 8, "bands": [["ALLIN", 45]] },
+
+    { "situation": "sb_open", "stack": 25, "bands": [["MR_4B_C", 10], ["MR_C_C", 8], ["MR_C_F", 12], ["L_C_F", 20], ["L_F", 15]] },
+    { "situation": "sb_open", "stack": 20, "bands": [["MR_4B_C", 10], ["MR_C_F", 12], ["MR_F_F", 10], ["L_C_F", 20], ["L_F", 13]] },
+    { "situation": "sb_open", "stack": 15, "bands": [["MR_4B_C", 10], ["ALLIN", 15], ["L_C_F", 20], ["L_F", 20]] },
+    { "situation": "sb_open", "stack": 12, "bands": [["MR_4B_C", 8], ["ALLIN", 25], ["L_C_F", 15], ["L_F", 17]] },
+    { "situation": "sb_open", "stack": 10, "bands": [["ALLIN", 45], ["L_F", 20]] },
+    { "situation": "sb_open", "stack": 8, "bands": [["ALLIN", 60]] },
+
+    { "situation": "sb_vs_btn_mr", "stack": 25, "bands": [["3BET_C", 5], ["ALLIN", 8], ["CALL", 10]] },
+    { "situation": "sb_vs_btn_mr", "stack": 20, "bands": [["3BET_C", 4], ["ALLIN", 12], ["CALL", 8]] },
+    { "situation": "sb_vs_btn_mr", "stack": 15, "bands": [["ALLIN", 20], ["CALL", 4]] },
+    { "situation": "sb_vs_btn_mr", "stack": 10, "bands": [["ALLIN", 25]] },
+
+    { "situation": "sb_vs_btn_limp", "stack": 25, "bands": [["ISO_C", 10], ["ISO_F", 12], ["LIMP", 25]] },
+    { "situation": "sb_vs_btn_limp", "stack": 20, "bands": [["ISO_C", 10], ["ALLIN", 8], ["ISO_F", 8], ["LIMP", 25]] },
+    { "situation": "sb_vs_btn_limp", "stack": 15, "bands": [["ISO_C", 8], ["ALLIN", 20], ["LIMP", 25]] },
+
+    { "situation": "bb_vs_sb_mr", "stack": 25, "bands": [["3BET_C", 8], ["ALLIN", 6], ["CALL", 30], ["CALL_VS_X2", 15]] },
+    { "situation": "bb_vs_sb_mr", "stack": 20, "bands": [["3BET_C", 6], ["ALLIN", 10], ["CALL", 28], ["CALL_VS_X2", 12]] },
+    { "situation": "bb_vs_sb_mr", "stack": 15, "bands": [["ALLIN", 22], ["CALL", 25], ["CALL_VS_X2", 8]] },
+    { "situation": "bb_vs_sb_mr", "stack": 10, "bands": [["ALLIN", 30], ["CALL", 20]] },
+
+    { "situation": "bb_vs_sb_limp", "stack": 25, "bands": [["ISO_C", 25]] },
+    { "situation": "bb_vs_sb_limp", "stack": 20, "bands": [["ISO_C", 22], ["ALLIN", 8]] },
+    { "situation": "bb_vs_sb_limp", "stack": 15, "bands": [["ISO_C", 12], ["ALLIN", 20]] },
+    { "situation": "bb_vs_sb_limp", "stack": 10, "bands": [["ALLIN", 30]] },
+
+    { "situation": "bb_vs_sb_os", "stack": 20, "bands": [["CALL", 15]] },
+    { "situation": "bb_vs_sb_os", "stack": 15, "bands": [["CALL", 20]] },
+    { "situation": "bb_vs_sb_os", "stack": 12, "bands": [["CALL", 25]] },
+    { "situation": "bb_vs_sb_os", "stack": 10, "bands": [["CALL", 30]] },
+    { "situation": "bb_vs_sb_os", "stack": 8, "bands": [["CALL", 38]] },
+    { "situation": "bb_vs_sb_os", "stack": 6, "bands": [["CALL", 50]] },
+    { "situation": "bb_vs_sb_os", "stack": 4, "bands": [["CALL", 70]] },
+
+    { "situation": "bb_vs_btn_mr_sb_fold", "stack": 25, "bands": [["3BET", 8], ["ALLIN", 6], ["CALL", 35]] },
+    { "situation": "bb_vs_btn_mr_sb_fold", "stack": 20, "bands": [["3BET", 6], ["ALLIN", 10], ["CALL", 30]] },
+    { "situation": "bb_vs_btn_mr_sb_fold", "stack": 15, "bands": [["ALLIN", 20], ["CALL", 25]] },
+    { "situation": "bb_vs_btn_mr_sb_fold", "stack": 10, "bands": [["ALLIN", 28], ["CALL", 12]] },
+
+    { "situation": "bb_vs_btn_limp_sb_fold", "stack": 25, "bands": [["ISO_C", 22]] },
+    { "situation": "bb_vs_btn_limp_sb_fold", "stack": 20, "bands": [["ISO_C", 20], ["ALLIN", 6]] },
+    { "situation": "bb_vs_btn_limp_sb_fold", "stack": 15, "bands": [["ISO_C", 10], ["ALLIN", 18]] },
+    { "situation": "bb_vs_btn_limp_sb_fold", "stack": 10, "bands": [["ALLIN", 28]] },
+
+    { "situation": "bb_vs_btn_mr_sb_3bet", "stack": 25, "bands": [["ALLIN", 4], ["CALL", 3]] },
+    { "situation": "bb_vs_btn_mr_sb_3bet", "stack": 12.5, "bands": [["ALLIN", 9]] },
+    { "situation": "bb_vs_btn_mr_sb_3bet", "stack": 10, "bands": [["ALLIN", 12]] },
+
+    { "situation": "bb_vs_btn_limp_sb_3bet", "stack": 25, "bands": [["3BET_C", 5], ["ALLIN", 5], ["CALL", 12]] },
+    { "situation": "bb_vs_btn_limp_sb_3bet", "stack": 20, "bands": [["3BET_C", 4], ["ALLIN", 8], ["CALL", 10]] },
+    { "situation": "bb_vs_btn_limp_sb_3bet", "stack": 15, "bands": [["ALLIN", 15], ["CALL", 6]] },
+    { "situation": "bb_vs_btn_limp_sb_3bet", "stack": 10, "bands": [["ALLIN", 20]] },
+
+    { "situation": "bb_vs_btn_mr_sb_call", "stack": 25, "bands": [["3BET", 6], ["ALLIN", 4], ["CALL", 30]] },
+    { "situation": "bb_vs_btn_mr_sb_call", "stack": 20, "bands": [["3BET", 5], ["ALLIN", 8], ["CALL", 25]] },
+    { "situation": "bb_vs_btn_mr_sb_call", "stack": 15, "bands": [["ALLIN", 15], ["CALL", 22]] },
+    { "situation": "bb_vs_btn_mr_sb_call", "stack": 10, "bands": [["ALLIN", 20], ["CALL", 12]] },
+
+    { "situation": "bb_vs_btn_limp_sb_call", "stack": 25, "bands": [["ISO_C", 18]] },
+    { "situation": "bb_vs_btn_limp_sb_call", "stack": 20, "bands": [["ISO_C", 15], ["ALLIN", 6]] },
+    { "situation": "bb_vs_btn_limp_sb_call", "stack": 15, "bands": [["ISO_C", 8], ["ALLIN", 14]] },
+    { "situation": "bb_vs_btn_limp_sb_call", "stack": 10, "bands": [["ALLIN", 20]] },
+
+    { "situation": "hu_sb_open", "stack": 25, "bands": [["MR_4B_C", 10], ["MR_C_C", 15], ["MR_C_F", 15], ["MR_F_F", 15], ["L_C_F", 15], ["L_F", 15]] },
+    { "situation": "hu_sb_open", "stack": 20, "bands": [["MR_4B_C", 10], ["MR_C_C", 10], ["MR_C_F", 15], ["MR_F_F", 15], ["L_C_F", 15], ["L_F", 20]] },
+    { "situation": "hu_sb_open", "stack": 15, "bands": [["MR_4B_C", 12], ["L_PUSH", 10], ["MR_C_F", 15], ["L_C_F", 20], ["L_F", 25]] },
+    { "situation": "hu_sb_open", "stack": 12, "bands": [["L_PUSH", 10], ["ALLIN", 20], ["L_C_C", 10], ["L_F", 40]] },
+    { "situation": "hu_sb_open", "stack": 10, "bands": [["ALLIN", 45], ["L_C_C", 10], ["L_F", 25]] },
+    { "situation": "hu_sb_open", "stack": 8, "bands": [["ALLIN", 70], ["L_F", 10]] },
+
+    { "situation": "hu_bb_vs_mr", "stack": 25, "bands": [["3BET_C", 10], ["ALLIN", 5], ["CALL", 45]] },
+    { "situation": "hu_bb_vs_mr", "stack": 20, "bands": [["3BET_C", 8], ["ALLIN", 10], ["CALL", 40]] },
+    { "situation": "hu_bb_vs_mr", "stack": 15, "bands": [["ALLIN", 25], ["CALL", 30]] },
+    { "situation": "hu_bb_vs_mr", "stack": 10, "bands": [["ALLIN", 35], ["CALL", 15]] },
+    { "situation": "hu_bb_vs_mr", "stack": 8, "bands": [["ALLIN", 45], ["CALL", 5]] },
+
+    { "situation": "hu_bb_vs_limp", "stack": 25, "bands": [["ISO_C", 15], ["ISO_F", 15]] },
+    { "situation": "hu_bb_vs_limp", "stack": 20, "bands": [["ISO_C", 15], ["ISO_F", 12]] },
+    { "situation": "hu_bb_vs_limp", "stack": 15, "bands": [["ISO_C", 10], ["ALLIN", 15], ["ISO_F", 8]] },
+    { "situation": "hu_bb_vs_limp", "stack": 12, "bands": [["ISO_C", 6], ["ALLIN", 22]] },
+    { "situation": "hu_bb_vs_limp", "stack": 10, "bands": [["ALLIN", 30]] },
+    { "situation": "hu_bb_vs_limp", "stack": 8, "bands": [["ALLIN", 35]] },
+
+    { "situation": "hu_bb_vs_os", "stack": 25, "bands": [["CALL", 18]] },
+    { "situation": "hu_bb_vs_os", "stack": 20, "bands": [["CALL", 22]] },
+    { "situation": "hu_bb_vs_os", "stack": 15, "bands": [["CALL", 30]] },
+    { "situation": "hu_bb_vs_os", "stack": 12, "bands": [["CALL", 36]] },
+    { "situation": "hu_bb_vs_os", "stack": 10, "bands": [["CALL", 42]] },
+    { "situation": "hu_bb_vs_os", "stack": 8, "bands": [["CALL", 50]] }
+  ]
+}

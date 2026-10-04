@@ -1,10 +1,10 @@
--- Catalog seed: the 16 situations of the reference PDF (12 3-max and 4 HU), in presentation order.
--- hero and the prior actions are read from the PDF labels (ADR-0013): pending validation with Pedro.
+-- Catalog seed: the 16 Spin & Go situations (12 3-max and 4 HU, ADR-0011), in presentation order, with the hero and
+-- the prior actions of each one (ADR-0013).
 
 INSERT INTO app.situation (key, position, label, format, hero, notes) VALUES
     ('btn_open', 1, 'BTN Open', '3max', 'BTN', NULL),
-    ('sb_open', 2, 'SB Open (BTN fold)', '3max', 'SB', 'Amarillo parte suited se puede L/C/F. Solo usar la parte gris vs fish pasivo.'),
-    ('sb_vs_btn_mr', 3, 'SB vs BTN Min-Raise', '3max', 'SB', 'Pagamos las verdes (call) solo vs 2 fishes.'),
+    ('sb_open', 2, 'SB Open (BTN fold)', '3max', 'SB', NULL),
+    ('sb_vs_btn_mr', 3, 'SB vs BTN Min-Raise', '3max', 'SB', NULL),
     ('sb_vs_btn_limp', 4, 'SB vs BTN Limp', '3max', 'SB', NULL),
     ('bb_vs_sb_mr', 5, 'BB vs SB Min-Raise', '3max', 'BB', NULL),
     ('bb_vs_sb_limp', 6, 'BB vs SB Limp', '3max', 'BB', NULL),

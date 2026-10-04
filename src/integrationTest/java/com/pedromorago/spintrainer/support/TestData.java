@@ -41,6 +41,18 @@ public final class TestData {
         }
     }
 
+    /** Sets (or, with null, removes) the notes of a situation: the seed has none (ADR-0024). */
+    public static void situationNotes(String situation, String notes) {
+        try (Connection admin = PostgresTestDatabase.shared().adminConnection();
+                PreparedStatement update = admin.prepareStatement("UPDATE app.situation SET notes = ? WHERE key = ?")) {
+            update.setString(1, notes);
+            update.setString(2, situation);
+            update.executeUpdate();
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     /** Removes the reference range of a spot (the seed includes all of them): to test what happens without it. */
     public static void withoutDefaultRange(String situation, double stack) {
         try (Connection admin = PostgresTestDatabase.shared().adminConnection();

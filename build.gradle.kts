@@ -111,6 +111,16 @@ tasks.withType<Test>().configureEach {
 
 tasks.check { dependsOn(testing.suites.named("integrationTest"), tasks.jacocoTestCoverageVerification, tasks.pitest) }
 
+// The example reference ranges (ADR-0024): rewrites reference-ranges.json from reference-ranges-recipe.json.
+// ExampleRangesTest fails while they differ; changing a range also takes a new migration.
+tasks.register<JavaExec>("generateReferenceRanges") {
+    group = "reference data"
+    description = "Writes reference-ranges.json from reference-ranges-recipe.json."
+    classpath = sourceSets.test.get().runtimeClasspath
+    mainClass = "com.pedromorago.spintrainer.range.ExampleRanges"
+    workingDir = projectDir
+}
+
 // Coverage of both suites; the code generated from the spec does not count.
 val coveredClasses =
     sourceSets.main.map { main ->

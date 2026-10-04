@@ -1,10 +1,15 @@
-{
-  "description": "Example reference ranges (ADR-0024), generated from reference-ranges-recipe.json (./gradlew generateReferenceRanges): the hands, ranked by all-in equity against a random hand, fill each range's bands of actions; the rest take the implicit action (FOLD, or CHECK if FOLD is not possible). Examples to train with, not a strategy. Source of migration V9 and of the web and QA copies.",
-  "ranges": [
-    {
-      "situation": "btn_open",
-      "stack": 25,
-      "hands": {
+-- The reference ranges become examples (ADR-0024): the hands, ranked by all-in equity against a random hand, fill each
+-- spot's bands of actions (reference-ranges-recipe.json; ExampleRanges generates reference-ranges.json). Same content
+-- as reference-ranges.json (ReferenceSeedIT). Examples to train with, not a strategy.
+--
+-- They replace what the database had: nothing on one migrated from scratch; on one migrated before V2, V5, V7 and V8
+-- were rewritten (production), a third party's tables, and its advice in the situation notes. Version 2: the contents
+-- changed, and the attempts graded against the first ones keep their range_version 1.
+DELETE FROM app.default_range;
+UPDATE app.situation SET notes = NULL WHERE notes IS NOT NULL;
+
+WITH example (situation, stack, hands) AS (VALUES
+    ('btn_open', 25, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "MR_C_C", "A8s": "MR_C_C", "A7s": "MR_C_C", "A6s": "MR_C_C", "A5s": "MR_C_F", "A4s": "MR_C_F", "A3s": "MR_C_F", "A2s": "MR_C_F",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "MR_C_C", "KTs": "MR_C_C", "K9s": "MR_C_C", "K8s": "MR_C_F", "K7s": "MR_C_F", "K6s": "MR_F_F", "K5s": "MR_F_F", "K4s": "MR_F_F", "K3s": "MR_F_F", "K2s": "MR_F_F",
         "AQo": "MR_4B_C", "KQo": "MR_C_C", "QQ": "MR_4B_C", "QJs": "MR_C_C", "QTs": "MR_C_F", "Q9s": "MR_C_F", "Q8s": "MR_F_F", "Q7s": "MR_F_F", "Q6s": "MR_F_F", "Q5s": "MR_F_F", "Q4s": "L_C_F",
@@ -18,12 +23,8 @@
         "A4o": "MR_F_F", "K4o": "MR_F_F", "44": "MR_C_F",
         "A3o": "MR_F_F", "K3o": "L_C_F", "33": "MR_F_F",
         "A2o": "MR_F_F"
-      }
-    },
-    {
-      "situation": "btn_open",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('btn_open', 20, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "MR_4B_C", "A8s": "MR_C_C", "A7s": "MR_C_C", "A6s": "MR_C_C", "A5s": "MR_C_C", "A4s": "MR_C_F", "A3s": "MR_C_F", "A2s": "MR_C_F",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "MR_4B_C", "KTs": "MR_4B_C", "K9s": "MR_C_C", "K8s": "MR_C_F", "K7s": "MR_C_F", "K6s": "MR_F_F", "K5s": "MR_F_F", "K4s": "MR_F_F", "K3s": "MR_F_F", "K2s": "MR_F_F",
         "AQo": "MR_4B_C", "KQo": "MR_C_C", "QQ": "MR_4B_C", "QJs": "MR_C_C", "QTs": "MR_C_F", "Q9s": "MR_C_F", "Q8s": "MR_F_F", "Q7s": "MR_F_F", "Q6s": "MR_F_F", "Q5s": "L_C_C", "Q4s": "L_C_C",
@@ -37,12 +38,8 @@
         "A4o": "MR_C_F", "K4o": "L_C_C", "44": "MR_C_F",
         "A3o": "MR_F_F", "K3o": "L_C_F", "33": "MR_F_F",
         "A2o": "MR_F_F"
-      }
-    },
-    {
-      "situation": "btn_open",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('btn_open', 15, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "MR_4B_C", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "MR_F_F",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "MR_4B_C", "KTs": "MR_4B_C", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "MR_F_F", "K6s": "MR_F_F", "K5s": "MR_F_F", "K4s": "MR_F_F", "K3s": "L_C_F", "K2s": "L_C_F",
         "AQo": "MR_4B_C", "KQo": "ALLIN", "QQ": "MR_4B_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "MR_F_F", "Q7s": "L_C_F", "Q6s": "L_C_F", "Q5s": "L_C_F",
@@ -56,12 +53,8 @@
         "A4o": "MR_F_F", "K4o": "L_C_F", "44": "MR_F_F",
         "A3o": "MR_F_F", "33": "L_C_F",
         "A2o": "L_C_F"
-      }
-    },
-    {
-      "situation": "btn_open",
-      "stack": 12,
-      "hands": {
+    }'::jsonb),
+    ('btn_open', 12, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "L_C_F", "K3s": "L_C_F", "K2s": "L_C_F",
         "AQo": "MR_4B_C", "KQo": "ALLIN", "QQ": "MR_4B_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "L_C_F", "Q6s": "L_C_F",
@@ -75,12 +68,8 @@
         "A4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN", "33": "L_C_F",
         "A2o": "L_C_F"
-      }
-    },
-    {
-      "situation": "btn_open",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('btn_open', 10, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN", "K3s": "ALLIN", "K2s": "L_C_F",
         "AQo": "MR_4B_C", "KQo": "ALLIN", "QQ": "MR_4B_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "ALLIN", "Q6s": "L_C_F", "Q5s": "L_C_F",
@@ -94,12 +83,8 @@
         "A4o": "ALLIN", "K4o": "L_C_F", "44": "ALLIN",
         "A3o": "ALLIN", "33": "L_C_F",
         "A2o": "ALLIN"
-      }
-    },
-    {
-      "situation": "btn_open",
-      "stack": 8,
-      "hands": {
+    }'::jsonb),
+    ('btn_open', 8, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN", "K3s": "ALLIN", "K2s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "ALLIN", "Q6s": "ALLIN", "Q5s": "ALLIN", "Q4s": "ALLIN",
@@ -113,12 +98,8 @@
         "A4o": "ALLIN", "K4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "ALLIN", "33": "ALLIN",
         "A2o": "ALLIN"
-      }
-    },
-    {
-      "situation": "sb_open",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('sb_open', 25, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "MR_4B_C", "A8s": "MR_C_C", "A7s": "MR_C_C", "A6s": "MR_C_C", "A5s": "MR_C_C", "A4s": "MR_C_C", "A3s": "MR_C_F", "A2s": "MR_C_F",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "MR_4B_C", "KTs": "MR_4B_C", "K9s": "MR_C_C", "K8s": "MR_C_F", "K7s": "MR_C_F", "K6s": "MR_C_F", "K5s": "MR_C_F", "K4s": "L_C_F", "K3s": "L_C_F", "K2s": "L_C_F",
         "AQo": "MR_4B_C", "KQo": "MR_C_C", "QQ": "MR_4B_C", "QJs": "MR_C_C", "QTs": "MR_C_C", "Q9s": "MR_C_F", "Q8s": "MR_C_F", "Q7s": "L_C_F", "Q6s": "L_C_F", "Q5s": "L_C_F", "Q4s": "L_C_F", "Q3s": "L_C_F", "Q2s": "L_C_F",
@@ -132,12 +113,8 @@
         "A4o": "MR_C_F", "K4o": "L_C_F", "Q4o": "L_F", "J4o": "L_F", "44": "MR_C_F",
         "A3o": "MR_C_F", "K3o": "L_C_F", "Q3o": "L_F", "J3o": "L_F", "33": "L_C_F",
         "A2o": "L_C_F", "K2o": "L_C_F", "Q2o": "L_F", "22": "L_C_F"
-      }
-    },
-    {
-      "situation": "sb_open",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('sb_open', 20, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "MR_4B_C", "A8s": "MR_C_F", "A7s": "MR_C_F", "A6s": "MR_C_F", "A5s": "MR_C_F", "A4s": "MR_C_F", "A3s": "MR_C_F", "A2s": "MR_F_F",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "MR_4B_C", "KTs": "MR_4B_C", "K9s": "MR_C_F", "K8s": "MR_C_F", "K7s": "MR_F_F", "K6s": "MR_F_F", "K5s": "MR_F_F", "K4s": "MR_F_F", "K3s": "L_C_F", "K2s": "L_C_F",
         "AQo": "MR_4B_C", "KQo": "MR_C_F", "QQ": "MR_4B_C", "QJs": "MR_C_F", "QTs": "MR_C_F", "Q9s": "MR_C_F", "Q8s": "MR_F_F", "Q7s": "L_C_F", "Q6s": "L_C_F", "Q5s": "L_C_F", "Q4s": "L_C_F", "Q3s": "L_C_F", "Q2s": "L_C_F",
@@ -151,12 +128,8 @@
         "A4o": "MR_F_F", "K4o": "L_C_F", "Q4o": "L_F", "J4o": "L_F", "44": "MR_F_F",
         "A3o": "MR_F_F", "K3o": "L_C_F", "Q3o": "L_F", "J3o": "L_F", "33": "L_C_F",
         "A2o": "L_C_F", "K2o": "L_C_F", "Q2o": "L_F", "22": "L_C_F"
-      }
-    },
-    {
-      "situation": "sb_open",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('sb_open', 15, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "MR_4B_C", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "MR_4B_C", "KTs": "MR_4B_C", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "L_C_F", "K5s": "L_C_F", "K4s": "L_C_F", "K3s": "L_C_F", "K2s": "L_C_F",
         "AQo": "MR_4B_C", "KQo": "ALLIN", "QQ": "MR_4B_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "L_C_F", "Q7s": "L_C_F", "Q6s": "L_C_F", "Q5s": "L_C_F", "Q4s": "L_C_F", "Q3s": "L_F", "Q2s": "L_F",
@@ -170,12 +143,8 @@
         "A4o": "L_C_F", "K4o": "L_C_F", "Q4o": "L_F", "J4o": "L_F", "44": "ALLIN",
         "A3o": "L_C_F", "K3o": "L_C_F", "Q3o": "L_F", "J3o": "L_F", "33": "L_C_F",
         "A2o": "L_C_F", "K2o": "L_F", "Q2o": "L_F", "22": "L_F"
-      }
-    },
-    {
-      "situation": "sb_open",
-      "stack": 12,
-      "hands": {
+    }'::jsonb),
+    ('sb_open', 12, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN", "K3s": "L_C_F", "K2s": "L_C_F",
         "AQo": "MR_4B_C", "KQo": "ALLIN", "QQ": "MR_4B_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "L_C_F", "Q6s": "L_C_F", "Q5s": "L_C_F", "Q4s": "L_C_F", "Q3s": "L_C_F", "Q2s": "L_F",
@@ -189,12 +158,8 @@
         "A4o": "ALLIN", "K4o": "L_C_F", "Q4o": "L_F", "J4o": "L_F", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "L_C_F", "Q3o": "L_F", "J3o": "L_F", "33": "L_C_F",
         "A2o": "ALLIN", "K2o": "L_C_F", "Q2o": "L_F", "22": "L_C_F"
-      }
-    },
-    {
-      "situation": "sb_open",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('sb_open', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN", "K3s": "ALLIN", "K2s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "ALLIN", "Q6s": "ALLIN", "Q5s": "ALLIN", "Q4s": "ALLIN", "Q3s": "L_F", "Q2s": "L_F",
@@ -208,12 +173,8 @@
         "A4o": "ALLIN", "K4o": "ALLIN", "Q4o": "L_F", "J4o": "L_F", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "ALLIN", "Q3o": "L_F", "J3o": "L_F", "33": "ALLIN",
         "A2o": "ALLIN", "K2o": "L_F", "Q2o": "L_F", "22": "L_F"
-      }
-    },
-    {
-      "situation": "sb_open",
-      "stack": 8,
-      "hands": {
+    }'::jsonb),
+    ('sb_open', 8, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN", "K3s": "ALLIN", "K2s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "ALLIN", "Q6s": "ALLIN", "Q5s": "ALLIN", "Q4s": "ALLIN", "Q3s": "ALLIN", "Q2s": "ALLIN",
@@ -227,12 +188,8 @@
         "A4o": "ALLIN", "K4o": "ALLIN", "Q4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "ALLIN", "Q3o": "ALLIN", "33": "ALLIN",
         "A2o": "ALLIN", "K2o": "ALLIN", "Q2o": "ALLIN", "22": "ALLIN"
-      }
-    },
-    {
-      "situation": "sb_vs_btn_mr",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('sb_vs_btn_mr', 25, '{
         "AA": "3BET_C", "AKs": "3BET_C", "AQs": "3BET_C", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL",
         "AKo": "3BET_C", "KK": "3BET_C", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "3BET_C", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL",
@@ -243,12 +200,8 @@
         "A7o": "CALL", "77": "3BET_C",
         "A6o": "CALL", "66": "ALLIN",
         "A5o": "CALL", "55": "CALL"
-      }
-    },
-    {
-      "situation": "sb_vs_btn_mr",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('sb_vs_btn_mr', 20, '{
         "AA": "3BET_C", "AKs": "3BET_C", "AQs": "3BET_C", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "ALLIN", "KK": "3BET_C", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "CALL", "K7s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "3BET_C", "QJs": "ALLIN", "QTs": "CALL", "Q9s": "CALL",
@@ -259,12 +212,8 @@
         "A7o": "CALL", "77": "3BET_C",
         "A6o": "CALL", "66": "ALLIN",
         "A5o": "CALL", "55": "ALLIN"
-      }
-    },
-    {
-      "situation": "sb_vs_btn_mr",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('sb_vs_btn_mr', 15, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "CALL",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "CALL",
@@ -275,12 +224,8 @@
         "A7o": "ALLIN", "77": "ALLIN",
         "A6o": "CALL", "66": "ALLIN",
         "A5o": "CALL", "55": "ALLIN"
-      }
-    },
-    {
-      "situation": "sb_vs_btn_mr",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('sb_vs_btn_mr', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN",
@@ -292,12 +237,8 @@
         "A6o": "ALLIN", "66": "ALLIN",
         "A5o": "ALLIN", "55": "ALLIN",
         "44": "ALLIN"
-      }
-    },
-    {
-      "situation": "sb_vs_btn_limp",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('sb_vs_btn_limp', 25, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_F", "A7s": "ISO_F", "A6s": "ISO_F", "A5s": "ISO_F", "A4s": "ISO_F", "A3s": "ISO_F", "A2s": "LIMP",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ISO_F", "K8s": "ISO_F", "K7s": "LIMP", "K6s": "LIMP", "K5s": "LIMP", "K4s": "LIMP", "K3s": "LIMP", "K2s": "LIMP",
         "AQo": "ISO_C", "KQo": "ISO_F", "QQ": "ISO_C", "QJs": "ISO_F", "QTs": "ISO_F", "Q9s": "ISO_F", "Q8s": "LIMP", "Q7s": "LIMP", "Q6s": "LIMP", "Q5s": "LIMP", "Q4s": "LIMP", "Q3s": "LIMP",
@@ -311,12 +252,8 @@
         "A4o": "LIMP", "K4o": "LIMP", "44": "LIMP",
         "A3o": "LIMP", "K3o": "LIMP", "33": "LIMP",
         "A2o": "LIMP", "22": "LIMP"
-      }
-    },
-    {
-      "situation": "sb_vs_btn_limp",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('sb_vs_btn_limp', 20, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ISO_F", "A2s": "ISO_F",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ALLIN", "K8s": "ISO_F", "K7s": "ISO_F", "K6s": "LIMP", "K5s": "LIMP", "K4s": "LIMP", "K3s": "LIMP", "K2s": "LIMP",
         "AQo": "ISO_C", "KQo": "ALLIN", "QQ": "ISO_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ISO_F", "Q8s": "LIMP", "Q7s": "LIMP", "Q6s": "LIMP", "Q5s": "LIMP", "Q4s": "LIMP", "Q3s": "LIMP", "Q2s": "LIMP",
@@ -330,12 +267,8 @@
         "A4o": "ISO_F", "K4o": "LIMP", "44": "ISO_F",
         "A3o": "LIMP", "K3o": "LIMP", "33": "LIMP",
         "A2o": "LIMP", "K2o": "LIMP", "22": "LIMP"
-      }
-    },
-    {
-      "situation": "sb_vs_btn_limp",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('sb_vs_btn_limp', 15, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "LIMP", "K4s": "LIMP", "K3s": "LIMP", "K2s": "LIMP",
         "AQo": "ISO_C", "KQo": "ALLIN", "QQ": "ISO_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "LIMP", "Q7s": "LIMP", "Q6s": "LIMP", "Q5s": "LIMP", "Q4s": "LIMP", "Q3s": "LIMP", "Q2s": "LIMP",
@@ -349,12 +282,8 @@
         "A4o": "ALLIN", "K4o": "LIMP", "Q4o": "LIMP", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "LIMP", "33": "LIMP",
         "A2o": "LIMP", "K2o": "LIMP", "22": "LIMP"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_mr",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_mr', 25, '{
         "AA": "3BET_C", "AKs": "3BET_C", "AQs": "3BET_C", "AJs": "3BET_C", "ATs": "3BET_C", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "3BET_C", "KK": "3BET_C", "KQs": "3BET_C", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "3BET_C", "KQo": "ALLIN", "QQ": "3BET_C", "QJs": "ALLIN", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL_VS_X2", "Q2s": "CALL_VS_X2",
@@ -368,12 +297,8 @@
         "A4o": "CALL", "K4o": "CALL", "Q4o": "CALL_VS_X2", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "Q3o": "CALL_VS_X2", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL_VS_X2", "Q2o": "CALL_VS_X2", "22": "CALL_VS_X2"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_mr",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_mr', 20, '{
         "AA": "3BET_C", "AKs": "3BET_C", "AQs": "3BET_C", "AJs": "3BET_C", "ATs": "3BET_C", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "3BET_C", "KK": "3BET_C", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "3BET_C", "KQo": "ALLIN", "QQ": "3BET_C", "QJs": "ALLIN", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL_VS_X2", "Q2s": "CALL_VS_X2",
@@ -387,12 +312,8 @@
         "A4o": "CALL", "K4o": "CALL", "Q4o": "CALL_VS_X2", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "Q3o": "CALL_VS_X2", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL_VS_X2", "22": "CALL_VS_X2"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_mr",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_mr', 15, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "CALL",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL_VS_X2",
@@ -406,12 +327,8 @@
         "A4o": "CALL", "K4o": "CALL", "Q4o": "CALL_VS_X2", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "Q3o": "CALL_VS_X2", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL_VS_X2", "22": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_mr",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_mr', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL",
@@ -425,12 +342,8 @@
         "A4o": "ALLIN", "K4o": "CALL", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "CALL", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL", "22": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_limp",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_limp', 25, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_C", "A7s": "ISO_C", "A6s": "ISO_C", "A5s": "ISO_C", "A4s": "ISO_C", "A3s": "ISO_C", "A2s": "ISO_C",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ISO_C", "K8s": "ISO_C", "K7s": "ISO_C",
         "AQo": "ISO_C", "KQo": "ISO_C", "QQ": "ISO_C", "QJs": "ISO_C", "QTs": "ISO_C", "Q9s": "ISO_C",
@@ -442,12 +355,8 @@
         "A6o": "ISO_C", "66": "ISO_C",
         "A5o": "ISO_C", "55": "ISO_C",
         "44": "ISO_C"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_limp",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_limp', 20, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_C", "A7s": "ISO_C", "A6s": "ISO_C", "A5s": "ISO_C", "A4s": "ISO_C", "A3s": "ISO_C", "A2s": "ALLIN",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ISO_C", "K8s": "ISO_C", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN",
         "AQo": "ISO_C", "KQo": "ISO_C", "QQ": "ISO_C", "QJs": "ISO_C", "QTs": "ISO_C", "Q9s": "ISO_C", "Q8s": "ALLIN",
@@ -460,12 +369,8 @@
         "A5o": "ALLIN", "55": "ISO_C",
         "A4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_limp",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_limp', 15, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_C", "A7s": "ISO_C", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN",
         "AQo": "ISO_C", "KQo": "ISO_C", "QQ": "ISO_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN",
@@ -478,12 +383,8 @@
         "A5o": "ALLIN", "55": "ALLIN",
         "A4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_limp",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_limp', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN",
@@ -496,12 +397,8 @@
         "A5o": "ALLIN", "55": "ALLIN",
         "A4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_os",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_os', 20, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL",
@@ -512,12 +409,8 @@
         "77": "CALL",
         "66": "CALL",
         "55": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_os",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_os', 15, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL",
@@ -528,12 +421,8 @@
         "A7o": "CALL", "77": "CALL",
         "66": "CALL",
         "55": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_os",
-      "stack": 12,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_os', 12, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL",
@@ -545,12 +434,8 @@
         "A6o": "CALL", "66": "CALL",
         "A5o": "CALL", "55": "CALL",
         "44": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_os",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_os', 10, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL",
@@ -563,12 +448,8 @@
         "A5o": "CALL", "55": "CALL",
         "A4o": "CALL", "44": "CALL",
         "A3o": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_os",
-      "stack": 8,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_os', 8, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL",
@@ -582,12 +463,8 @@
         "A4o": "CALL", "44": "CALL",
         "A3o": "CALL", "33": "CALL",
         "A2o": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_os",
-      "stack": 6,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_os', 6, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL",
@@ -601,12 +478,8 @@
         "A4o": "CALL", "K4o": "CALL", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL", "22": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_sb_os",
-      "stack": 4,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_sb_os', 4, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL",
@@ -620,12 +493,8 @@
         "A4o": "CALL", "K4o": "CALL", "Q4o": "CALL", "J4o": "CALL", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "Q3o": "CALL", "J3o": "CALL", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL", "Q2o": "CALL", "J2o": "CALL", "22": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_fold",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_fold', 25, '{
         "AA": "3BET", "AKs": "3BET", "AQs": "3BET", "AJs": "3BET", "ATs": "3BET", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "3BET", "KK": "3BET", "KQs": "3BET", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "3BET", "KQo": "ALLIN", "QQ": "3BET", "QJs": "ALLIN", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL",
@@ -639,12 +508,8 @@
         "A4o": "CALL", "K4o": "CALL", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL", "22": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_fold",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_fold', 20, '{
         "AA": "3BET", "AKs": "3BET", "AQs": "3BET", "AJs": "3BET", "ATs": "3BET", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "3BET", "KK": "3BET", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "3BET", "KQo": "ALLIN", "QQ": "3BET", "QJs": "ALLIN", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL",
@@ -658,12 +523,8 @@
         "A4o": "CALL", "K4o": "CALL", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "33": "CALL",
         "A2o": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_fold",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_fold', 15, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "CALL",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL",
@@ -677,12 +538,8 @@
         "A4o": "CALL", "K4o": "CALL", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "33": "CALL",
         "A2o": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_fold",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_fold', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL",
@@ -696,12 +553,8 @@
         "A4o": "ALLIN", "K4o": "CALL", "44": "ALLIN",
         "A3o": "ALLIN", "33": "CALL",
         "A2o": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_fold",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_fold', 25, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_C", "A7s": "ISO_C", "A6s": "ISO_C", "A5s": "ISO_C", "A4s": "ISO_C", "A3s": "ISO_C",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ISO_C", "K8s": "ISO_C",
         "AQo": "ISO_C", "KQo": "ISO_C", "QQ": "ISO_C", "QJs": "ISO_C", "QTs": "ISO_C", "Q9s": "ISO_C",
@@ -712,12 +565,8 @@
         "A7o": "ISO_C", "77": "ISO_C",
         "A6o": "ISO_C", "66": "ISO_C",
         "55": "ISO_C"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_fold",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_fold', 20, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_C", "A7s": "ISO_C", "A6s": "ISO_C", "A5s": "ISO_C", "A4s": "ISO_C", "A3s": "ISO_C", "A2s": "ALLIN",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ISO_C", "K8s": "ISO_C", "K7s": "ALLIN",
         "AQo": "ISO_C", "KQo": "ISO_C", "QQ": "ISO_C", "QJs": "ISO_C", "QTs": "ISO_C", "Q9s": "ALLIN",
@@ -729,12 +578,8 @@
         "A6o": "ALLIN", "66": "ISO_C",
         "A5o": "ALLIN", "55": "ISO_C",
         "A4o": "ALLIN", "44": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_fold",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_fold', 15, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN",
         "AQo": "ISO_C", "KQo": "ALLIN", "QQ": "ISO_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN",
@@ -747,12 +592,8 @@
         "A5o": "ALLIN", "55": "ALLIN",
         "A4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_fold",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_fold', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN",
@@ -765,12 +606,8 @@
         "A5o": "ALLIN", "55": "ALLIN",
         "A4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_3bet",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_3bet', 25, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "CALL", "ATs": "CALL",
         "AKo": "CALL", "KK": "ALLIN",
         "AQo": "CALL", "QQ": "ALLIN",
@@ -779,12 +616,8 @@
         "99": "ALLIN",
         "88": "ALLIN",
         "77": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_3bet",
-      "stack": 12.5,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_3bet', 12.5, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN",
         "AQo": "ALLIN", "QQ": "ALLIN",
@@ -794,12 +627,8 @@
         "88": "ALLIN",
         "77": "ALLIN",
         "66": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_3bet",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_3bet', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN",
@@ -809,12 +638,8 @@
         "88": "ALLIN",
         "77": "ALLIN",
         "66": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_3bet",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_3bet', 25, '{
         "AA": "3BET_C", "AKs": "3BET_C", "AQs": "3BET_C", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL",
         "AKo": "3BET_C", "KK": "3BET_C", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "CALL", "K8s": "CALL",
         "AQo": "ALLIN", "KQo": "CALL", "QQ": "3BET_C", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL",
@@ -825,12 +650,8 @@
         "A7o": "CALL", "77": "3BET_C",
         "A6o": "CALL", "66": "ALLIN",
         "55": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_3bet",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_3bet', 20, '{
         "AA": "3BET_C", "AKs": "3BET_C", "AQs": "3BET_C", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL",
         "AKo": "ALLIN", "KK": "3BET_C", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "CALL", "K8s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "3BET_C", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL",
@@ -841,12 +662,8 @@
         "A7o": "CALL", "77": "3BET_C",
         "A6o": "CALL", "66": "ALLIN",
         "55": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_3bet",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_3bet', 15, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "CALL", "Q9s": "CALL",
@@ -857,12 +674,8 @@
         "A7o": "CALL", "77": "ALLIN",
         "66": "ALLIN",
         "55": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_3bet",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_3bet', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN",
@@ -873,12 +686,8 @@
         "A7o": "ALLIN", "77": "ALLIN",
         "66": "ALLIN",
         "55": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_call",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_call', 25, '{
         "AA": "3BET", "AKs": "3BET", "AQs": "3BET", "AJs": "3BET", "ATs": "3BET", "A9s": "ALLIN", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "3BET", "KK": "3BET", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "3BET", "KQo": "CALL", "QQ": "3BET", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL",
@@ -892,12 +701,8 @@
         "A4o": "CALL", "K4o": "CALL", "44": "CALL",
         "A3o": "CALL", "33": "CALL",
         "A2o": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_call",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_call', 20, '{
         "AA": "3BET", "AKs": "3BET", "AQs": "3BET", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "3BET", "KK": "3BET", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "3BET", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL",
@@ -911,12 +716,8 @@
         "A4o": "CALL", "44": "CALL",
         "A3o": "CALL", "33": "CALL",
         "A2o": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_call",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_call', 15, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL",
@@ -930,12 +731,8 @@
         "A4o": "CALL", "44": "CALL",
         "A3o": "CALL", "33": "CALL",
         "A2o": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_mr_sb_call",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_mr_sb_call', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "CALL",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "CALL", "Q8s": "CALL",
@@ -948,12 +745,8 @@
         "A5o": "CALL", "55": "ALLIN",
         "A4o": "CALL", "44": "CALL",
         "A3o": "CALL"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_call",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_call', 25, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_C", "A7s": "ISO_C", "A6s": "ISO_C", "A5s": "ISO_C", "A4s": "ISO_C",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ISO_C",
         "AQo": "ISO_C", "KQo": "ISO_C", "QQ": "ISO_C", "QJs": "ISO_C", "QTs": "ISO_C",
@@ -964,12 +757,8 @@
         "A7o": "ISO_C", "77": "ISO_C",
         "66": "ISO_C",
         "55": "ISO_C"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_call",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_call', 20, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_C", "A7s": "ISO_C", "A6s": "ISO_C", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ISO_C", "K8s": "ALLIN",
         "AQo": "ISO_C", "KQo": "ISO_C", "QQ": "ISO_C", "QJs": "ISO_C", "QTs": "ALLIN", "Q9s": "ALLIN",
@@ -980,12 +769,8 @@
         "A7o": "ALLIN", "77": "ISO_C",
         "66": "ISO_C",
         "55": "ISO_C"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_call",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_call', 15, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN",
         "AQo": "ISO_C", "KQo": "ALLIN", "QQ": "ISO_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN",
@@ -996,12 +781,8 @@
         "A7o": "ALLIN", "77": "ISO_C",
         "A6o": "ALLIN", "66": "ISO_C",
         "55": "ALLIN"
-      }
-    },
-    {
-      "situation": "bb_vs_btn_limp_sb_call",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('bb_vs_btn_limp_sb_call', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN",
@@ -1012,12 +793,8 @@
         "A7o": "ALLIN", "77": "ALLIN",
         "66": "ALLIN",
         "55": "ALLIN"
-      }
-    },
-    {
-      "situation": "hu_sb_open",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('hu_sb_open', 25, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "MR_4B_C", "A8s": "MR_C_C", "A7s": "MR_C_C", "A6s": "MR_C_C", "A5s": "MR_C_C", "A4s": "MR_C_C", "A3s": "MR_C_C", "A2s": "MR_C_C",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "MR_4B_C", "KTs": "MR_4B_C", "K9s": "MR_C_C", "K8s": "MR_C_C", "K7s": "MR_C_C", "K6s": "MR_C_F", "K5s": "MR_C_F", "K4s": "MR_C_F", "K3s": "MR_C_F", "K2s": "MR_C_F",
         "AQo": "MR_4B_C", "KQo": "MR_C_C", "QQ": "MR_4B_C", "QJs": "MR_C_C", "QTs": "MR_C_C", "Q9s": "MR_C_C", "Q8s": "MR_C_F", "Q7s": "MR_C_F", "Q6s": "MR_C_F", "Q5s": "MR_C_F", "Q4s": "MR_F_F", "Q3s": "MR_F_F", "Q2s": "MR_F_F",
@@ -1031,12 +808,8 @@
         "A4o": "MR_C_F", "K4o": "MR_C_F", "Q4o": "MR_F_F", "J4o": "L_C_F", "T4o": "L_F", "94o": "L_F", "84o": "L_F", "44": "MR_C_C",
         "A3o": "MR_C_F", "K3o": "MR_F_F", "Q3o": "MR_F_F", "J3o": "L_C_F", "T3o": "L_F", "93o": "L_F", "33": "MR_C_F",
         "A2o": "MR_C_F", "K2o": "MR_F_F", "Q2o": "L_C_F", "J2o": "L_C_F", "T2o": "L_F", "92o": "L_F", "22": "MR_F_F"
-      }
-    },
-    {
-      "situation": "hu_sb_open",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('hu_sb_open', 20, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "MR_4B_C", "A8s": "MR_C_C", "A7s": "MR_C_C", "A6s": "MR_C_C", "A5s": "MR_C_C", "A4s": "MR_C_C", "A3s": "MR_C_C", "A2s": "MR_C_F",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "MR_4B_C", "KTs": "MR_4B_C", "K9s": "MR_C_C", "K8s": "MR_C_C", "K7s": "MR_C_F", "K6s": "MR_C_F", "K5s": "MR_C_F", "K4s": "MR_C_F", "K3s": "MR_F_F", "K2s": "MR_F_F",
         "AQo": "MR_4B_C", "KQo": "MR_C_C", "QQ": "MR_4B_C", "QJs": "MR_C_C", "QTs": "MR_C_C", "Q9s": "MR_C_F", "Q8s": "MR_C_F", "Q7s": "MR_C_F", "Q6s": "MR_F_F", "Q5s": "MR_F_F", "Q4s": "MR_F_F", "Q3s": "MR_F_F", "Q2s": "MR_F_F",
@@ -1050,12 +823,8 @@
         "A4o": "MR_C_F", "K4o": "MR_F_F", "Q4o": "L_C_F", "J4o": "L_C_F", "T4o": "L_F", "94o": "L_F", "84o": "L_F", "44": "MR_C_F",
         "A3o": "MR_C_F", "K3o": "MR_F_F", "Q3o": "L_C_F", "J3o": "L_C_F", "T3o": "L_F", "93o": "L_F", "33": "MR_F_F",
         "A2o": "MR_C_F", "K2o": "MR_F_F", "Q2o": "L_C_F", "J2o": "L_F", "T2o": "L_F", "92o": "L_F", "22": "MR_F_F"
-      }
-    },
-    {
-      "situation": "hu_sb_open",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('hu_sb_open', 15, '{
         "AA": "MR_4B_C", "AKs": "MR_4B_C", "AQs": "MR_4B_C", "AJs": "MR_4B_C", "ATs": "MR_4B_C", "A9s": "MR_4B_C", "A8s": "MR_4B_C", "A7s": "MR_4B_C", "A6s": "L_PUSH", "A5s": "L_PUSH", "A4s": "L_PUSH", "A3s": "L_PUSH", "A2s": "MR_C_F",
         "AKo": "MR_4B_C", "KK": "MR_4B_C", "KQs": "MR_4B_C", "KJs": "MR_4B_C", "KTs": "MR_4B_C", "K9s": "L_PUSH", "K8s": "L_PUSH", "K7s": "MR_C_F", "K6s": "MR_C_F", "K5s": "MR_C_F", "K4s": "MR_C_F", "K3s": "MR_C_F", "K2s": "MR_C_F",
         "AQo": "MR_4B_C", "KQo": "MR_4B_C", "QQ": "MR_4B_C", "QJs": "L_PUSH", "QTs": "L_PUSH", "Q9s": "L_PUSH", "Q8s": "MR_C_F", "Q7s": "MR_C_F", "Q6s": "MR_C_F", "Q5s": "L_C_F", "Q4s": "L_C_F", "Q3s": "L_C_F", "Q2s": "L_C_F",
@@ -1069,12 +838,8 @@
         "A4o": "MR_C_F", "K4o": "L_C_F", "Q4o": "L_C_F", "J4o": "L_F", "T4o": "L_F", "94o": "L_F", "44": "MR_C_F",
         "A3o": "MR_C_F", "K3o": "L_C_F", "Q3o": "L_C_F", "J3o": "L_F", "T3o": "L_F", "93o": "L_F", "33": "MR_C_F",
         "A2o": "MR_C_F", "K2o": "L_C_F", "Q2o": "L_F", "J2o": "L_F", "T2o": "L_F", "22": "L_C_F"
-      }
-    },
-    {
-      "situation": "hu_sb_open",
-      "stack": 12,
-      "hands": {
+    }'::jsonb),
+    ('hu_sb_open', 12, '{
         "AA": "L_PUSH", "AKs": "L_PUSH", "AQs": "L_PUSH", "AJs": "L_PUSH", "ATs": "L_PUSH", "A9s": "L_PUSH", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "L_PUSH", "KK": "L_PUSH", "KQs": "L_PUSH", "KJs": "L_PUSH", "KTs": "L_PUSH", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "L_C_C", "K3s": "L_C_C", "K2s": "L_C_C",
         "AQo": "L_PUSH", "KQo": "ALLIN", "QQ": "L_PUSH", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "L_C_C", "Q6s": "L_C_C", "Q5s": "L_C_C", "Q4s": "L_F", "Q3s": "L_F", "Q2s": "L_F",
@@ -1088,12 +853,8 @@
         "A4o": "ALLIN", "K4o": "L_C_C", "Q4o": "L_F", "J4o": "L_F", "T4o": "L_F", "94o": "L_F", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "L_F", "Q3o": "L_F", "J3o": "L_F", "T3o": "L_F", "33": "L_C_C",
         "A2o": "L_C_C", "K2o": "L_F", "Q2o": "L_F", "J2o": "L_F", "T2o": "L_F", "22": "L_F"
-      }
-    },
-    {
-      "situation": "hu_sb_open",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('hu_sb_open', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN", "K3s": "ALLIN", "K2s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "ALLIN", "Q6s": "ALLIN", "Q5s": "ALLIN", "Q4s": "ALLIN", "Q3s": "L_C_C", "Q2s": "L_C_C",
@@ -1107,12 +868,8 @@
         "A4o": "ALLIN", "K4o": "ALLIN", "Q4o": "L_C_C", "J4o": "L_F", "T4o": "L_F", "94o": "L_F", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "ALLIN", "Q3o": "L_C_C", "J3o": "L_F", "T3o": "L_F", "33": "ALLIN",
         "A2o": "ALLIN", "K2o": "L_C_C", "Q2o": "L_F", "J2o": "L_F", "T2o": "L_F", "22": "L_C_C"
-      }
-    },
-    {
-      "situation": "hu_sb_open",
-      "stack": 8,
-      "hands": {
+    }'::jsonb),
+    ('hu_sb_open', 8, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN", "K3s": "ALLIN", "K2s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "ALLIN", "Q6s": "ALLIN", "Q5s": "ALLIN", "Q4s": "ALLIN", "Q3s": "ALLIN", "Q2s": "ALLIN",
@@ -1126,12 +883,8 @@
         "A4o": "ALLIN", "K4o": "ALLIN", "Q4o": "ALLIN", "J4o": "ALLIN", "T4o": "L_F", "94o": "L_F", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "ALLIN", "Q3o": "ALLIN", "J3o": "ALLIN", "T3o": "L_F", "33": "ALLIN",
         "A2o": "ALLIN", "K2o": "ALLIN", "Q2o": "ALLIN", "J2o": "ALLIN", "T2o": "L_F", "22": "ALLIN"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_mr",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_mr', 25, '{
         "AA": "3BET_C", "AKs": "3BET_C", "AQs": "3BET_C", "AJs": "3BET_C", "ATs": "3BET_C", "A9s": "3BET_C", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "3BET_C", "KK": "3BET_C", "KQs": "3BET_C", "KJs": "3BET_C", "KTs": "3BET_C", "K9s": "ALLIN", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "3BET_C", "KQo": "ALLIN", "QQ": "3BET_C", "QJs": "ALLIN", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL",
@@ -1145,12 +898,8 @@
         "A4o": "CALL", "K4o": "CALL", "Q4o": "CALL", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "Q3o": "CALL", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL", "Q2o": "CALL", "22": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_mr",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_mr', 20, '{
         "AA": "3BET_C", "AKs": "3BET_C", "AQs": "3BET_C", "AJs": "3BET_C", "ATs": "3BET_C", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "CALL", "A2s": "CALL",
         "AKo": "3BET_C", "KK": "3BET_C", "KQs": "3BET_C", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "3BET_C", "KQo": "ALLIN", "QQ": "3BET_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL",
@@ -1164,12 +913,8 @@
         "A4o": "CALL", "K4o": "CALL", "Q4o": "CALL", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "Q3o": "CALL", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL", "22": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_mr",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_mr', 15, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL",
@@ -1183,12 +928,8 @@
         "A4o": "CALL", "K4o": "CALL", "Q4o": "CALL", "44": "ALLIN",
         "A3o": "CALL", "K3o": "CALL", "Q3o": "CALL", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL", "22": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_mr",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_mr', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN", "K3s": "CALL", "K2s": "CALL",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "ALLIN", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL",
@@ -1202,12 +943,8 @@
         "A4o": "ALLIN", "K4o": "CALL", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "CALL", "33": "CALL",
         "A2o": "ALLIN", "K2o": "CALL", "22": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_mr",
-      "stack": 8,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_mr', 8, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN", "K3s": "ALLIN", "K2s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "ALLIN", "Q6s": "ALLIN", "Q5s": "ALLIN", "Q4s": "ALLIN", "Q3s": "CALL", "Q2s": "CALL",
@@ -1221,12 +958,8 @@
         "A4o": "ALLIN", "K4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN", "K3o": "ALLIN", "33": "ALLIN",
         "A2o": "ALLIN", "K2o": "CALL", "22": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_limp",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_limp', 25, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_C", "A7s": "ISO_C", "A6s": "ISO_C", "A5s": "ISO_F", "A4s": "ISO_F", "A3s": "ISO_F", "A2s": "ISO_F",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ISO_C", "K8s": "ISO_F", "K7s": "ISO_F", "K6s": "ISO_F", "K5s": "ISO_F",
         "AQo": "ISO_C", "KQo": "ISO_C", "QQ": "ISO_C", "QJs": "ISO_C", "QTs": "ISO_F", "Q9s": "ISO_F", "Q8s": "ISO_F",
@@ -1239,12 +972,8 @@
         "A5o": "ISO_F", "55": "ISO_C",
         "A4o": "ISO_F", "44": "ISO_F",
         "A3o": "ISO_F"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_limp",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_limp', 20, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ISO_C", "A7s": "ISO_C", "A6s": "ISO_C", "A5s": "ISO_F", "A4s": "ISO_F", "A3s": "ISO_F", "A2s": "ISO_F",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ISO_C", "K8s": "ISO_F", "K7s": "ISO_F", "K6s": "ISO_F",
         "AQo": "ISO_C", "KQo": "ISO_C", "QQ": "ISO_C", "QJs": "ISO_C", "QTs": "ISO_F", "Q9s": "ISO_F",
@@ -1256,12 +985,8 @@
         "A6o": "ISO_F", "66": "ISO_C",
         "A5o": "ISO_F", "55": "ISO_C",
         "A4o": "ISO_F", "44": "ISO_F"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_limp",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_limp', 15, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ISO_C", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ISO_C", "KJs": "ISO_C", "KTs": "ISO_C", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ISO_F", "K5s": "ISO_F", "K4s": "ISO_F",
         "AQo": "ISO_C", "KQo": "ALLIN", "QQ": "ISO_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ISO_F",
@@ -1275,12 +1000,8 @@
         "A4o": "ISO_F", "44": "ALLIN",
         "A3o": "ISO_F",
         "A2o": "ISO_F"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_limp",
-      "stack": 12,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_limp', 12, '{
         "AA": "ISO_C", "AKs": "ISO_C", "AQs": "ISO_C", "AJs": "ISO_C", "ATs": "ISO_C", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ISO_C", "KK": "ISO_C", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN",
         "AQo": "ISO_C", "KQo": "ALLIN", "QQ": "ISO_C", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN",
@@ -1293,12 +1014,8 @@
         "A5o": "ALLIN", "55": "ALLIN",
         "A4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_limp",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_limp', 10, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN",
@@ -1311,12 +1028,8 @@
         "A5o": "ALLIN", "55": "ALLIN",
         "A4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_limp",
-      "stack": 8,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_limp', 8, '{
         "AA": "ALLIN", "AKs": "ALLIN", "AQs": "ALLIN", "AJs": "ALLIN", "ATs": "ALLIN", "A9s": "ALLIN", "A8s": "ALLIN", "A7s": "ALLIN", "A6s": "ALLIN", "A5s": "ALLIN", "A4s": "ALLIN", "A3s": "ALLIN", "A2s": "ALLIN",
         "AKo": "ALLIN", "KK": "ALLIN", "KQs": "ALLIN", "KJs": "ALLIN", "KTs": "ALLIN", "K9s": "ALLIN", "K8s": "ALLIN", "K7s": "ALLIN", "K6s": "ALLIN", "K5s": "ALLIN", "K4s": "ALLIN",
         "AQo": "ALLIN", "KQo": "ALLIN", "QQ": "ALLIN", "QJs": "ALLIN", "QTs": "ALLIN", "Q9s": "ALLIN", "Q8s": "ALLIN", "Q7s": "ALLIN",
@@ -1330,12 +1043,8 @@
         "A4o": "ALLIN", "44": "ALLIN",
         "A3o": "ALLIN",
         "A2o": "ALLIN"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_os",
-      "stack": 25,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_os', 25, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL",
@@ -1346,12 +1055,8 @@
         "A7o": "CALL", "77": "CALL",
         "66": "CALL",
         "55": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_os",
-      "stack": 20,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_os', 20, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL",
@@ -1362,12 +1067,8 @@
         "A7o": "CALL", "77": "CALL",
         "A6o": "CALL", "66": "CALL",
         "55": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_os",
-      "stack": 15,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_os', 15, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL",
@@ -1380,12 +1081,8 @@
         "A5o": "CALL", "55": "CALL",
         "A4o": "CALL", "44": "CALL",
         "A3o": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_os",
-      "stack": 12,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_os', 12, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL",
@@ -1399,12 +1096,8 @@
         "A4o": "CALL", "44": "CALL",
         "A3o": "CALL",
         "A2o": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_os",
-      "stack": 10,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_os', 10, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL",
@@ -1418,12 +1111,8 @@
         "A4o": "CALL", "K4o": "CALL", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "33": "CALL",
         "A2o": "CALL"
-      }
-    },
-    {
-      "situation": "hu_bb_vs_os",
-      "stack": 8,
-      "hands": {
+    }'::jsonb),
+    ('hu_bb_vs_os', 8, '{
         "AA": "CALL", "AKs": "CALL", "AQs": "CALL", "AJs": "CALL", "ATs": "CALL", "A9s": "CALL", "A8s": "CALL", "A7s": "CALL", "A6s": "CALL", "A5s": "CALL", "A4s": "CALL", "A3s": "CALL", "A2s": "CALL",
         "AKo": "CALL", "KK": "CALL", "KQs": "CALL", "KJs": "CALL", "KTs": "CALL", "K9s": "CALL", "K8s": "CALL", "K7s": "CALL", "K6s": "CALL", "K5s": "CALL", "K4s": "CALL", "K3s": "CALL", "K2s": "CALL",
         "AQo": "CALL", "KQo": "CALL", "QQ": "CALL", "QJs": "CALL", "QTs": "CALL", "Q9s": "CALL", "Q8s": "CALL", "Q7s": "CALL", "Q6s": "CALL", "Q5s": "CALL", "Q4s": "CALL", "Q3s": "CALL", "Q2s": "CALL",
@@ -1437,7 +1126,12 @@
         "A4o": "CALL", "K4o": "CALL", "44": "CALL",
         "A3o": "CALL", "K3o": "CALL", "33": "CALL",
         "A2o": "CALL", "K2o": "CALL", "22": "CALL"
-      }
-    }
-  ]
-}
+    }'::jsonb)
+),
+reference AS (
+    INSERT INTO app.default_range (situation, stack, version)
+    SELECT situation, stack, 2 FROM example
+)
+INSERT INTO app.default_range_hand (situation, stack, hand, action)
+SELECT example.situation, example.stack, h.key, h.value
+FROM example, jsonb_each_text(example.hands) AS h;
